@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LaburAI — Mi dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/base.css"/>
+  <link rel="stylesheet" href="css/dashboard-candidato.css"/>
+</head>
+<body>
+
+  <!-- ══ TOPBAR ══ -->
+  <header class="dash-topbar">
+    <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
+    <nav class="dash-nav">
+      <a href="ofertas.html">Buscar empleo</a>
+      <a href="#postulaciones">Mis postulaciones</a>
+      <a href="#recomendadas">Recomendaciones</a>
+    </nav>
+    <div class="dash-topbar-actions">
+      <button class="topbar-notif" id="btnNotif" aria-label="Notificaciones">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="topbar-avatar" id="avatarMenu">
+        <div class="avatar-circle">VG</div>
+        <span class="avatar-name">Valentina</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        <div class="avatar-dropdown" id="avatarDropdown">
+          <a href="#">Mi perfil</a>
+          <a href="#">Configuración</a>
+          <hr/>
+          <a href="index.html" class="dropdown-logout">Cerrar sesión</a>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <!-- ══ LAYOUT ══ -->
+  <div class="dash-layout">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="dash-sidebar" id="dashSidebar">
+      <div class="sidebar-profile">
+        <div class="sp-avatar">VG</div>
+        <div class="sp-info">
+          <div class="sp-name">Valentina González</div>
+          <div class="sp-role">Candidata activa</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="snav-item active" data-section="overview">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Resumen
+        </a>
+        <a href="#" class="snav-item" data-section="cv">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Mi CV e IA
+        </a>
+        <a href="#" class="snav-item" data-section="postulaciones">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          Postulaciones
+          <span class="snav-badge">3</span>
+        </a>
+        <a href="#" class="snav-item" data-section="recomendadas">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Recomendadas
+          <span class="snav-badge snav-badge--new">12</span>
+        </a>
+        <a href="#" class="snav-item" data-section="perfil">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Mi perfil
+        </a>
+      </nav>
+
+      <div class="sidebar-cv-status">
+        <div class="cvs-label">Completud del perfil</div>
+        <div class="cvs-bar"><div class="cvs-fill" style="width:72%"></div></div>
+        <div class="cvs-pct">72%</div>
+        <a href="#" class="cvs-cta">Completar perfil →</a>
+      </div>
+    </aside>
+
+    <!-- ── CONTENIDO PRINCIPAL ── -->
+    <main class="dash-main">
+
+      <!-- Saludo -->
+      <div class="dash-greeting">
+        <div>
+          <h1 class="greeting-title">¡Hola, Valentina! 👋</h1>
+          <p class="greeting-sub">Tenés <strong>3 novedades</strong> en tus postulaciones y <strong>12 ofertas nuevas</strong> compatibles con tu perfil.</p>
+        </div>
+        <a href="ofertas.html" class="btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Buscar más empleos
+        </a>
+      </div>
+
+      <!-- ── SECCIÓN: RESUMEN ── -->
+      <section id="overview">
+
+        <!-- Stats rápidas -->
+        <div class="dash-stats">
+          <div class="dstat">
+            <div class="dstat-icon dstat-icon--blue">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+            </div>
+            <div class="dstat-num">8</div>
+            <div class="dstat-label">Postulaciones</div>
+          </div>
+          <div class="dstat">
+            <div class="dstat-icon dstat-icon--green">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="dstat-num">34</div>
+            <div class="dstat-label">Vistas al perfil</div>
+          </div>
+          <div class="dstat">
+            <div class="dstat-icon dstat-icon--amber">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div class="dstat-num">12</div>
+            <div class="dstat-label">Ofertas nuevas</div>
+          </div>
+          <div class="dstat">
+            <div class="dstat-icon dstat-icon--indigo">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="dstat-num">3</div>
+            <div class="dstat-label">Entrevistas</div>
+          </div>
+        </div>
+
+        <!-- Fila: Score IA + Análisis CV -->
+        <div class="overview-row">
+
+          <!-- Score del CV -->
+          <div class="score-card">
+            <div class="score-header">
+              <div class="score-title-wrap">
+                <span class="ai-pill-sm">✦ IA</span>
+                <h2 class="card-title">Score de tu CV</h2>
+              </div>
+              <button class="btn-ghost btn-sm" id="btnReanalyze">Re-analizar</button>
+            </div>
+
+            <!-- Número + explicación -->
+            <div class="score-top">
+              <div class="score-ring-wrap">
+                <svg viewBox="0 0 120 120" class="score-ring-svg">
+                  <defs>
+                    <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#5C6BC0"/>
+                      <stop offset="100%" stop-color="#7C4DFF"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="60" cy="60" r="50" class="score-ring-bg"/>
+                  <circle cx="60" cy="60" r="50" class="score-ring-fill" id="scoreRingFill"/>
+                </svg>
+                <div class="score-ring-inner">
+                  <div class="score-num" id="scoreNum">82</div>
+                  <div class="score-max">/ 100</div>
+                </div>
+              </div>
+              <div class="score-explain">
+                <div class="score-explain-title">¿Qué significa?</div>
+                <p class="score-explain-text">La IA evaluó qué tan completo, claro y competitivo está tu CV para el mercado laboral. <strong>No mide cuánto sabés</strong>, sino qué tan bien presentado está tu perfil.</p>
+                <div class="score-level" id="scoreLevel"></div>
+              </div>
+            </div>
+
+            <!-- Criterios detallados -->
+            <div class="score-criteria" id="scoreCriteria"></div>
+
+            <!-- Tip de la IA -->
+            <div class="score-tip" id="scoreTip"></div>
+          </div>
+
+          <!-- Resumen IA -->
+          <div class="ai-summary-card">
+            <div class="score-header">
+              <div class="score-title-wrap">
+                <span class="ai-pill-sm">✦ IA</span>
+                <h2 class="card-title">Resumen profesional generado</h2>
+              </div>
+              <button class="btn-ghost btn-sm" id="btnCopySummary">Copiar</button>
+            </div>
+            <p class="ai-summary-text" id="aiSummaryText">
+              Profesional con más de 5 años de experiencia en ventas B2B y gestión de cuentas en el sector de consumo masivo. Sólido historial en cumplimiento de objetivos comerciales, negociación y desarrollo de carteras de clientes en canales modernos y tradicionales. Conocimiento avanzado de CRM, análisis de datos comerciales y liderazgo de equipos pequeños. Orientada a resultados, con alta capacidad de adaptación y excelentes habilidades comunicacionales.
+            </p>
+            <div class="ai-summary-tags" id="aiSummaryTags"></div>
+            <div class="ai-regen-note">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Generado automáticamente por LaburAI a partir de tu CV · Última actualización: hace 3 días
+            </div>
+          </div>
+        </div>
+
+        <!-- Habilidades detectadas -->
+        <div class="skills-card">
+          <div class="score-header">
+            <div class="score-title-wrap">
+              <span class="ai-pill-sm">✦ IA</span>
+              <h2 class="card-title">Habilidades detectadas en tu CV</h2>
+            </div>
+            <a href="#cv" class="btn-ghost btn-sm" onclick="switchSection('cv')">Ver análisis completo</a>
+          </div>
+          <div class="skills-detected" id="skillsDetected"></div>
+        </div>
+
+      </section>
+
+      <!-- ── SECCIÓN: MI CV E IA ── -->
+      <section id="cv" class="dash-section hidden">
+        <div class="section-title-row">
+          <h2 class="dash-section-title">Mi CV e Inteligencia Artificial</h2>
+        </div>
+
+        <!-- CV actual -->
+        <div class="cv-upload-card">
+          <div class="cvc-left">
+            <div class="cvc-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <div>
+              <div class="cvc-name">valentina-gonzalez-cv.pdf</div>
+              <div class="cvc-meta">Subido el 16 mar 2026 · 2.4 MB · Analizado por IA ✓</div>
+            </div>
+          </div>
+          <div class="cvc-actions">
+            <button class="btn-ghost btn-sm">Descargar</button>
+            <button class="btn-primary btn-sm" id="btnUploadNew">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Actualizar CV
+            </button>
+          </div>
+        </div>
+
+        <!-- Análisis detallado IA -->
+        <div class="ia-analysis-grid">
+          <div class="ia-block">
+            <div class="ia-block-header">
+              <span class="ia-block-icon">🛠️</span>
+              <h3 class="ia-block-title">Habilidades técnicas</h3>
+            </div>
+            <div class="ia-tags" id="iaTechSkills"></div>
+          </div>
+          <div class="ia-block">
+            <div class="ia-block-header">
+              <span class="ia-block-icon">🤝</span>
+              <h3 class="ia-block-title">Habilidades blandas</h3>
+            </div>
+            <div class="ia-tags" id="iaSoftSkills"></div>
+          </div>
+          <div class="ia-block">
+            <div class="ia-block-header">
+              <span class="ia-block-icon">💻</span>
+              <h3 class="ia-block-title">Tecnologías detectadas</h3>
+            </div>
+            <div class="ia-tags" id="iaTechs"></div>
+          </div>
+          <div class="ia-block">
+            <div class="ia-block-header">
+              <span class="ia-block-icon">⚠️</span>
+              <h3 class="ia-block-title">Habilidades faltantes sugeridas</h3>
+            </div>
+            <div class="ia-tags" id="iaMissing"></div>
+          </div>
+        </div>
+
+        <!-- Experiencia laboral extraída -->
+        <div class="exp-card">
+          <h3 class="card-title" style="margin-bottom:20px">Experiencia laboral detectada por IA</h3>
+          <div class="exp-timeline" id="expTimeline"></div>
+        </div>
+
+      </section>
+
+      <!-- ── SECCIÓN: POSTULACIONES ── -->
+      <section id="postulaciones" class="dash-section hidden">
+        <div class="section-title-row">
+          <h2 class="dash-section-title">Mis postulaciones</h2>
+          <div class="postul-filters">
+            <button class="pf-btn active" data-pf="todas">Todas (8)</button>
+            <button class="pf-btn" data-pf="pendiente">Pendiente</button>
+            <button class="pf-btn" data-pf="revisada">Revisada</button>
+            <button class="pf-btn" data-pf="entrevista">Entrevista</button>
+            <button class="pf-btn" data-pf="rechazada">Rechazada</button>
+          </div>
+        </div>
+        <div class="postulaciones-list" id="postulacionesList"></div>
+      </section>
+
+      <!-- ── SECCIÓN: RECOMENDADAS ── -->
+      <section id="recomendadas" class="dash-section hidden">
+        <div class="section-title-row">
+          <h2 class="dash-section-title">Ofertas recomendadas para vos</h2>
+          <span class="ai-pill-sm">✦ Ordenadas por compatibilidad IA</span>
+        </div>
+        <div class="rec-grid" id="recGrid"></div>
+      </section>
+
+      <!-- ── SECCIÓN: MI PERFIL ── -->
+      <section id="perfil" class="dash-section hidden">
+        <div class="section-title-row">
+          <h2 class="dash-section-title">Mi perfil profesional</h2>
+          <button class="btn-primary btn-sm" id="btnSaveProfile">Guardar cambios</button>
+        </div>
+        <div class="profile-form-grid">
+          <div class="pf-card">
+            <h3 class="pf-card-title">Datos personales</h3>
+            <div class="form-field">
+              <label class="form-label">Nombre completo</label>
+              <input type="text" class="form-input" value="Valentina González"/>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" value="valentina.g@email.com"/>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Ubicación</label>
+                <input type="text" class="form-input" value="Córdoba, Argentina"/>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Teléfono</label>
+                <input type="text" class="form-input" value="+54 351 456 7890"/>
+              </div>
+            </div>
+          </div>
+          <div class="pf-card">
+            <h3 class="pf-card-title">Perfil profesional</h3>
+            <div class="form-field">
+              <label class="form-label">Área / Rubro</label>
+              <select class="form-select">
+                <option selected>Ventas y Comercial</option>
+                <option>Administración y RRHH</option>
+                <option>Tecnología e IT</option>
+                <option>Salud y Medicina</option>
+                <option>Educación y Docencia</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Años de experiencia</label>
+                <select class="form-select">
+                  <option>1 – 2 años</option>
+                  <option>3 – 5 años</option>
+                  <option selected>5 – 10 años</option>
+                  <option>Más de 10 años</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Modalidad buscada</label>
+                <select class="form-select">
+                  <option>Presencial</option>
+                  <option selected>Remoto</option>
+                  <option>Híbrido</option>
+                  <option>Indiferente</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Pretensión salarial</label>
+              <input type="text" class="form-input" value="$500.000 – $700.000"/>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Overlay mobile sidebar -->
+  <div class="dash-overlay" id="dashOverlay"></div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/dashboard-candidato.js"></script>
+</body>
+</html>

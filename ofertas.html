@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LaburAI — Buscar empleo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/base.css"/>
+  <link rel="stylesheet" href="css/ofertas.css"/>
+</head>
+<body>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
+      <div class="nav-links">
+        <a href="ofertas.html" class="active">Buscar empleo</a>
+        <a href="#">Para empresas</a>
+        <a href="#">Salarios</a>
+        <a href="#">Recursos</a>
+      </div>
+      <div class="nav-actions">
+        <a href="login.html" class="btn-ghost">Ingresar</a>
+        <a href="login.html" class="btn-primary">Publicar oferta</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="ofertas.html">Buscar empleo</a>
+      <a href="#">Para empresas</a>
+      <a href="#">Salarios</a>
+      <a href="#">Recursos</a>
+      <hr/>
+      <a href="login.html" class="btn-ghost" style="text-align:center;display:block">Ingresar</a>
+      <a href="login.html" class="btn-primary" style="text-align:center;display:block;margin-top:8px">Publicar oferta</a>
+    </div>
+  </nav>
+
+  <!-- ══ PAGE HEADER ══ -->
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="ph-left">
+        <h1 class="ph-title">Buscar empleo</h1>
+        <p class="ph-sub">Encontrá tu próxima oportunidad entre miles de ofertas en toda Argentina</p>
+      </div>
+      <!-- Barra de búsqueda integrada -->
+      <div class="ph-search">
+        <div class="search-box-sm">
+          <div class="search-field-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="searchQuery" placeholder="Puesto, empresa o rubro…" autocomplete="off"/>
+          </div>
+          <div class="search-sep-sm"></div>
+          <div class="search-field-sm search-field-sm--loc">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <input type="text" id="searchLocation" placeholder="Ciudad o provincia"/>
+          </div>
+          <button class="search-btn-sm" id="searchBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            Buscar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FILTROS ACTIVOS ══ -->
+  <div class="active-filters-bar" id="activeFiltersBar" style="display:none">
+    <div class="active-filters-inner">
+      <span class="af-label">Filtros activos:</span>
+      <div class="af-chips" id="activeChips"></div>
+      <button class="af-clear" id="clearAllFilters">Limpiar todos</button>
+    </div>
+  </div>
+
+  <!-- ══ LAYOUT PRINCIPAL ══ -->
+  <div class="offers-layout">
+
+    <!-- ── SIDEBAR DE FILTROS ── -->
+    <aside class="filters-sidebar" id="filtersSidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Filtros</span>
+        <button class="sidebar-reset" id="resetFilters">Limpiar</button>
+      </div>
+
+      <!-- Rubro -->
+      <div class="filter-group">
+        <div class="filter-group-header" data-toggle="rubro">
+          <span>Rubro</span>
+          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="filter-group-body" id="rubro">
+          <label class="filter-check"><input type="checkbox" name="rubro" value="administracion"/><span class="fc-box"></span>Administración y RRHH <span class="fc-count">4.120</span></label>
+          <label class="filter-check"><input type="checkbox" name="rubro" value="ventas"/><span class="fc-box"></span>Ventas y Comercial <span class="fc-count">3.840</span></label>
+          <label class="filter-check"><input type="checkbox" name="rubro" value="tecnologia"/><span class="fc-box"></span>Tecnología e IT <span class="fc-count">3.240</span></label>
+          <label class="filter-check"><input type="checkbox" name="rubro" value="salud"/><span class="fc-box"></span>Salud y Medicina <span class="fc-count">2.710</span></label>
+          <label class="filter-check"><input type="checkbox" name="rubro" value="educacion"/><span class="fc-box"></span>Educación y Docencia <span class="fc-count">2.380</span></label>
+          <label class="filter-check"><input type="checkbox" name="rubro" value="construccion"/><span class="fc-box"></span>Construcción e Ing. <span class="fc-count">1.950</span></label>
+          <label class="filter-check"><input type="checkbox" name="rubro" value="gastronomia"/><span class="fc-box"></span>Gastronomía y Turismo <span class="fc-count">1.640</span></label>
+          <label class="filter-check"><input type="checkbox" name="rubro" value="logistica"/><span class="fc-box"></span>Logística y Transporte <span class="fc-count">1.420</span></label>
+          <label class="filter-check"><input type="checkbox" name="rubro" value="finanzas"/><span class="fc-box"></span>Finanzas y Contabilidad <span class="fc-count">1.280</span></label>
+          <label class="filter-check"><input type="checkbox" name="rubro" value="diseno"/><span class="fc-box"></span>Diseño y Creatividad <span class="fc-count">980</span></label>
+        </div>
+      </div>
+
+      <!-- Modalidad -->
+      <div class="filter-group">
+        <div class="filter-group-header" data-toggle="modalidad">
+          <span>Modalidad</span>
+          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="filter-group-body" id="modalidad">
+          <label class="filter-check"><input type="checkbox" name="modalidad" value="remoto"/><span class="fc-box"></span>Remoto <span class="fc-count">3.200</span></label>
+          <label class="filter-check"><input type="checkbox" name="modalidad" value="presencial"/><span class="fc-box"></span>Presencial <span class="fc-count">5.800</span></label>
+          <label class="filter-check"><input type="checkbox" name="modalidad" value="hibrido"/><span class="fc-box"></span>Híbrido <span class="fc-count">2.300</span></label>
+        </div>
+      </div>
+
+      <!-- Tipo de jornada -->
+      <div class="filter-group">
+        <div class="filter-group-header" data-toggle="jornada">
+          <span>Jornada</span>
+          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="filter-group-body" id="jornada">
+          <label class="filter-check"><input type="checkbox" name="jornada" value="fulltime"/><span class="fc-box"></span>Full time <span class="fc-count">8.100</span></label>
+          <label class="filter-check"><input type="checkbox" name="jornada" value="parttime"/><span class="fc-box"></span>Part time <span class="fc-count">2.200</span></label>
+          <label class="filter-check"><input type="checkbox" name="jornada" value="freelance"/><span class="fc-box"></span>Freelance / Por proyecto <span class="fc-count">980</span></label>
+        </div>
+      </div>
+
+      <!-- Experiencia -->
+      <div class="filter-group">
+        <div class="filter-group-header" data-toggle="experiencia">
+          <span>Experiencia</span>
+          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="filter-group-body" id="experiencia">
+          <label class="filter-check"><input type="checkbox" name="experiencia" value="sin-exp"/><span class="fc-box"></span>Sin experiencia <span class="fc-count">1.400</span></label>
+          <label class="filter-check"><input type="checkbox" name="experiencia" value="1-2"/><span class="fc-box"></span>1 – 2 años <span class="fc-count">3.100</span></label>
+          <label class="filter-check"><input type="checkbox" name="experiencia" value="3-5"/><span class="fc-box"></span>3 – 5 años <span class="fc-count">4.200</span></label>
+          <label class="filter-check"><input type="checkbox" name="experiencia" value="5+"/><span class="fc-box"></span>Más de 5 años <span class="fc-count">2.600</span></label>
+        </div>
+      </div>
+
+      <!-- Salario -->
+      <div class="filter-group">
+        <div class="filter-group-header" data-toggle="salario">
+          <span>Salario mínimo</span>
+          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="filter-group-body" id="salario">
+          <div class="salary-slider-wrap">
+            <input type="range" id="salaryRange" min="0" max="1500000" step="50000" value="0" class="salary-slider"/>
+            <div class="salary-display">
+              <span class="salary-min-label">Sin mínimo</span>
+              <span class="salary-cur" id="salaryDisplay">$0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón aplicar en mobile -->
+      <button class="btn-primary apply-filters-btn" id="applyFiltersBtn">
+        Ver resultados
+      </button>
+    </aside>
+
+    <!-- ── CONTENIDO PRINCIPAL ── -->
+    <main class="offers-main">
+
+      <!-- Toolbar: resultado + ordenar -->
+      <div class="results-toolbar">
+        <div class="results-count">
+          <span class="rc-num" id="resultsCount">11.300</span>
+          <span class="rc-label">ofertas encontradas</span>
+          <div class="ai-pill">
+            <span class="ai-pill-dot"></span>
+            Ordenadas por compatibilidad IA
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <div class="sort-wrap">
+            <label class="sort-label" for="sortSelect">Ordenar por</label>
+            <select class="sort-select" id="sortSelect">
+              <option value="relevancia">Relevancia IA</option>
+              <option value="recientes">Más recientes</option>
+              <option value="salario-asc">Menor salario</option>
+              <option value="salario-desc">Mayor salario</option>
+            </select>
+          </div>
+          <!-- Botón filtros mobile -->
+          <button class="btn-ghost filters-toggle-btn" id="filtersToggleBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            Filtros
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid de tarjetas -->
+      <div class="offers-grid" id="offersGrid"></div>
+
+      <!-- Paginación -->
+      <div class="pagination" id="pagination"></div>
+
+    </main>
+  </div>
+
+  <!-- Overlay mobile para sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
+        <p>La plataforma de empleo impulsada por IA. Conectamos talento con las mejores oportunidades de Argentina en todos los rubros.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Candidatos</h4>
+        <a href="#">Buscar empleo</a>
+        <a href="#">Subir CV</a>
+        <a href="#">Análisis de perfil</a>
+        <a href="#">Historial de postulaciones</a>
+      </div>
+      <div class="footer-col">
+        <h4>Empresas</h4>
+        <a href="#">Publicar oferta</a>
+        <a href="#">Buscar candidatos</a>
+        <a href="#">Dashboard</a>
+        <a href="#">Planes y precios</a>
+      </div>
+      <div class="footer-col">
+        <h4>LaburAI</h4>
+        <a href="#">Acerca de</a>
+        <a href="#">Blog</a>
+        <a href="#">Privacidad</a>
+        <a href="#">Contacto</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 LaburAI. Todos los derechos reservados.</p>
+      <p style="color:#5C6BC0;font-weight:600;font-size:13px">Búsqueda potenciada por IA ✦</p>
+    </div>
+  </footer>
+
+  <script src="js/utils.js"></script>
+  <script src="js/ofertas.js"></script>
+</body>
+</html>

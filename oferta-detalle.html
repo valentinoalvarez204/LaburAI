@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LaburAI — Detalle de oferta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/base.css"/>
+  <link rel="stylesheet" href="css/detalle.css"/>
+</head>
+<body>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
+      <div class="nav-links">
+        <a href="ofertas.html" class="active">Buscar empleo</a>
+        <a href="#">Para empresas</a>
+        <a href="#">Salarios</a>
+        <a href="#">Recursos</a>
+      </div>
+      <div class="nav-actions">
+        <a href="login.html" class="btn-ghost">Ingresar</a>
+        <a href="login.html" class="btn-primary">Publicar oferta</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="ofertas.html">Buscar empleo</a>
+      <a href="#">Para empresas</a>
+      <a href="#">Salarios</a>
+      <a href="#">Recursos</a>
+      <hr/>
+      <a href="login.html" class="btn-ghost" style="text-align:center;display:block">Ingresar</a>
+      <a href="login.html" class="btn-primary" style="text-align:center;display:block;margin-top:8px">Publicar oferta</a>
+    </div>
+  </nav>
+
+  <!-- ══ BREADCRUMB ══ -->
+  <div class="breadcrumb-bar">
+    <nav class="breadcrumb">
+      <a href="index.html">Inicio</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="ofertas.html">Buscar empleo</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-cur" id="bcTitle">Cargando…</span>
+    </nav>
+  </div>
+
+  <!-- ══ LAYOUT PRINCIPAL ══ -->
+  <div class="detail-layout">
+
+    <!-- ── COLUMNA PRINCIPAL ── -->
+    <main class="detail-main">
+
+      <!-- Cabecera de la oferta -->
+      <div class="job-header-card">
+        <div class="jhc-top">
+          <div class="jhc-logo" id="jobLogo">A</div>
+          <div class="jhc-meta">
+            <div class="jhc-tags" id="jobTagsHeader"></div>
+            <h1 class="jhc-title" id="jobTitle">Cargando…</h1>
+            <div class="jhc-company-row">
+              <span class="jhc-company-name" id="jobCompany">—</span>
+              <span class="jhc-dot">·</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span id="jobLocation">—</span>
+              <span class="jhc-dot">·</span>
+              <span class="jhc-time" id="jobTime">—</span>
+            </div>
+          </div>
+          <div class="jhc-actions">
+            <button class="btn-icon" id="btnSave" title="Guardar oferta">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            </button>
+            <button class="btn-icon" id="btnShare" title="Compartir">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Banner de compatibilidad IA -->
+        <div class="match-banner">
+          <div class="match-banner-left">
+            <div class="match-star">✦</div>
+            <div>
+              <div class="match-title">Análisis de compatibilidad IA</div>
+              <div class="match-sub">Basado en tu CV y perfil profesional</div>
+            </div>
+          </div>
+          <div class="match-right">
+            <div class="match-ring-wrap">
+              <svg viewBox="0 0 60 60" class="ring-svg">
+                <circle cx="30" cy="30" r="24" class="ring-bg"/>
+                <circle cx="30" cy="30" r="24" class="ring-fill" id="ringFill"/>
+              </svg>
+              <span class="ring-pct" id="ringPct">—</span>
+            </div>
+            <div>
+              <div class="match-pct-big" id="matchPct">—%</div>
+              <div class="match-pct-label">compatibilidad</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Habilidades matching -->
+        <div class="match-skills" id="matchSkills"></div>
+      </div>
+
+      <!-- Tabs de navegación -->
+      <div class="detail-tabs">
+        <button class="dtab active" data-tab="descripcion">Descripción</button>
+        <button class="dtab" data-tab="requisitos">Requisitos</button>
+        <button class="dtab" data-tab="empresa">La empresa</button>
+      </div>
+
+      <!-- ── TAB: Descripción ── -->
+      <div class="tab-content active" id="tab-descripcion">
+        <div class="content-card">
+          <h2 class="content-title">Sobre el puesto</h2>
+          <div class="content-body" id="jobDesc"></div>
+
+          <h2 class="content-title mt">Responsabilidades</h2>
+          <ul class="content-list" id="jobResponsabilities"></ul>
+
+          <h2 class="content-title mt">Ofrecemos</h2>
+          <ul class="content-list content-list--green" id="jobBenefits"></ul>
+        </div>
+      </div>
+
+      <!-- ── TAB: Requisitos ── -->
+      <div class="tab-content" id="tab-requisitos">
+        <div class="content-card">
+          <h2 class="content-title">Requisitos del puesto</h2>
+          <ul class="content-list" id="jobRequirements"></ul>
+
+          <h2 class="content-title mt">Habilidades requeridas</h2>
+          <div class="skills-grid" id="jobSkills"></div>
+
+          <h2 class="content-title mt">Habilidades valoradas</h2>
+          <div class="skills-grid" id="jobNiceSkills"></div>
+        </div>
+      </div>
+
+      <!-- ── TAB: Empresa ── -->
+      <div class="tab-content" id="tab-empresa">
+        <div class="content-card" id="companyTab"></div>
+      </div>
+
+      <!-- Ofertas similares -->
+      <div class="similar-section">
+        <h2 class="similar-title">Ofertas similares</h2>
+        <div class="similar-grid" id="similarGrid"></div>
+        <div style="text-align:center;margin-top:24px">
+          <a href="ofertas.html" class="btn-outline">Ver todas las ofertas</a>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ── SIDEBAR STICKY ── -->
+    <aside class="detail-sidebar">
+
+      <!-- Card de postulación -->
+      <div class="apply-card">
+        <div class="apply-salary" id="applySalary">—</div>
+        <div class="apply-salary-label">Rango salarial estimado</div>
+        <button class="btn-apply" id="btnApply">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          Postularme ahora
+        </button>
+        <button class="btn-apply-ghost" id="btnSaveAlt">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          Guardar para después
+        </button>
+        <div class="apply-meta" id="applyMeta"></div>
+      </div>
+
+      <!-- Detalles del puesto -->
+      <div class="info-card">
+        <h3 class="info-card-title">Detalles del puesto</h3>
+        <div class="info-rows" id="infoRows"></div>
+      </div>
+
+      <!-- Mini card empresa -->
+      <div class="info-card" id="companyMini"></div>
+
+      <!-- Reportar -->
+      <button class="report-btn" id="reportBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Reportar esta oferta
+      </button>
+
+    </aside>
+  </div>
+
+  <!-- ══ BARRA MOBILE STICKY ══ -->
+  <div class="mobile-apply-bar" id="mobileApplyBar">
+    <div class="mab-info">
+      <div class="mab-title" id="mabTitle">—</div>
+      <div class="mab-salary" id="mabSalary">—</div>
+    </div>
+    <button class="btn-apply mab-btn" id="btnApplyMobile">Postularme</button>
+  </div>
+
+  <!-- ══ MODAL DE POSTULACIÓN ══ -->
+  <div class="modal-overlay hidden" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirmar postulación</h3>
+        <button class="modal-close" id="modalClose">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-job-preview" id="modalJobPreview"></div>
+        <div class="modal-section">
+          <div class="modal-label">CV que vas a enviar</div>
+          <div class="cv-preview">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <div>
+              <div class="cv-name">mi-curriculum.pdf</div>
+              <div class="cv-meta">Subido hace 3 días · 2.4 MB</div>
+            </div>
+            <a href="login.html" class="cv-change">Cambiar</a>
+          </div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-label">Carta de presentación <span style="font-weight:400;color:var(--text3)">(opcional)</span></div>
+          <textarea id="coverLetter" class="modal-textarea" placeholder="Contale a la empresa por qué sos el candidato ideal para este puesto…" rows="4"></textarea>
+        </div>
+        <div class="modal-notice">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Al postularte aceptás que la empresa pueda ver tu perfil y CV en LaburAI.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="btnCancelModal">Cancelar</button>
+        <button class="btn-apply modal-submit" id="btnConfirmApply">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          Confirmar postulación
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL ÉXITO POSTULACIÓN ══ -->
+  <div class="modal-overlay hidden" id="successOverlay">
+    <div class="modal modal--success">
+      <div class="success-anim">✦</div>
+      <h3 class="success-modal-title">¡Postulación enviada!</h3>
+      <p class="success-modal-sub">La empresa recibirá tu perfil y CV. Te notificaremos cuando revisen tu postulación.</p>
+      <a href="ofertas.html" class="btn-apply" style="text-decoration:none;justify-content:center;margin-top:8px">Ver más ofertas</a>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/detalle.js"></script>
+</body>
+</html>

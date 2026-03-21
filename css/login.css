@@ -1,0 +1,341 @@
+/* ══════════════════════════════════════════
+   LaburAI — login.css
+   Estilos EXCLUSIVOS de la página de login/registro.
+   Requiere: base.css cargado antes.
+══════════════════════════════════════════ */
+
+/* ─────────────────────────────────
+   BARRA SUPERIOR (reemplaza navbar)
+───────────────────────────────── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all .2s;
+}
+.back-link:hover { color: var(--indigo); background: var(--grad-soft); }
+.back-link:hover svg { transform: translateX(-3px); }
+.back-link svg { transition: transform .2s; }
+
+/* ─────────────────────────────────
+   LAYOUT PRINCIPAL (two-column)
+───────────────────────────────── */
+.auth-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 60px);
+}
+
+/* ─────────────────────────────────
+   PANEL IZQUIERDO — decorativo
+───────────────────────────────── */
+.auth-aside {
+  background: var(--grad);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 60px 52px;
+}
+
+.aside-blob { position: absolute; border-radius: 50%; pointer-events: none; }
+.aside-blob.b1 { width: 400px; height: 400px; background: rgba(255,255,255,0.08); top: -100px; right: -100px; animation: blob-drift 10s ease-in-out infinite; }
+.aside-blob.b2 { width: 300px; height: 300px; background: rgba(255,255,255,0.06); bottom: -80px; left: -60px; animation: blob-drift 12s 3s ease-in-out infinite; }
+@keyframes blob-drift {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-20px) scale(1.05); }
+}
+
+.aside-content  { position: relative; z-index: 1; color: #fff; max-width: 420px; }
+.aside-logo     { font-family: var(--font-head); font-weight: 800; font-size: 22px; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 36px; letter-spacing: -.3px; }
+.aside-logo .logo-star { -webkit-text-fill-color: rgba(255,255,255,0.7); }
+.aside-title    { font-family: var(--font-head); font-size: clamp(26px, 3vw, 36px); font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin-bottom: 16px; color: #fff; }
+.aside-sub      { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.75); margin-bottom: 36px; }
+
+/* Features del aside */
+.aside-features { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
+.aside-feat     { display: flex; align-items: flex-start; gap: 14px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; padding: 14px 16px; backdrop-filter: blur(8px); transition: background .2s; }
+.aside-feat:hover { background: rgba(255,255,255,0.15); }
+.feat-icon      { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+.feat-title     { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.feat-desc      { font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; }
+
+/* Testimonial */
+.testimonial    { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 20px; backdrop-filter: blur(8px); }
+.t-text         { font-size: 14px; font-style: italic; color: rgba(255,255,255,0.9); line-height: 1.65; margin-bottom: 16px; }
+.t-author       { display: flex; align-items: center; gap: 10px; }
+.t-av           { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-weight: 700; font-size: 14px; color: #fff; flex-shrink: 0; }
+.t-name         { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: #fff; }
+.t-role         { font-size: 12px; color: rgba(255,255,255,0.6); }
+
+/* ─────────────────────────────────
+   PANEL DERECHO — formulario
+───────────────────────────────── */
+.auth-panel {
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  overflow-y: auto;
+}
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  animation: card-in .45s ease both;
+}
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─────────────────────────────────
+   TABS ingresar / crear cuenta
+───────────────────────────────── */
+.auth-tabs {
+  display: flex;
+  background: var(--bg2);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 32px;
+}
+.auth-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 10px;
+  border-radius: 9px;
+  font-family: var(--font-head);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text2);
+  transition: all .22s;
+  cursor: pointer;
+}
+.auth-tab.active { background: var(--white); color: var(--indigo); box-shadow: var(--shadow-sm); }
+
+/* ─────────────────────────────────
+   HEADER DEL FORMULARIO
+───────────────────────────────── */
+.form-header  { margin-bottom: 24px; }
+.form-title   { font-family: var(--font-head); font-size: 24px; font-weight: 800; letter-spacing: -.5px; margin-bottom: 6px; color: var(--text); }
+.form-sub     { font-size: 14px; color: var(--text2); }
+
+/* ─────────────────────────────────
+   SELECTOR DE ROL
+───────────────────────────────── */
+.role-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.role-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 16px 12px;
+  background: var(--bg2);
+  border: 2px solid var(--border);
+  border-radius: var(--r);
+  transition: all .22s;
+  position: relative;
+  text-align: center;
+  cursor: pointer;
+}
+.role-btn:hover  { border-color: var(--indigo); background: var(--grad-soft); }
+.role-btn.active { border-color: var(--indigo); background: var(--grad-soft); box-shadow: 0 0 0 3px rgba(92,107,192,0.12); }
+.role-icon  { font-size: 24px; margin-bottom: 4px; }
+.role-name  { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--text); }
+.role-desc  { font-size: 11px; color: var(--text3); }
+.role-check {
+  position: absolute; top: 8px; right: 10px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--grad); color: #fff;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: scale(.6);
+  transition: all .2s;
+}
+.role-btn.active .role-check { opacity: 1; transform: scale(1); }
+
+/* ─────────────────────────────────
+   BOTONES SOCIALES (Google)
+───────────────────────────────── */
+.social-btns { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.social-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 11px 16px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px; font-weight: 500; color: var(--text);
+  transition: all .2s;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+.social-btn:hover { border-color: var(--indigo); background: var(--grad-soft); color: var(--indigo); box-shadow: var(--shadow-md); }
+
+/* ─────────────────────────────────
+   DIVISOR
+───────────────────────────────── */
+.divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.divider span { font-size: 12px; color: var(--text3); white-space: nowrap; }
+
+/* ─────────────────────────────────
+   CAMPOS DEL FORMULARIO
+───────────────────────────────── */
+.field-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field-group { margin-bottom: 16px; }
+.label-row   { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+
+.field-label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.forgot-link { font-size: 12px; color: var(--indigo); font-weight: 500; transition: opacity .2s; }
+.forgot-link:hover { opacity: .7; }
+
+.field-wrap {
+  display: flex; align-items: center;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all .22s;
+}
+.field-wrap:focus-within { background: var(--white); border-color: var(--indigo); box-shadow: 0 0 0 3px rgba(92,107,192,0.1); }
+.field-wrap.error   { border-color: var(--error);   box-shadow: 0 0 0 3px rgba(229,57,53,0.1); }
+.field-wrap.success { border-color: var(--success); }
+
+.field-icon { color: var(--text3); flex-shrink: 0; margin-left: 14px; }
+.field-wrap input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--text); font-family: var(--font-body);
+  font-size: 14px; padding: 12px 14px;
+}
+.field-wrap input::placeholder { color: var(--text3); }
+
+.toggle-pass { background: transparent; border: none; padding: 0 14px; color: var(--text3); display: flex; align-items: center; transition: color .2s; flex-shrink: 0; cursor: pointer; }
+.toggle-pass:hover { color: var(--indigo); }
+
+.field-error { display: block; font-size: 12px; color: var(--error); margin-top: 5px; min-height: 16px; }
+
+/* ─────────────────────────────────
+   INDICADOR DE FORTALEZA
+───────────────────────────────── */
+.strength-wrap  { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.strength-bar   { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.strength-fill  { height: 100%; border-radius: 2px; width: 0%; transition: width .35s ease, background .35s ease; }
+.strength-label { font-size: 11px; font-weight: 600; flex-shrink: 0; min-width: 60px; text-align: right; }
+
+/* ─────────────────────────────────
+   CHECKBOX PERSONALIZADO
+───────────────────────────────── */
+.field-check   { margin-bottom: 20px; }
+.check-label   { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text2); line-height: 1.5; }
+.check-label input[type="checkbox"] { display: none; }
+.check-box     { width: 18px; height: 18px; border: 2px solid var(--border-h); border-radius: 5px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all .2s; background: var(--white); }
+.check-label input:checked + .check-box { background: var(--grad); border-color: transparent; }
+.check-label input:checked + .check-box::after { content: ''; width: 10px; height: 6px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translateY(-1px); display: block; }
+.inline-link   { color: var(--indigo); font-weight: 500; }
+.inline-link:hover { text-decoration: underline; }
+
+/* ─────────────────────────────────
+   BOTÓN ENVIAR
+───────────────────────────────── */
+.btn-submit {
+  width: 100%;
+  background: var(--grad);
+  border: none;
+  color: #fff;
+  padding: 14px;
+  border-radius: 12px;
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 700;
+  transition: all .22s;
+  box-shadow: 0 4px 14px rgba(92,107,192,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.btn-submit:hover    { box-shadow: 0 6px 22px rgba(124,77,255,0.45); transform: translateY(-1px); }
+.btn-submit:active   { transform: translateY(0); }
+.btn-submit:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+
+/* Spinner dentro del botón */
+.btn-spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─────────────────────────────────
+   NOTA DEL PIE DEL FORM
+───────────────────────────────── */
+.form-footer-note { text-align: center; font-size: 13px; color: var(--text3); margin-top: 20px; }
+.switch-tab       { color: var(--indigo); font-weight: 600; cursor: pointer; }
+.switch-tab:hover { text-decoration: underline; }
+
+/* ─────────────────────────────────
+   ESTADO DE ÉXITO (post registro)
+───────────────────────────────── */
+.success-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 0;
+  animation: card-in .4s ease both;
+}
+.success-icon  { width: 72px; height: 72px; border-radius: 50%; background: var(--grad-soft); border: 2px solid var(--border-h); display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 24px; }
+.success-title { font-family: var(--font-head); font-size: 26px; font-weight: 800; letter-spacing: -.5px; margin-bottom: 12px; color: var(--text); }
+.success-sub   { font-size: 15px; color: var(--text2); line-height: 1.65; max-width: 340px; margin: 0 auto 28px; }
+
+.success-countdown {
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.scd-bar  { width: 100%; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.scd-fill {
+  height: 100%;
+  background: var(--grad);
+  border-radius: 2px;
+  width: 100%;
+  transition: width 1s linear;
+}
+.scd-text { font-size: 13px; color: var(--text3); font-weight: 500; }
+
+/* ─────────────────────────────────
+   RESPONSIVE — login específico
+───────────────────────────────── */
+@media (max-width: 900px) {
+  .auth-layout { grid-template-columns: 1fr; }
+  .auth-aside  { display: none; }
+  .auth-panel  { min-height: calc(100vh - 60px); }
+}
+@media (max-width: 480px) {
+  .auth-panel  { padding: 24px 20px; }
+  .top-bar     { padding: 0 20px; }
+  .field-row   { grid-template-columns: 1fr; }
+}

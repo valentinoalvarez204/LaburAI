@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LaburAI — Panel de empresa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/base.css"/>
+  <link rel="stylesheet" href="css/dashboard-empresa.css"/>
+</head>
+<body>
+
+  <!-- ══ TOPBAR ══ -->
+  <header class="dash-topbar">
+    <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
+    <nav class="dash-nav">
+      <a href="#overview" class="active" data-section="overview">Resumen</a>
+      <a href="#ofertas"  data-section="ofertas">Mis ofertas</a>
+      <a href="#candidatos" data-section="candidatos">Candidatos</a>
+    </nav>
+    <div class="dash-topbar-actions">
+      <button class="btn-primary btn-sm" id="btnNuevaOferta">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Nueva oferta
+      </button>
+      <button class="topbar-notif" aria-label="Notificaciones">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="topbar-avatar" id="avatarMenu">
+        <div class="avatar-circle">GR</div>
+        <span class="avatar-name">Grupo Arcor</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        <div class="avatar-dropdown" id="avatarDropdown">
+          <a href="#">Perfil de empresa</a>
+          <a href="#">Configuración</a>
+          <a href="#">Planes y facturación</a>
+          <hr/>
+          <a href="index.html" class="dropdown-logout">Cerrar sesión</a>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <!-- ══ LAYOUT ══ -->
+  <div class="dash-layout">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="dash-sidebar" id="dashSidebar">
+      <div class="sidebar-profile">
+        <div class="sp-avatar sp-avatar--empresa">GA</div>
+        <div class="sp-info">
+          <div class="sp-name">Grupo Arcor</div>
+          <div class="sp-role">Cuenta empresa · Activa</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="snav-item active" data-section="overview">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Resumen
+        </a>
+        <a class="snav-item" data-section="ofertas">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+          Mis ofertas
+          <span class="snav-badge">3</span>
+        </a>
+        <a class="snav-item" data-section="candidatos">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Candidatos
+          <span class="snav-badge snav-badge--new">47</span>
+        </a>
+        <a class="snav-item" data-section="publicar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Publicar oferta
+        </a>
+        <a class="snav-item" data-section="empresa">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Perfil de empresa
+        </a>
+      </nav>
+
+      <div class="sidebar-plan">
+        <div class="plan-label">Plan actual</div>
+        <div class="plan-name">Plan Gratuito</div>
+        <div class="plan-detail">3 / 3 ofertas activas usadas</div>
+        <div class="plan-bar"><div class="plan-fill" style="width:100%"></div></div>
+        <a href="#" class="btn-primary btn-sm" style="margin-top:10px;justify-content:center">Mejorar plan</a>
+      </div>
+    </aside>
+
+    <!-- ── MAIN ── -->
+    <main class="dash-main">
+
+      <!-- Saludo -->
+      <div class="dash-greeting">
+        <div>
+          <h1 class="greeting-title">Bienvenido, Grupo Arcor 🏢</h1>
+          <p class="greeting-sub">Tenés <strong>47 postulaciones nuevas</strong> y <strong>3 ofertas activas</strong> publicadas.</p>
+        </div>
+        <button class="btn-primary" id="btnNuevaOfertaHero">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Publicar nueva oferta
+        </button>
+      </div>
+
+      <!-- ── SECCIÓN RESUMEN ── -->
+      <section id="overview">
+
+        <!-- Stats -->
+        <div class="dash-stats">
+          <div class="dstat">
+            <div class="dstat-icon dstat-icon--blue">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+            </div>
+            <div class="dstat-num">3</div>
+            <div class="dstat-label">Ofertas activas</div>
+            <div class="dstat-trend dstat-trend--up">↑ 1 esta semana</div>
+          </div>
+          <div class="dstat">
+            <div class="dstat-icon dstat-icon--indigo">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div class="dstat-num">47</div>
+            <div class="dstat-label">Postulaciones totales</div>
+            <div class="dstat-trend dstat-trend--up">↑ 12 esta semana</div>
+          </div>
+          <div class="dstat">
+            <div class="dstat-icon dstat-icon--green">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="dstat-num">8</div>
+            <div class="dstat-label">Entrevistas agendadas</div>
+            <div class="dstat-trend dstat-trend--up">↑ 3 esta semana</div>
+          </div>
+          <div class="dstat">
+            <div class="dstat-icon dstat-icon--amber">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="dstat-num">1.240</div>
+            <div class="dstat-label">Vistas a tus ofertas</div>
+            <div class="dstat-trend dstat-trend--up">↑ 18% vs mes anterior</div>
+          </div>
+        </div>
+
+        <!-- Fila: Ofertas activas + Top candidatos -->
+        <div class="overview-grid">
+
+          <!-- Ofertas activas -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <span class="dash-card-title">Ofertas activas</span>
+              <a class="btn-ghost btn-sm" data-section="ofertas">Ver todas →</a>
+            </div>
+            <div class="ofertas-mini" id="ofertasMini"></div>
+          </div>
+
+          <!-- Top candidatos IA -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="dash-card-title">Top candidatos</span>
+                <span class="ai-pill-sm">✦ IA</span>
+              </div>
+              <a class="btn-ghost btn-sm" data-section="candidatos">Ver todos →</a>
+            </div>
+            <div class="top-candidatos" id="topCandidatos"></div>
+          </div>
+        </div>
+
+        <!-- Actividad reciente -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <span class="dash-card-title">Actividad reciente</span>
+          </div>
+          <div class="actividad-list" id="actividadList"></div>
+        </div>
+
+      </section>
+
+      <!-- ── SECCIÓN: MIS OFERTAS ── -->
+      <section id="ofertas" class="dash-section hidden">
+        <div class="section-title-row">
+          <h2 class="dash-section-title">Mis ofertas publicadas</h2>
+          <button class="btn-primary btn-sm" data-section="publicar">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Nueva oferta
+          </button>
+        </div>
+        <div class="ofertas-tabs">
+          <button class="otab active" data-of="todas">Todas (5)</button>
+          <button class="otab" data-of="activa">Activas (3)</button>
+          <button class="otab" data-of="cerrada">Cerradas (2)</button>
+        </div>
+        <div class="ofertas-list" id="ofertasList"></div>
+      </section>
+
+      <!-- ── SECCIÓN: CANDIDATOS ── -->
+      <section id="candidatos" class="dash-section hidden">
+        <div class="section-title-row">
+          <h2 class="dash-section-title">Candidatos postulados</h2>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="ai-pill-sm">✦ Ordenados por compatibilidad IA</span>
+          </div>
+        </div>
+
+        <!-- Filtro por oferta -->
+        <div class="candidatos-filter">
+          <label class="form-label">Filtrar por oferta</label>
+          <select class="form-select cand-select" id="selectOferta" style="max-width:320px">
+            <option value="todas">Todas las ofertas (47)</option>
+            <option value="1">Vendedor/a Senior · Córdoba (34)</option>
+            <option value="2">Administrativo/a Contable · Remoto (8)</option>
+            <option value="3">Analista de Marketing · Buenos Aires (5)</option>
+          </select>
+        </div>
+
+        <div class="candidatos-list" id="candidatosList"></div>
+      </section>
+
+      <!-- ── SECCIÓN: PUBLICAR OFERTA ── -->
+      <section id="publicar" class="dash-section hidden">
+        <div class="section-title-row">
+          <h2 class="dash-section-title">Publicar nueva oferta</h2>
+          <button class="btn-ghost btn-sm" data-section="ofertas">← Volver a mis ofertas</button>
+        </div>
+
+        <div class="publicar-layout">
+
+          <!-- FORMULARIO -->
+          <div class="publicar-form">
+
+            <!-- Paso 1 -->
+            <div class="po-step-header">
+              <div class="po-step-num">1</div>
+              <div>
+                <div class="po-step-title">Información básica</div>
+                <div class="po-step-sub">Datos principales del puesto que querés cubrir</div>
+              </div>
+            </div>
+            <div class="dash-card" style="margin-bottom:20px">
+              <div class="form-field">
+                <label class="form-label">Título del puesto *</label>
+                <input type="text" class="form-input" id="pub-titulo" placeholder="Ej: Vendedor/a Senior B2B"/>
+                <span class="pub-error" id="pub-err-titulo"></span>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label class="form-label">Área / Rubro *</label>
+                  <select class="form-select" id="pub-rubro">
+                    <option value="">Seleccioná un rubro</option>
+                    <option>Ventas y Comercial</option>
+                    <option>Administración y RRHH</option>
+                    <option>Tecnología e IT</option>
+                    <option>Salud y Medicina</option>
+                    <option>Educación y Docencia</option>
+                    <option>Construcción e Ingeniería</option>
+                    <option>Gastronomía y Turismo</option>
+                    <option>Logística y Transporte</option>
+                    <option>Finanzas y Contabilidad</option>
+                    <option>Diseño y Creatividad</option>
+                    <option>Legal y Jurídico</option>
+                    <option>Agro y Medioambiente</option>
+                  </select>
+                  <span class="pub-error" id="pub-err-rubro"></span>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Modalidad *</label>
+                  <div class="pub-radio-group" id="pub-modalidad">
+                    <label class="pub-radio active" data-val="Presencial"><span>🏢</span> Presencial</label>
+                    <label class="pub-radio" data-val="Remoto"><span>🌐</span> Remoto</label>
+                    <label class="pub-radio" data-val="Híbrido"><span>🔀</span> Híbrido</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label class="form-label">Ubicación *</label>
+                  <input type="text" class="form-input" id="pub-ubicacion" placeholder="Ej: Córdoba, Argentina"/>
+                  <span class="pub-error" id="pub-err-ubicacion"></span>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Jornada</label>
+                  <select class="form-select" id="pub-jornada">
+                    <option>Full time</option>
+                    <option>Part time</option>
+                    <option>Freelance / Por proyecto</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label class="form-label">Vacantes</label>
+                  <input type="number" class="form-input" id="pub-vacantes" value="1" min="1"/>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Fecha límite</label>
+                  <input type="date" class="form-input" id="pub-fecha"/>
+                </div>
+              </div>
+            </div>
+
+            <!-- Paso 2 -->
+            <div class="po-step-header">
+              <div class="po-step-num">2</div>
+              <div>
+                <div class="po-step-title">Descripción del puesto</div>
+                <div class="po-step-sub">Describí el rol, las responsabilidades y lo que ofrecés</div>
+              </div>
+            </div>
+            <div class="dash-card" style="margin-bottom:20px">
+              <div class="form-field">
+                <label class="form-label">Descripción general *</label>
+                <textarea class="form-textarea" id="pub-desc" rows="4"
+                  placeholder="Contá en qué consiste el puesto, cómo es el equipo y qué tipo de candidato buscamos…"></textarea>
+                <div class="pub-char-counter"><span id="pub-chars">0</span> / 2000 caracteres</div>
+                <span class="pub-error" id="pub-err-desc"></span>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Responsabilidades principales</label>
+                <div class="pub-tags-wrap" id="pub-resp-wrap">
+                  <div class="pub-tags-list" id="pub-resp-list"></div>
+                  <input class="pub-tags-input" id="pub-resp-input" placeholder="Escribí una y presioná Enter…"/>
+                </div>
+                <span class="pub-hint">Presioná Enter o coma para agregar cada ítem</span>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Beneficios y condiciones</label>
+                <div class="pub-tags-wrap" id="pub-benef-wrap">
+                  <div class="pub-tags-list" id="pub-benef-list"></div>
+                  <input class="pub-tags-input" id="pub-benef-input" placeholder="Ej: OSDE 310, auto de empresa…"/>
+                </div>
+              </div>
+            </div>
+
+            <!-- Paso 3 -->
+            <div class="po-step-header">
+              <div class="po-step-num">3</div>
+              <div>
+                <div class="po-step-title">Requisitos y salario</div>
+                <div class="po-step-sub">Definí el perfil ideal y las condiciones económicas</div>
+              </div>
+            </div>
+            <div class="dash-card">
+              <div class="form-row">
+                <div class="form-field">
+                  <label class="form-label">Experiencia mínima</label>
+                  <select class="form-select" id="pub-exp">
+                    <option>Sin experiencia</option>
+                    <option>1 – 2 años</option>
+                    <option selected>3 – 5 años</option>
+                    <option>Más de 5 años</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Nivel de estudios</label>
+                  <select class="form-select" id="pub-estudios">
+                    <option>Indiferente</option>
+                    <option>Secundario completo</option>
+                    <option>Terciario / Técnico</option>
+                    <option>Universitario en curso</option>
+                    <option selected>Universitario completo</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Habilidades requeridas</label>
+                <div class="pub-tags-wrap" id="pub-skills-wrap">
+                  <div class="pub-tags-list" id="pub-skills-list"></div>
+                  <input class="pub-tags-input" id="pub-skills-input" placeholder="Ej: Ventas B2B, CRM…"/>
+                </div>
+                <span class="pub-hint">La IA usa estas habilidades para rankear candidatos automáticamente</span>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label class="form-label">Salario desde</label>
+                  <input type="text" class="form-input" id="pub-sal-min" placeholder="Ej: 400.000"/>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Salario hasta</label>
+                  <input type="text" class="form-input" id="pub-sal-max" placeholder="Ej: 600.000"/>
+                </div>
+              </div>
+              <div class="pub-sal-opts">
+                <label class="pub-check-opt">
+                  <input type="checkbox" id="pub-sal-neg"/>
+                  <span class="pub-co-box"></span>
+                  Salario a convenir
+                </label>
+                <label class="pub-check-opt">
+                  <input type="checkbox" id="pub-sal-conf"/>
+                  <span class="pub-co-box"></span>
+                  No mostrar salario
+                </label>
+              </div>
+
+              <!-- Tip IA -->
+              <div class="pub-ia-tip">
+                <span class="ai-pill-sm">✦ IA</span>
+                <p>LaburAI analizará tu oferta y la cruzará con todos los perfiles registrados para mostrarte un <strong>ranking de candidatos por compatibilidad</strong> en tiempo real.</p>
+              </div>
+
+              <!-- Acciones -->
+              <div class="pub-actions">
+                <button class="btn-ghost" id="btnBorrador">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                  Guardar borrador
+                </button>
+                <button class="btn-primary pub-btn-submit" id="btnPublicar">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+                  <span class="pub-btn-text">Publicar oferta</span>
+                  <div class="pub-spinner hidden"></div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SIDEBAR -->
+          <div class="publicar-sidebar">
+
+            <!-- Preview -->
+            <div class="dash-card pub-preview">
+              <div class="dash-card-header" style="margin-bottom:14px">
+                <span class="dash-card-title" style="font-size:13px">Vista previa</span>
+                <span class="ai-pill-sm">En vivo</span>
+              </div>
+              <div class="prev-logo-emp">GA</div>
+              <div class="prev-t" id="prev-titulo">Tu oferta aparecerá así</div>
+              <div class="prev-co">Grupo Arcor · <span id="prev-ubicacion">Ubicación</span></div>
+              <div class="prev-tags-row">
+                <span class="job-tag" id="prev-modalidad">Presencial</span>
+                <span class="job-tag" id="prev-jornada">Full time</span>
+              </div>
+              <div class="prev-salary-val" id="prev-salario">Salario a confirmar</div>
+            </div>
+
+            <!-- Checklist -->
+            <div class="dash-card pub-checklist">
+              <div class="dash-card-title" style="margin-bottom:14px">Completitud</div>
+              <div id="pub-checklist-items"></div>
+              <div class="pub-cl-bar-wrap">
+                <div class="pub-cl-bar"><div class="pub-cl-fill" id="pub-cl-fill" style="width:0%"></div></div>
+                <span class="pub-cl-pct" id="pub-cl-pct">0%</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Estado éxito (oculto hasta publicar) -->
+        <div class="pub-success hidden" id="pubSuccess">
+          <div class="pub-success-icon">✦</div>
+          <h3 class="pub-success-title">¡Oferta publicada!</h3>
+          <p class="pub-success-sub">Tu oferta ya está visible. LaburAI analizó <strong id="pubCandCount">0</strong> perfiles y encontró <strong id="pubMatchCount">0</strong> candidatos con alta compatibilidad.</p>
+          <div class="pub-success-actions">
+            <button class="btn-primary" data-section="candidatos">Ver candidatos →</button>
+            <button class="btn-ghost" id="btnPublicarOtra">Publicar otra oferta</button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── SECCIÓN: PERFIL DE EMPRESA ── -->
+      <section id="empresa" class="dash-section hidden">
+        <div class="section-title-row">
+          <h2 class="dash-section-title">Perfil de empresa</h2>
+          <button class="btn-primary btn-sm" id="btnSaveEmpresa">Guardar cambios</button>
+        </div>
+        <div class="publicar-grid">
+          <div class="dash-card">
+            <h3 class="pf-card-title">Datos de la empresa</h3>
+            <div class="empresa-logo-upload">
+              <div class="elu-avatar">GA</div>
+              <div>
+                <div class="elu-name">Grupo Arcor S.A.</div>
+                <button class="btn-ghost btn-sm" style="margin-top:6px">Cambiar logo</button>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Nombre de la empresa *</label>
+              <input type="text" class="form-input" value="Grupo Arcor S.A."/>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Industria</label>
+                <select class="form-select">
+                  <option selected>Alimentación y bebidas</option>
+                  <option>Tecnología</option>
+                  <option>Salud</option>
+                  <option>Educación</option>
+                  <option>Construcción</option>
+                  <option>Finanzas</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Tamaño</label>
+                <select class="form-select">
+                  <option>1 – 10 empleados</option>
+                  <option>11 – 50</option>
+                  <option>51 – 200</option>
+                  <option>201 – 1.000</option>
+                  <option selected>Más de 1.000</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Sitio web</label>
+              <input type="url" class="form-input" value="https://www.arcor.com"/>
+            </div>
+          </div>
+          <div class="dash-card">
+            <h3 class="pf-card-title">Descripción pública</h3>
+            <div class="form-field">
+              <label class="form-label">Descripción de la empresa</label>
+              <textarea class="form-textarea" rows="5">Arcor es la empresa argentina líder en el mercado mundial de caramelos y uno de los principales fabricantes de galletas, chocolates y alimentos. Presente en más de 120 países.</textarea>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Sede principal</label>
+              <input type="text" class="form-input" value="Córdoba, Argentina"/>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Año de fundación</label>
+              <input type="text" class="form-input" value="1951"/>
+            </div>
+            <div class="form-field">
+              <label class="form-label">LinkedIn de la empresa</label>
+              <input type="url" class="form-input" placeholder="https://linkedin.com/company/..."/>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div class="dash-overlay" id="dashOverlay"></div>
+  <script src="js/utils.js"></script>
+  <script src="js/dashboard-empresa.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── USUARIOS ──
+model Usuario {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  rol       Rol      @default(CANDIDATO)
+  creadoEn  DateTime @default(now())
+
+  candidato  Candidato?
+  empresa    Empresa?
+}
+
+enum Rol {
+  CANDIDATO
+  EMPRESA
+}
+
+// ── CANDIDATO ──
+model Candidato {
+  id          String   @id @default(uuid())
+  nombre      String
+  apellido    String
+  ubicacion   String?
+  telefono    String?
+  linkedin    String?
+  cvUrl       String?
+  scoreCV     Int?
+  resumenIA   String?
+  habilidades String[]
+  creadoEn    DateTime @default(now())
+
+  usuarioId   String   @unique
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+
+  postulaciones Postulacion[]
+}
+
+// ── EMPRESA ──
+model Empresa {
+  id          String   @id @default(uuid())
+  nombre      String
+  industria   String?
+  descripcion String?
+  ubicacion   String?
+  sitioWeb    String?
+  creadoEn    DateTime @default(now())
+
+  usuarioId   String   @unique
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+
+  ofertas     OfertaLaboral[]
+}
+
+// ── OFERTA LABORAL ──
+model OfertaLaboral {
+  id          String    @id @default(uuid())
+  titulo      String
+  descripcion String
+  rubro       String
+  modalidad   String
+  ubicacion   String
+  jornada     String
+  experiencia String?
+  estudios    String?
+  salarioMin  Int?
+  salarioMax  Int?
+  habilidades String[]
+  activa      Boolean   @default(true)
+  creadoEn    DateTime  @default(now())
+
+  empresaId   String
+  empresa     Empresa   @relation(fields: [empresaId], references: [id])
+
+  postulaciones Postulacion[]
+}
+
+// ── POSTULACION ──
+model Postulacion {
+  id              String   @id @default(uuid())
+  estado          Estado   @default(PENDIENTE)
+  cartaMotivacion String?
+  matchIA         Int?
+  creadoEn        DateTime @default(now())
+
+  candidatoId     String
+  candidato       Candidato @relation(fields: [candidatoId], references: [id])
+
+  ofertaId        String
+  oferta          OfertaLaboral @relation(fields: [ofertaId], references: [id])
+
+  @@unique([candidatoId, ofertaId])
+}
+
+enum Estado {
+  PENDIENTE
+  REVISADA
+  ENTREVISTA
+  RECHAZADA
+}

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LaburAI — Ingresar o registrarse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/base.css"/>
+  <link rel="stylesheet" href="css/login.css"/>
+</head>
+<body>
+
+  <!-- ══ NAVBAR mínimo ══ -->
+  <nav class="top-bar">
+    <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
+    <a href="index.html" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Volver al inicio
+    </a>
+  </nav>
+
+  <!-- ══ LAYOUT PRINCIPAL ══ -->
+  <main class="auth-layout">
+
+    <!-- Panel izquierdo — decorativo -->
+    <aside class="auth-aside">
+      <div class="aside-blob b1"></div>
+      <div class="aside-blob b2"></div>
+
+      <div class="aside-content">
+        <div class="aside-logo"><span class="logo-star">✦</span>LaburAI</div>
+        <h2 class="aside-title">Tu carrera profesional empieza aquí.</h2>
+        <p class="aside-sub">La inteligencia artificial analiza tu perfil y te conecta con las mejores oportunidades del mercado laboral argentino.</p>
+
+        <div class="aside-features">
+          <div class="aside-feat">
+            <div class="feat-icon">🎯</div>
+            <div>
+              <div class="feat-title">Match inteligente</div>
+              <div class="feat-desc">La IA sugiere ofertas con % de compatibilidad real</div>
+            </div>
+          </div>
+          <div class="aside-feat">
+            <div class="feat-icon">📋</div>
+            <div>
+              <div class="feat-title">Análisis de CV automático</div>
+              <div class="feat-desc">Extraemos tus habilidades y generamos tu resumen</div>
+            </div>
+          </div>
+          <div class="aside-feat">
+            <div class="feat-icon">🔒</div>
+            <div>
+              <div class="feat-title">Siempre gratis para candidatos</div>
+              <div class="feat-desc">Sin costo, sin tarjeta de crédito</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial -->
+        <div class="testimonial">
+          <p class="t-text">"Encontré trabajo en 3 semanas. La IA me recomendó ofertas que nunca hubiera buscado yo solo."</p>
+          <div class="t-author">
+            <div class="t-av" style="background:linear-gradient(135deg,#667EEA,#764BA2)">M</div>
+            <div>
+              <div class="t-name">Martín R.</div>
+              <div class="t-role">Administrativo · Rosario</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Panel derecho — formulario -->
+    <section class="auth-panel">
+      <div class="auth-card">
+
+        <!-- Tabs login / registro -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-tab="login">Ingresar</button>
+          <button class="auth-tab" data-tab="register">Crear cuenta</button>
+        </div>
+
+        <!-- ── FORM LOGIN ── -->
+        <form class="auth-form" id="formLogin" novalidate>
+          <div class="form-header">
+            <h1 class="form-title">Bienvenido de vuelta</h1>
+            <p class="form-sub">Ingresá con tu cuenta de LaburAI</p>
+          </div>
+
+          <!-- Botones sociales -->
+          <div class="social-btns">
+            <button type="button" class="social-btn" id="btnGoogleLogin">
+              <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+              Continuar con Google
+            </button>
+          </div>
+
+          <div class="divider"><span>o ingresá con tu email</span></div>
+
+          <div class="field-group">
+            <label class="field-label" for="loginEmail">Email</label>
+            <div class="field-wrap">
+              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              <input type="email" id="loginEmail" name="email" placeholder="tu@email.com" autocomplete="email"/>
+            </div>
+            <span class="field-error" id="loginEmailErr"></span>
+          </div>
+
+          <div class="field-group">
+            <div class="label-row">
+              <label class="field-label" for="loginPassword">Contraseña</label>
+              <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+            </div>
+            <div class="field-wrap">
+              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="loginPassword" name="password" placeholder="Tu contraseña" autocomplete="current-password"/>
+              <button type="button" class="toggle-pass" data-target="loginPassword" aria-label="Ver contraseña">
+                <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <span class="field-error" id="loginPassErr"></span>
+          </div>
+
+          <div class="field-check">
+            <label class="check-label">
+              <input type="checkbox" id="rememberMe"/>
+              <span class="check-box"></span>
+              Recordar sesión
+            </label>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnLogin">
+            <span class="btn-text">Ingresar</span>
+            <div class="btn-spinner" hidden></div>
+          </button>
+
+          <p class="form-footer-note">¿No tenés cuenta? <a href="#" class="switch-tab" data-tab="register">Registrate gratis</a></p>
+        </form>
+
+        <!-- ── FORM REGISTRO ── -->
+        <form class="auth-form hidden" id="formRegister" novalidate>
+          <div class="form-header">
+            <h1 class="form-title">Creá tu cuenta</h1>
+            <p class="form-sub">Es gratis y solo lleva un minuto</p>
+          </div>
+
+          <!-- Selector de rol -->
+          <div class="role-selector">
+            <button type="button" class="role-btn active" data-role="candidato">
+              <span class="role-icon">👤</span>
+              <span class="role-name">Soy candidato</span>
+              <span class="role-desc">Busco trabajo</span>
+              <span class="role-check">✓</span>
+            </button>
+            <button type="button" class="role-btn" data-role="empresa">
+              <span class="role-icon">🏢</span>
+              <span class="role-name">Soy empresa</span>
+              <span class="role-desc">Busco candidatos</span>
+              <span class="role-check">✓</span>
+            </button>
+          </div>
+          <input type="hidden" id="selectedRole" value="candidato"/>
+
+          <!-- Botones sociales -->
+          <div class="social-btns">
+            <button type="button" class="social-btn" id="btnGoogleRegister">
+              <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+              Registrarse con Google
+            </button>
+          </div>
+
+          <div class="divider"><span>o completá el formulario</span></div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label" for="regNombre">Nombre</label>
+              <div class="field-wrap">
+                <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" id="regNombre" name="nombre" placeholder="Tu nombre" autocomplete="given-name"/>
+              </div>
+              <span class="field-error" id="regNombreErr"></span>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="regApellido">Apellido</label>
+              <div class="field-wrap">
+                <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" id="regApellido" name="apellido" placeholder="Tu apellido" autocomplete="family-name"/>
+              </div>
+              <span class="field-error" id="regApellidoErr"></span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="regEmail">Email</label>
+            <div class="field-wrap">
+              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              <input type="email" id="regEmail" name="email" placeholder="tu@email.com" autocomplete="email"/>
+            </div>
+            <span class="field-error" id="regEmailErr"></span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="regPassword">Contraseña</label>
+            <div class="field-wrap">
+              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="regPassword" name="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password"/>
+              <button type="button" class="toggle-pass" data-target="regPassword" aria-label="Ver contraseña">
+                <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <span class="field-error" id="regPassErr"></span>
+            <!-- Indicador de fortaleza -->
+            <div class="strength-wrap" id="strengthWrap" hidden>
+              <div class="strength-bar">
+                <div class="strength-fill" id="strengthFill"></div>
+              </div>
+              <span class="strength-label" id="strengthLabel"></span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="regConfirm">Confirmar contraseña</label>
+            <div class="field-wrap">
+              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="regConfirm" name="confirm" placeholder="Repetí tu contraseña" autocomplete="new-password"/>
+              <button type="button" class="toggle-pass" data-target="regConfirm" aria-label="Ver contraseña">
+                <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <span class="field-error" id="regConfirmErr"></span>
+          </div>
+
+          <div class="field-check">
+            <label class="check-label">
+              <input type="checkbox" id="acceptTerms"/>
+              <span class="check-box"></span>
+              Acepto los <a href="#" class="inline-link">Términos de uso</a> y la <a href="#" class="inline-link">Política de privacidad</a>
+            </label>
+            <span class="field-error" id="termsErr"></span>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btnRegister">
+            <span class="btn-text">Crear cuenta gratis</span>
+            <div class="btn-spinner" hidden></div>
+          </button>
+
+          <p class="form-footer-note">¿Ya tenés cuenta? <a href="#" class="switch-tab" data-tab="login">Ingresá acá</a></p>
+        </form>
+
+        <!-- ── ESTADO: ÉXITO REGISTRO ── -->
+        <div class="success-state hidden" id="successState">
+          <div class="success-icon">✦</div>
+          <h2 class="success-title">¡Cuenta creada!</h2>
+          <p class="success-sub" id="successMsg">Redirigiendo a tu dashboard…</p>
+          <div class="success-countdown" id="successCountdown">
+            <div class="scd-bar"><div class="scd-fill" id="scdFill"></div></div>
+            <span class="scd-text" id="scdText">Entrando en 3…</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script src="js/utils.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
