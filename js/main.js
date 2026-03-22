@@ -201,11 +201,21 @@ function initNavSession() {
     const firstName = session.nombre.split(' ')[0];
 
     actions.innerHTML = `
-      <a href="${dashboard}" class="nav-user-btn">
+      <div class="nav-user-btn" id="avatarMenu" style="cursor:pointer">
         <div class="nav-avatar">${firstName.charAt(0).toUpperCase()}</div>
         <span class="nav-user-name">${firstName}</span>
-      </a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        <div class="avatar-dropdown" id="avatarDropdown">
+          <a href="${dashboard}?section=perfil">Mi perfil</a>
+          <a href="${dashboard}">Configuración</a>
+          <hr/>
+          <a href="#" class="dropdown-logout" onclick="cerrarSesion(); return false;">Cerrar sesión</a>
+        </div>
+      </div>
       <a href="${dashboard}" class="btn-primary">Mi dashboard</a>`;
+    
+    // init dropdown después de insertar el HTML
+    initAvatarDropdown();
 
     if (mobile) {
       mobile.innerHTML = `

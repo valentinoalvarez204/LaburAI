@@ -579,3 +579,4 @@ body { background: var(--bg); }
   .postul-item { flex-wrap: wrap; }
   .pi-match, .pi-status { align-self: flex-start; }
 }
+.avatar-dropdown { left: auto; right: 0; }
