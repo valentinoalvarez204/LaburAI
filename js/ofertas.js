@@ -429,44 +429,76 @@ function initReveal() {
 /* ─────────────────────────────────
    INIT
 ───────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   showSkeleton();
 
-  setTimeout(() => {
-    initNavbar();
-    initHamburger();
-    initSidebarToggle();
-    initAccordion();
-    initFilters();
-    initSearch();
-    initSort();
-    initReveal();
+  // Cargar ofertas reales desde la API
+  try {
+    const res  = await fetch('http://localhost:3000/api/jobs');
+    const data = await res.json();
 
-    // Leer parámetros de URL
-    const params = new URLSearchParams(window.location.search);
-    const q      = params.get('q')     || '';
-    const loc    = params.get('loc')   || '';
-    const rubro  = params.get('rubro') || '';
+    // Vaciar array hardcodeado y llenar con datos reales
+    OFERTAS.length = 0;
+    data.forEach((job) => {
+      OFERTAS.push({
+        id:           job.id,
+        title:        job.titulo,
+        company:      job.empresa?.nombre || 'Empresa',
+        location:     job.ubicacion,
+        logo:         job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+        logoColor:    '#5C6BC0',
+        tags:         [job.modalidad, job.jornada, ...(job.habilidades?.slice(0,1) || [])],
+        tagTypes:     [job.modalidad === 'Remoto' ? 'remote' : '', '', ''],
+        salary:       job.salarioMin && job.salarioMax
+                        ? `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`
+                        : 'Salario a convenir',
+        salaryNum:    job.salarioMin || 0,
+        time:         new Date(job.creadoEn).toLocaleDateString('es-AR'),
+        match:        null,
+        rubro:        job.rubro,
+        modalidad:    job.modalidad?.toLowerCase(),
+        jornada:      job.jornada?.toLowerCase().replace(' ', ''),
+        exp:          job.experiencia || '',
+        desc:         job.descripcion,
+      });
+    });
 
-    if (q) {
-      const qIn = document.getElementById('searchQuery');
-      if (qIn) qIn.value = q;
-      state.query = q.toLowerCase();
-    }
-    if (loc) {
-      const lIn = document.getElementById('searchLocation');
-      if (lIn) lIn.value = loc;
-      state.location = loc.toLowerCase();
-    }
-    if (rubro) {
-      // Marcar el checkbox correspondiente en el sidebar
-      const cb = document.querySelector(`input[name="rubro"][value="${rubro}"]`);
-      if (cb) {
-        cb.checked = true;
-        state.filters.rubro = [rubro];
-      }
-    }
+  } catch (err) {
+    console.error('Error cargando ofertas:', err);
+    showToast('No se pudieron cargar las ofertas', 'error');
+  }
 
-    applyAndRender();
-  }, 600);
+  // Leer parámetros de URL
+  const params = new URLSearchParams(window.location.search);
+  const q      = params.get('q')     || '';
+  const loc    = params.get('loc')   || '';
+  const rubro  = params.get('rubro') || '';
+
+  if (q) {
+    const qIn = document.getElementById('searchQuery');
+    if (qIn) qIn.value = q;
+    state.query = q.toLowerCase();
+  }
+  if (loc) {
+    const lIn = document.getElementById('searchLocation');
+    if (lIn) lIn.value = loc;
+    state.location = loc.toLowerCase();
+  }
+  if (rubro) {
+    const cb = document.querySelector(`input[name="rubro"][value="${rubro}"]`);
+    if (cb) {
+      cb.checked = true;
+      state.filters.rubro = [rubro];
+    }
+  }
+
+  initNavbar();
+  initHamburger();
+  initSidebarToggle();
+  initAccordion();
+  initFilters();
+  initSearch();
+  initSort();
+  initReveal();
+  applyAndRender();
 });

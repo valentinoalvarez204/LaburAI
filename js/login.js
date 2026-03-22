@@ -14,10 +14,10 @@
    TABS — alternar login / registro
 ───────────────────────────────── */
 function initTabs() {
-  const tabs       = document.querySelectorAll('.auth-tab');
-  const formLogin  = document.getElementById('formLogin');
-  const formReg    = document.getElementById('formRegister');
-  const successSt  = document.getElementById('successState');
+  const tabs = document.querySelectorAll('.auth-tab');
+  const formLogin = document.getElementById('formLogin');
+  const formReg = document.getElementById('formRegister');
+  const successSt = document.getElementById('successState');
 
   function switchTab(target) {
     // Activar tab
@@ -55,8 +55,8 @@ function initTabs() {
    SELECTOR DE ROL
 ───────────────────────────────── */
 function initRoleSelector() {
-  const btns         = document.querySelectorAll('.role-btn');
-  const hiddenInput  = document.getElementById('selectedRole');
+  const btns = document.querySelectorAll('.role-btn');
+  const hiddenInput = document.getElementById('selectedRole');
 
   btns.forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -74,11 +74,11 @@ function initPasswordToggles() {
   document.querySelectorAll('.toggle-pass').forEach((btn) => {
     btn.addEventListener('click', () => {
       const inputId = btn.dataset.target;
-      const input   = document.getElementById(inputId);
+      const input = document.getElementById(inputId);
       if (!input) return;
 
       const isText = input.type === 'text';
-      input.type   = isText ? 'password' : 'text';
+      input.type = isText ? 'password' : 'text';
 
       // Cambiar ícono
       const icon = btn.querySelector('.eye-icon');
@@ -95,28 +95,28 @@ function initPasswordToggles() {
    FORTALEZA DE CONTRASEÑA
 ───────────────────────────────── */
 const STRENGTH_LEVELS = [
-  { label: 'Muy débil',  color: '#E53935', width: '20%' },
-  { label: 'Débil',      color: '#FF7043', width: '40%' },
-  { label: 'Regular',    color: '#F4A700', width: '60%' },
-  { label: 'Buena',      color: '#66BB6A', width: '80%' },
-  { label: 'Excelente',  color: '#11998E', width: '100%' },
+  { label: 'Muy débil', color: '#E53935', width: '20%' },
+  { label: 'Débil', color: '#FF7043', width: '40%' },
+  { label: 'Regular', color: '#F4A700', width: '60%' },
+  { label: 'Buena', color: '#66BB6A', width: '80%' },
+  { label: 'Excelente', color: '#11998E', width: '100%' },
 ];
 
 function getStrengthScore(password) {
   let score = 0;
-  if (password.length >= 8)                    score++;
-  if (password.length >= 12)                   score++;
-  if (/[A-Z]/.test(password))                  score++;
-  if (/[0-9]/.test(password))                  score++;
-  if (/[^A-Za-z0-9]/.test(password))           score++;
+  if (password.length >= 8) score++;
+  if (password.length >= 12) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
   return Math.min(score, 4); // 0–4
 }
 
 function initPasswordStrength() {
-  const input       = document.getElementById('regPassword');
-  const wrap        = document.getElementById('strengthWrap');
-  const fill        = document.getElementById('strengthFill');
-  const label       = document.getElementById('strengthLabel');
+  const input = document.getElementById('regPassword');
+  const wrap = document.getElementById('strengthWrap');
+  const fill = document.getElementById('strengthFill');
+  const label = document.getElementById('strengthLabel');
   if (!input || !wrap || !fill || !label) return;
 
   input.addEventListener('input', () => {
@@ -128,12 +128,12 @@ function initPasswordStrength() {
     }
 
     wrap.hidden = false;
-    const score  = getStrengthScore(val);
-    const level  = STRENGTH_LEVELS[score];
-    fill.style.width      = level.width;
+    const score = getStrengthScore(val);
+    const level = STRENGTH_LEVELS[score];
+    fill.style.width = level.width;
     fill.style.background = level.color;
-    label.textContent     = level.label;
-    label.style.color     = level.color;
+    label.textContent = level.label;
+    label.style.color = level.color;
   });
 }
 
@@ -142,15 +142,15 @@ function initPasswordStrength() {
 ───────────────────────────────── */
 function setError(inputId, errId, message) {
   const input = document.getElementById(inputId);
-  const err   = document.getElementById(errId);
+  const err = document.getElementById(errId);
   if (input) input.closest('.field-wrap')?.classList.add('error');
-  if (err)   err.textContent = message;
+  if (err) err.textContent = message;
   return false;
 }
 
 function clearError(inputId, errId) {
   const input = document.getElementById(inputId);
-  const err   = document.getElementById(errId);
+  const err = document.getElementById(errId);
   if (input) {
     input.closest('.field-wrap')?.classList.remove('error');
     input.closest('.field-wrap')?.classList.remove('success');
@@ -185,7 +185,7 @@ function validateLogin() {
   clearErrors();
 
   const email = document.getElementById('loginEmail')?.value.trim();
-  const pass  = document.getElementById('loginPassword')?.value;
+  const pass = document.getElementById('loginPassword')?.value;
 
   if (!email) {
     setError('loginEmail', 'loginEmailErr', 'El email es obligatorio.');
@@ -215,12 +215,12 @@ function validateRegister() {
   let valid = true;
   clearErrors();
 
-  const nombre   = document.getElementById('regNombre')?.value.trim();
+  const nombre = document.getElementById('regNombre')?.value.trim();
   const apellido = document.getElementById('regApellido')?.value.trim();
-  const email    = document.getElementById('regEmail')?.value.trim();
-  const pass     = document.getElementById('regPassword')?.value;
-  const confirm  = document.getElementById('regConfirm')?.value;
-  const terms    = document.getElementById('acceptTerms')?.checked;
+  const email = document.getElementById('regEmail')?.value.trim();
+  const pass = document.getElementById('regPassword')?.value;
+  const confirm = document.getElementById('regConfirm')?.value;
+  const terms = document.getElementById('acceptTerms')?.checked;
 
   if (!nombre) {
     setError('regNombre', 'regNombreErr', 'Ingresá tu nombre.');
@@ -269,14 +269,14 @@ function validateRegister() {
    SIMULACIÓN DE ENVÍO
 ───────────────────────────────── */
 function setLoading(btnId, loading) {
-  const btn     = document.getElementById(btnId);
+  const btn = document.getElementById(btnId);
   if (!btn) return;
-  const txtEl   = btn.querySelector('.btn-text');
+  const txtEl = btn.querySelector('.btn-text');
   const spinner = btn.querySelector('.btn-spinner');
 
   btn.disabled = loading;
-  if (txtEl)   txtEl.style.display  = loading ? 'none' : '';
-  if (spinner) spinner.hidden        = !loading;
+  if (txtEl) txtEl.style.display = loading ? 'none' : '';
+  if (spinner) spinner.hidden = !loading;
 }
 
 function initForms() {
@@ -288,22 +288,47 @@ function initForms() {
       if (!validateLogin()) return;
 
       setLoading('btnLogin', true);
-      await delay(1500);
-      setLoading('btnLogin', false);
 
-      // Guardar sesión simulada en localStorage
-      // En producción esto vendría del backend (JWT, etc.)
-      const email = document.getElementById('loginEmail')?.value || '';
-      const nombre = email.split('@')[0]; // usar parte del email como nombre
-      localStorage.setItem('labuai_session', JSON.stringify({
-        nombre:    nombre.charAt(0).toUpperCase() + nombre.slice(1),
-        rol:       'candidato',
-        email:     email,
-      }));
+      try {
+        const email = document.getElementById('loginEmail')?.value || '';
+        const password = document.getElementById('loginPassword')?.value || '';
 
-      showToast('¡Bienvenido/a! Redirigiendo…', 'success');
-      await delay(1000);
-      window.location.href = 'dashboard-candidato.html';
+        const res = await fetch('http://localhost:3000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await res.json();
+        setLoading('btnLogin', false);
+
+        if (!res.ok) {
+          showToast(data.message || 'Email o contraseña incorrectos', 'error');
+          return;
+        }
+
+        localStorage.setItem('labuai_session', JSON.stringify({
+          nombre: data.usuario.nombre,
+          rol: data.usuario.rol.toLowerCase(),
+          email: data.usuario.email,
+          token: data.token,
+          id: data.usuario.id,
+          candidatoId: data.usuario.candidatoId,
+          empresaId: data.usuario.empresaId,
+        }));
+
+        showToast('¡Bienvenido/a! Redirigiendo…', 'success');
+        await delay(1000);
+
+        const destino = data.usuario.rol === 'EMPRESA'
+          ? 'dashboard-empresa.html'
+          : 'dashboard-candidato.html';
+        window.location.href = destino;
+
+      } catch (err) {
+        setLoading('btnLogin', false);
+        showToast('No se pudo conectar con el servidor', 'error');
+      }
     });
   }
 
@@ -315,50 +340,73 @@ function initForms() {
       if (!validateRegister()) return;
 
       setLoading('btnRegister', true);
-      await delay(1800);
-      setLoading('btnRegister', false);
 
-      // Determinar destino según rol
-      const rol     = document.getElementById('selectedRole')?.value || 'candidato';
-      const destino = rol === 'empresa' ? 'dashboard-empresa.html' : 'dashboard-candidato.html';
-      const label   = rol === 'empresa' ? 'al panel de empresa' : 'a tu dashboard';
+      try {
+        const rol = document.getElementById('selectedRole')?.value || 'candidato';
+        const nombre = document.getElementById('regNombre')?.value || '';
+        const apellido = document.getElementById('regApellido')?.value || '';
+        const email = document.getElementById('regEmail')?.value || '';
+        const password = document.getElementById('regPassword')?.value || '';
 
-      // Guardar sesión en localStorage
-      const nombre   = document.getElementById('regNombre')?.value   || '';
-      const apellido = document.getElementById('regApellido')?.value || '';
-      const email    = document.getElementById('regEmail')?.value    || '';
-      localStorage.setItem('labuai_session', JSON.stringify({
-        nombre:    `${nombre} ${apellido}`.trim(),
-        rol:       rol,
-        email:     email,
-      }));
+        const res = await fetch('http://localhost:3000/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            password,
+            rol: rol.toUpperCase(),
+            nombre,
+            apellido,
+            nombreEmpresa: nombre,
+          }),
+        });
 
-      // Mostrar estado de éxito
-      formReg.classList.add('hidden');
-      const success = document.getElementById('successState');
-      if (!success) return;
-      success.classList.remove('hidden');
+        const data = await res.json();
+        setLoading('btnRegister', false);
 
-      // Actualizar mensaje
-      const msg = document.getElementById('successMsg');
-      if (msg) msg.textContent = `Redirigiendo ${label}…`;
-
-      // Countdown visual 3 → 2 → 1
-      const fill    = document.getElementById('scdFill');
-      const scdText = document.getElementById('scdText');
-      let secs = 3;
-
-      function tick() {
-        if (scdText) scdText.textContent = `Entrando en ${secs}…`;
-        if (fill)    fill.style.width = ((secs / 3) * 100) + '%';
-        if (secs <= 0) {
-          window.location.href = destino;
+        if (!res.ok) {
+          showToast(data.message || 'Error al registrarse', 'error');
           return;
         }
-        secs--;
-        setTimeout(tick, 1000);
+
+        localStorage.setItem('labuai_session', JSON.stringify({
+          nombre: `${nombre} ${apellido}`.trim(),
+          rol: rol,
+          email: email,
+          token: data.token,
+          id: data.usuario.id,
+          candidatoId: data.usuario.candidatoId,
+          empresaId: data.usuario.empresaId,
+        }));
+
+        const destino = rol === 'empresa' ? 'dashboard-empresa.html' : 'dashboard-candidato.html';
+        const label = rol === 'empresa' ? 'al panel de empresa' : 'a tu dashboard';
+
+        formReg.classList.add('hidden');
+        const success = document.getElementById('successState');
+        if (!success) return;
+        success.classList.remove('hidden');
+
+        const msg = document.getElementById('successMsg');
+        if (msg) msg.textContent = `Redirigiendo ${label}…`;
+
+        const fill = document.getElementById('scdFill');
+        const scdText = document.getElementById('scdText');
+        let secs = 3;
+
+        function tick() {
+          if (scdText) scdText.textContent = `Entrando en ${secs}…`;
+          if (fill) fill.style.width = ((secs / 3) * 100) + '%';
+          if (secs <= 0) { window.location.href = destino; return; }
+          secs--;
+          setTimeout(tick, 1000);
+        }
+        tick();
+
+      } catch (err) {
+        setLoading('btnRegister', false);
+        showToast('No se pudo conectar con el servidor', 'error');
       }
-      tick();
     });
   }
 
@@ -368,25 +416,26 @@ function initForms() {
     if (btn) {
       btn.addEventListener('click', () => {
         showToast('Conectando con Google…', 'info');
-        // En producción: redirigir a OAuth
-        console.log('[LaburAI] OAuth Google iniciado');
       });
     }
   });
 }
+
+
 
 /* ─────────────────────────────────
    VALIDACIÓN EN TIEMPO REAL (blur)
 ───────────────────────────────── */
 function initLiveValidation() {
   const rules = [
-    { id: 'loginEmail',   errId: 'loginEmailErr',   check: (v) => !v ? 'El email es obligatorio.' : !isValidEmail(v) ? 'Email inválido.' : '' },
-    { id: 'loginPassword',errId: 'loginPassErr',    check: (v) => !v ? 'La contraseña es obligatoria.' : v.length < 6 ? 'Mínimo 6 caracteres.' : '' },
-    { id: 'regNombre',    errId: 'regNombreErr',    check: (v) => !v ? 'Ingresá tu nombre.' : '' },
-    { id: 'regApellido',  errId: 'regApellidoErr',  check: (v) => !v ? 'Ingresá tu apellido.' : '' },
-    { id: 'regEmail',     errId: 'regEmailErr',     check: (v) => !v ? 'El email es obligatorio.' : !isValidEmail(v) ? 'Email inválido.' : '' },
-    { id: 'regPassword',  errId: 'regPassErr',      check: (v) => !v ? 'La contraseña es obligatoria.' : v.length < 8 ? 'Mínimo 8 caracteres.' : '' },
-    { id: 'regConfirm',   errId: 'regConfirmErr',   check: (v) => {
+    { id: 'loginEmail', errId: 'loginEmailErr', check: (v) => !v ? 'El email es obligatorio.' : !isValidEmail(v) ? 'Email inválido.' : '' },
+    { id: 'loginPassword', errId: 'loginPassErr', check: (v) => !v ? 'La contraseña es obligatoria.' : v.length < 6 ? 'Mínimo 6 caracteres.' : '' },
+    { id: 'regNombre', errId: 'regNombreErr', check: (v) => !v ? 'Ingresá tu nombre.' : '' },
+    { id: 'regApellido', errId: 'regApellidoErr', check: (v) => !v ? 'Ingresá tu apellido.' : '' },
+    { id: 'regEmail', errId: 'regEmailErr', check: (v) => !v ? 'El email es obligatorio.' : !isValidEmail(v) ? 'Email inválido.' : '' },
+    { id: 'regPassword', errId: 'regPassErr', check: (v) => !v ? 'La contraseña es obligatoria.' : v.length < 8 ? 'Mínimo 8 caracteres.' : '' },
+    {
+      id: 'regConfirm', errId: 'regConfirmErr', check: (v) => {
         const pass = document.getElementById('regPassword')?.value;
         return !v ? 'Confirmá tu contraseña.' : v !== pass ? 'Las contraseñas no coinciden.' : '';
       }
