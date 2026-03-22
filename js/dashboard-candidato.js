@@ -417,5 +417,37 @@ document.addEventListener('DOMContentLoaded', () => {
   initPostulacionesFiltros();
   initReanalyze();
   initCopySummary();
+
+  let perfilClickCount = 0;
+  document.querySelector('.avatar-dropdown')?.addEventListener('click', (e) => {
+  if (e.target.textContent.trim() === 'Mi perfil') {
+    const current = document.getElementById('perfil');
+    if (current && !current.classList.contains('hidden')) {
+      perfilClickCount++;
+      if (perfilClickCount >= 3) {
+        perfilClickCount = 0;
+        const emoji = document.createElement('div');
+        emoji.textContent = '😵';
+        Object.assign(emoji.style, {
+          position: 'fixed', bottom: '-50px', left: Math.random() * 80 + 10 + '%',
+          fontSize: '2.5rem', zIndex: '9999', transition: 'bottom 2s ease-out, opacity 1s ease-in 1.5s',
+          opacity: '1', pointerEvents: 'none'
+        });
+        document.body.appendChild(emoji);
+        requestAnimationFrame(() => {
+          emoji.style.bottom = '110vh';
+          emoji.style.opacity = '0';
+        });
+        setTimeout(() => emoji.remove(), 2500);
+      }
+    } else {
+      perfilClickCount = 0;
+    }
+  }
+});
+  
   initSaveProfile();
+
+  const section = getParam('section');
+  if (section) switchSection(section);
 });

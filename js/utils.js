@@ -210,3 +210,9 @@ function initDashSidebar() {
   });
   overlay?.addEventListener('click', closeSidebar);
 }
+
+// Cerrar sesion ----
+  function cerrarSesion() {
+    localStorage.removeItem('labuai_session');
+  window.location.href = 'index.html';
+}
