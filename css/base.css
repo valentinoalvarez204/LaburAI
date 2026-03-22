@@ -585,7 +585,7 @@ footer {
 }
 .avatar-name { font-size: 13px; font-weight: 600; color: var(--text); }
 .avatar-dropdown {
-  position: absolute; top: calc(100% + 8px); right: 0;
+  position: absolute; top: calc(100% + 8px); right: 255;
   background: var(--white); border: 1.5px solid var(--border);
   border-radius: var(--r); box-shadow: var(--shadow-lg);
   min-width: 160px; padding: 6px; display: none; z-index: 300;
