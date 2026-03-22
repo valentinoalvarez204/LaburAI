@@ -8,7 +8,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
-  ) {}
+  ) { }
 
   async register(data: {
     email: string;
@@ -57,6 +57,10 @@ export class AuthService {
     // Generar token
     const token = this.jwt.sign({ sub: usuario.id, rol: usuario.rol });
 
+    // Buscar ID del perfil según rol
+    const candidato = await this.prisma.candidato.findUnique({ where: { usuarioId: usuario.id } });
+    const empresa = await this.prisma.empresa.findUnique({ where: { usuarioId: usuario.id } });
+
     return {
       token,
       usuario: {
@@ -64,6 +68,8 @@ export class AuthService {
         email: usuario.email,
         rol: usuario.rol,
         nombre: data.rol === 'CANDIDATO' ? data.nombre : data.nombreEmpresa,
+        candidatoId: candidato?.id || null,
+        empresaId: empresa?.id || null,
       },
     };
   }
@@ -97,6 +103,9 @@ export class AuthService {
         email: usuario.email,
         rol: usuario.rol,
         nombre,
+        // ID del perfil según rol — lo necesita el frontend
+        candidatoId: usuario.candidato?.id || null,
+        empresaId: usuario.empresa?.id || null,
       },
     };
   }
