@@ -527,14 +527,65 @@ function initModal() {
   sucOverlay?.addEventListener('click', (e) => { if (e.target === sucOverlay) { sucOverlay.classList.add('hidden'); document.body.style.overflow = ''; } });
 
   btnConfirm?.addEventListener('click', async () => {
-    // Simular envío
-    btnConfirm.disabled = true;
-    btnConfirm.innerHTML = '<div style="width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div> Enviando…';
-    await delay(1600);
+  btnConfirm.disabled = true;
+  btnConfirm.innerHTML = '<div style="width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div> Enviando…';
+
+  try {
+    // Obtener sesión del usuario
+    const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+
+    if (!session.token) {
+      showToast('Necesitás iniciar sesión para postularte', 'error');
+      setTimeout(() => window.location.href = 'login.html', 1500);
+      return;
+    }
+
+    // Obtener ID del candidato desde la API
+    const perfilRes = await fetch(`http://localhost:3000/api/applications?candidatoId=${session.id}`);
+
+    // Obtener ID de oferta de la URL
+    const ofertaId = getParam('id');
+    const carta    = document.getElementById('coverLetter')?.value || '';
+
+    // Buscar el candidatoId real en la base de datos
+    const candidatosRes = await fetch('http://localhost:3000/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${session.token}` },
+    });
+
+    // Postular directamente usando el id guardado en sesión
+    const res = await fetch('http://localhost:3000/api/applications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.token}`,
+      },
+      body: JSON.stringify({
+        candidatoId:     session.candidatoId || session.id,
+        ofertaId:        ofertaId,
+        cartaMotivacion: carta,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showToast(data.message || 'Error al postularse', 'error');
+      btnConfirm.disabled = false;
+      btnConfirm.innerHTML = 'Confirmar postulación';
+      return;
+    }
+
+    // Mostrar éxito
+    overlay?.classList.add('hidden');
+    sucOverlay?.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+  } catch (err) {
+    showToast('No se pudo conectar con el servidor', 'error');
     btnConfirm.disabled = false;
     btnConfirm.innerHTML = 'Confirmar postulación';
-    showSuccess();
-  });
+  }
+});
 }
 
 /* ─────────────────────────────────
@@ -581,16 +632,61 @@ function renderList(id, items) {
 /* ─────────────────────────────────
    INIT
 ───────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
-  const id     = getParam('id') || '1';
-  const oferta = getOferta(id);
+document.addEventListener('DOMContentLoaded', async () => {
+  const id = getParam('id');
+  if (!id) { window.location.href = 'ofertas.html'; return; }
 
-  initNavbar();
-  initHamburger();
-  renderPage(oferta);
-  initTabs();
-  initSave();
-  initModal();
-  initReport();
-  initShare();
+  try {
+    const res  = await fetch(`http://localhost:3000/api/jobs/${id}`);
+    const job  = await res.json();
+
+    if (!res.ok) { window.location.href = 'ofertas.html'; return; }
+
+    // Mapear datos de la API al formato que espera renderPage()
+    const oferta = {
+      id:           job.id,
+      title:        job.titulo,
+      company:      job.empresa?.nombre || 'Empresa',
+      location:     job.ubicacion,
+      logo:         job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+      logoColor:    '#5C6BC0',
+      tags:         [job.modalidad, job.jornada],
+      tagTypes:     [job.modalidad === 'Remoto' ? 'remote' : '', ''],
+      salary:       job.salarioMin && job.salarioMax
+                      ? `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`
+                      : 'Salario a convenir',
+      time:         new Date(job.creadoEn).toLocaleDateString('es-AR'),
+      match:        null,
+      modalidad:    job.modalidad,
+      jornada:      job.jornada,
+      exp:          job.experiencia || 'No especificada',
+      vacantes:     1,
+      postulaciones: job.postulaciones?.length || 0,
+      desc:         job.descripcion,
+      responsibilities: [],
+      benefits:     [],
+      requirements: [job.experiencia, job.estudios].filter(Boolean),
+      skills:       job.habilidades || [],
+      niceSkills:   [],
+      matchSkills:  [],
+      company_desc: job.empresa?.descripcion || `${job.empresa?.nombre} es una empresa líder en ${job.empresa?.industria || 'su sector'}.`,
+      company_employees: 'No especificado',
+      company_since:     'No especificado',
+      company_industry:  job.empresa?.industria || 'No especificado',
+      company_openings:  1,
+    };
+
+    initNavbar();
+    initHamburger();
+    renderPage(oferta);
+    initTabs();
+    initSave();
+    initModal();
+    initReport();
+    initShare();
+
+  } catch (err) {
+    console.error('Error cargando oferta:', err);
+    window.location.href = 'ofertas.html';
+  }
 });
