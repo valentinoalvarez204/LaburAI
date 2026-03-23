@@ -28,14 +28,57 @@ async function fetchHomeJobs() {
         ? `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`
         : 'Salario a convenir',
       time: new Date(job.creadoEn).toLocaleDateString('es-AR'),
-      match: null, // El match se calcula en el dashboard o detalle
+      match: null,
+      rubro: job.rubro,
       filter: ['todos', job.modalidad === 'Remoto' ? 'remoto' : '', job.jornada.toLowerCase().replace(' ', '')].filter(Boolean)
     }));
     
     renderJobs('todos');
+    renderCategories();
   } catch (err) {
     console.error('Error cargando ofertas en home:', err);
   }
+}
+
+/* ─────────────────────────────────
+   RENDER CATEGORIAS (áreas)
+───────────────────────────────── */
+function renderCategories() {
+  const grid = document.getElementById('catGrid');
+  if (!grid) return;
+
+  const RUBROS_MAP = {
+    administracion: { label: 'Administración y RRHH', icon: '💼' },
+    ventas: { label: 'Ventas y Comercial', icon: '🛒' },
+    tecnologia: { label: 'Tecnología e IT', icon: '💻' },
+    salud: { label: 'Salud y Medicina', icon: '🏥' },
+    educacion: { label: 'Educación y Docencia', icon: '🎓' },
+    construccion: { label: 'Construcción e Ingeniería', icon: '🏗️' },
+    gastronomia: { label: 'Gastronomía y Turismo', icon: '🍽️' },
+    logistica: { label: 'Logística y Transporte', icon: '🚚' },
+    finanzas: { label: 'Finanzas y Contabilidad', icon: '📊' },
+    diseno: { label: 'Diseño y Creatividad', icon: '🎨' },
+    legal: { label: 'Legal y Jurídico', icon: '⚖️' },
+    agro: { label: 'Agro y Medioambiente', icon: '🌱' },
+  };
+
+  // Contar ofertas por rubro
+  const counts = {};
+  JOBS.forEach(j => {
+    if (j.rubro) counts[j.rubro] = (counts[j.rubro] || 0) + 1;
+  });
+
+  // Mostrar todos los rubros definidos, incluso con 0 ofertas
+  grid.innerHTML = Object.keys(RUBROS_MAP).map(r => {
+    const meta = RUBROS_MAP[r];
+    const count = counts[r] || 0;
+    return `
+      <a class="cat-card" href="ofertas.html?rubro=${r}">
+        <div class="cat-icon">${meta.icon}</div>
+        <div class="cat-name">${meta.label}</div>
+        <div class="cat-count">${count} oferta${count !== 1 ? 's' : ''}</div>
+      </a>`;
+  }).join('');
 }
 
 /* ─────────────────────────────────
