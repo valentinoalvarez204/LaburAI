@@ -27,15 +27,18 @@ async findAll(filtros?: {
       ];
     }
 
-    return this.prisma.ofertaLaboral.findMany({
-      where,
-      include: {
-        empresa: {
-          select: { nombre: true, industria: true, ubicacion: true },
-        },
-      },
-      orderBy: { creadoEn: 'desc' },
-    });
+return this.prisma.ofertaLaboral.findMany({
+  where,
+  include: {
+    empresa: {
+      select: { nombre: true, industria: true, ubicacion: true },
+    },
+    postulaciones: {
+      select: { id: true, estado: true },
+    },
+  },
+  orderBy: { creadoEn: 'desc' },
+});
   }
 
   // Obtener una oferta por ID

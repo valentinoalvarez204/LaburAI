@@ -71,9 +71,9 @@ function initNav() {
   document.querySelectorAll('.dash-nav a[data-section]').forEach((a) => {
     a.addEventListener('click', (e) => { e.preventDefault(); switchSection(a.dataset.section); });
   });
-  // Botones "Nueva oferta"
+  // Botones "Nueva oferta" → van a la sección publicar del dashboard
   ['btnNuevaOferta', 'btnNuevaOfertaHero'].forEach((id) => {
-    document.getElementById(id)?.addEventListener('click', () => window.location.href = 'publicar-oferta.html');
+    document.getElementById(id)?.addEventListener('click', () => switchSection('publicar'));
   });
   // Links internos (dash-card headers "Ver todas →")
   document.querySelectorAll('[data-section]').forEach((el) => {
@@ -148,7 +148,21 @@ function renderTopCandidatos() {
 function renderActividad() {
   const el = document.getElementById('actividadList');
   if (!el) return;
-  el.innerHTML = ACTIVIDAD.map((a) => `
+
+  // Generar actividad real desde candidatos
+  const actividad = CANDIDATOS_DATA.map((c) => ({
+    icon: '👤',
+    type: 'postul',
+    text: `<strong>${c.nombre}</strong> se postuló a ${c.oferta}`,
+    time: 'reciente',
+  }));
+
+  if (!actividad.length) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:14px">No hay actividad reciente.</div>';
+    return;
+  }
+
+  el.innerHTML = actividad.map((a) => `
     <div class="act-item">
       <div class="act-icon act-icon--${a.type}">${a.icon}</div>
       <div class="act-text">${a.text}</div>
@@ -198,7 +212,7 @@ function renderOfertas(filter = 'todas') {
       <div class="or-actions">
         <button class="or-btn or-btn--primary" onclick="switchSection('candidatos')">Ver candidatos</button>
         <button class="or-btn">Editar</button>
-        ${o.status === 'activa' ? '<button class="or-btn">Cerrar</button>' : ''}
+        ${o.status === 'activa' ? `<button class="or-btn" onclick="cerrarOferta('${o.id}', this)">Cerrar</button>` : ''}
       </div>
     </div>`).join('');
 }
@@ -303,13 +317,63 @@ function initSelectOferta() {
 /* ─────────────────────────────────
    ACCIONES
 ───────────────────────────────── */
-window.agendarEntrevista = function (id) {
+window.agendarEntrevista = async function(id) {
   const c = CANDIDATOS_DATA.find((x) => x.id === id);
   if (!c) return;
-  showToast(`Entrevista agendada con ${c.nombre}`, 'success');
+
+  const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+
+  try {
+    // c.id ES el id de la postulación (lo guardamos así en el DOMContentLoaded)
+    const res = await fetch(`http://localhost:3000/api/applications/${c.id}/estado`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.token}`,
+      },
+      body: JSON.stringify({ estado: 'ENTREVISTA' }),
+    });
+
+    if (res.ok) {
+      showToast(`✓ Entrevista agendada con ${c.nombre}`, 'success');
+      const card = document.querySelector(`.cand-card[data-id="${id}"]`);
+      if (card) {
+        const btn = card.querySelector('.cand-btn--primary');
+        if (btn) { btn.textContent = '✓ Entrevista agendada'; btn.disabled = true; }
+      }
+    } else {
+      showToast('Error al agendar entrevista', 'error');
+    }
+  } catch (err) {
+    showToast('No se pudo conectar con el servidor', 'error');
+  }
 };
-window.verPerfil = function (id) {
-  window.location.href = `oferta-detalle.html?id=${id}`;
+window.verPerfil = function(id) {
+  const c = CANDIDATOS_DATA.find((x) => x.id === id);
+  if (!c) return;
+  showToast(`${c.nombre} · ${c.oferta} · ${c.exp}`, 'info');
+};
+
+window.cerrarOferta = async function(ofertaId, btn) {
+  const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+  if (!confirm('¿Seguro que querés cerrar esta oferta?')) return;
+  try {
+    const res = await fetch(`http://localhost:3000/api/jobs/${ofertaId}/cerrar`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${session.token}` },
+    });
+    if (res.ok) {
+      showToast('Oferta cerrada correctamente', 'success');
+      // Actualizar en el array local
+      const oferta = OFERTAS_DATA.find((o) => o.id === ofertaId);
+      if (oferta) oferta.status = 'cerrada';
+      renderOfertas(document.querySelector('.otab.active')?.dataset.of || 'todas');
+    } else {
+      showToast('Error al cerrar la oferta', 'error');
+    }
+  } catch (err) {
+    showToast('No se pudo conectar con el servidor', 'error');
+  }
 };
 
 function initPublicar() {
@@ -497,10 +561,9 @@ function pubResetForm() {
    INIT
 ───────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
-  // Cargar sesión
   const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
 
-  // Actualizar nombre de la empresa en el sidebar y topbar
+  // Actualizar nombre en sidebar y topbar
   if (session.nombre) {
     document.querySelectorAll('.sp-name, .avatar-name').forEach((el) => {
       el.textContent = session.nombre;
@@ -515,66 +578,76 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Cargar ofertas reales de la empresa
   if (session.empresaId) {
     try {
-      const res = await fetch(`http://localhost:3000/api/jobs?empresaId=${session.empresaId}`);
-      const data = await res.json();
-
-      // Filtrar solo las ofertas de esta empresa
-      const misOfertas = data;
+      const res      = await fetch(`http://localhost:3000/api/jobs?empresaId=${session.empresaId}`);
+      const misOfertas = await res.json();
 
       if (misOfertas.length) {
-        // Reemplazar datos hardcodeados
         OFERTAS_DATA.length = 0;
         misOfertas.forEach((j) => {
           OFERTAS_DATA.push({
-            id: j.id,
-            title: j.titulo,
-            area: j.rubro,
-            modalidad: j.modalidad,
-            ubicacion: j.ubicacion,
-            status: j.activa ? 'activa' : 'cerrada',
+            id:           j.id,
+            title:        j.titulo,
+            area:         j.rubro,
+            modalidad:    j.modalidad,
+            ubicacion:    j.ubicacion,
+            status:       j.activa ? 'activa' : 'cerrada',
             postulaciones: j.postulaciones?.length || 0,
-            vistas: 0,
-            dias: Math.floor((Date.now() - new Date(j.creadoEn)) / 86400000),
+            vistas:       0,
+            dias:         Math.floor((Date.now() - new Date(j.creadoEn)) / 86400000),
           });
         });
 
-        // Actualizar stats
-        const activas = OFERTAS_DATA.filter((o) => o.status === 'activa').length;
-        const totalPostulaciones = OFERTAS_DATA.reduce((acc, o) => acc + o.postulaciones, 0);
-
-        // Actualizar badge del sidebar
+        // Badge ofertas en sidebar
         const badge = document.querySelector('.snav-item[data-section="ofertas"] .snav-badge');
-        if (badge) badge.textContent = activas;
-      }
+        if (badge) badge.textContent = OFERTAS_DATA.filter((o) => o.status === 'activa').length;
 
-      // Cargar candidatos de todas las ofertas de la empresa
-      if (misOfertas.length) {
-        const candidatosRes = await fetch(
-          `http://localhost:3000/api/applications?ofertaId=${misOfertas[0].id}`
-        );
-        const candidatosData = await candidatosRes.json();
+        // Actualizar stats del resumen con datos reales
+        const totalPostulaciones = OFERTAS_DATA.reduce((acc, o) => acc + o.postulaciones, 0);
+        const totalActivas       = OFERTAS_DATA.filter((o) => o.status === 'activa').length;
+        const greetSub = document.querySelector('.greeting-sub');
+        if (greetSub) greetSub.innerHTML = `Tenés <strong>${totalPostulaciones} postulaciones nuevas</strong> y <strong>${totalActivas} ofertas activas</strong> publicadas.`;
 
-        if (candidatosRes.ok && Array.isArray(candidatosData)) {
-          CANDIDATOS_DATA.length = 0;
-          candidatosData.forEach((p, i) => {
-            CANDIDATOS_DATA.push({
-              id: i + 1,
-              rank: i + 1,
-              nombre: `${p.candidato?.nombre || 'Candidato'} ${p.candidato?.apellido || ''}`.trim(),
-              iniciales: (p.candidato?.nombre?.charAt(0) || 'C') + (p.candidato?.apellido?.charAt(0) || ''),
-              color: 'linear-gradient(135deg,#5C6BC0,#7C4DFF)',
-              ofertaId: p.ofertaId,
-              oferta: misOfertas[0]?.titulo || 'Oferta',
-              exp: p.candidato?.habilidades?.join(', ') || 'Sin datos',
-              match: p.matchIA || 0,
-              skills: p.candidato?.habilidades?.slice(0, 3) || [],
-              missing: 0,
-            });
-          });
+        // Cargar candidatos de TODAS las ofertas
+        CANDIDATOS_DATA.length = 0;
+        for (const oferta of misOfertas) {
+          try {
+            const candRes  = await fetch(`http://localhost:3000/api/applications?ofertaId=${oferta.id}`);
+            const candData = await candRes.json();
+            if (candRes.ok && Array.isArray(candData)) {
+              candData.forEach((p) => {
+                CANDIDATOS_DATA.push({
+                  id:        p.id,
+                  rank:      CANDIDATOS_DATA.length + 1,
+                  nombre:    `${p.candidato?.nombre || 'Candidato'} ${p.candidato?.apellido || ''}`.trim(),
+                  iniciales: (p.candidato?.nombre?.charAt(0) || 'C') + (p.candidato?.apellido?.charAt(0) || ''),
+                  color:     'linear-gradient(135deg,#5C6BC0,#7C4DFF)',
+                  ofertaId:  p.ofertaId,
+                  oferta:    oferta.titulo,
+                  exp:       p.candidato?.habilidades?.join(', ') || 'Sin datos',
+                  match:     p.matchIA || 0,
+                  skills:    p.candidato?.habilidades?.slice(0, 3) || [],
+                  missing:   0,
+                });
+              });
+            }
+          } catch (err) {
+            console.error('Error cargando candidatos:', err);
+          }
+        }
 
-          // Actualizar badge candidatos
-          const candBadge = document.querySelector('.snav-item[data-section="candidatos"] .snav-badge');
-          if (candBadge) candBadge.textContent = candidatosData.length;
+        // Badge candidatos en sidebar
+        const candBadge = document.querySelector('.snav-item[data-section="candidatos"] .snav-badge');
+        if (candBadge) candBadge.textContent = CANDIDATOS_DATA.length;
+
+        // Actualizar selector de ofertas con datos reales
+        const selectOferta = document.getElementById('selectOferta');
+        if (selectOferta) {
+          selectOferta.innerHTML =
+            `<option value="todas">Todas las ofertas (${CANDIDATOS_DATA.length})</option>` +
+            misOfertas.map((o) => {
+              const cant = CANDIDATOS_DATA.filter((c) => c.ofertaId === o.id).length;
+              return `<option value="${o.id}">${o.titulo} (${cant})</option>`;
+            }).join('');
         }
       }
 

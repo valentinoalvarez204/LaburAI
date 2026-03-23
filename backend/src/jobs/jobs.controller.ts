@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { JwtGuard } from '../auth/jwt.guard';
 import { JobsService } from './jobs.service';
 
@@ -42,5 +42,11 @@ export class JobsController {
     empresaId: string;
   }) {
     return this.jobsService.create(body);
+  }
+  // PATCH /api/jobs/:id/cerrar — requiere token
+  @Patch(':id/cerrar')
+  @UseGuards(JwtGuard)
+  cerrar(@Param('id') id: string) {
+    return this.jobsService.close(id);
   }
 }
