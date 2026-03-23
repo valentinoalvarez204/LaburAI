@@ -65,48 +65,48 @@ const CANDIDATO = {
 
   resumen: 'Profesional con más de 5 años de experiencia en ventas B2B y gestión de cuentas en el sector de consumo masivo. Sólido historial en cumplimiento de objetivos comerciales, negociación y desarrollo de carteras de clientes en canales modernos y tradicionales. Orientada a resultados, con alta capacidad de adaptación y excelentes habilidades comunicacionales.',
   habilidades: [
-    { name: 'Ventas B2B',         type: 'main' },
-    { name: 'Negociación',        type: 'main' },
+    { name: 'Ventas B2B', type: 'main' },
+    { name: 'Negociación', type: 'main' },
     { name: 'Gestión de cuentas', type: 'main' },
-    { name: 'CRM Salesforce',     type: 'tech' },
-    { name: 'Excel avanzado',     type: 'tech' },
-    { name: 'Power BI',           type: 'tech' },
-    { name: 'Liderazgo',          type: 'soft' },
-    { name: 'Comunicación',       type: 'soft' },
-    { name: 'Trabajo en equipo',  type: 'soft' },
-    { name: 'Adaptabilidad',      type: 'soft' },
-    { name: 'Canal moderno',      type: 'main' },
-    { name: 'Canal tradicional',  type: 'main' },
+    { name: 'CRM Salesforce', type: 'tech' },
+    { name: 'Excel avanzado', type: 'tech' },
+    { name: 'Power BI', type: 'tech' },
+    { name: 'Liderazgo', type: 'soft' },
+    { name: 'Comunicación', type: 'soft' },
+    { name: 'Trabajo en equipo', type: 'soft' },
+    { name: 'Adaptabilidad', type: 'soft' },
+    { name: 'Canal moderno', type: 'main' },
+    { name: 'Canal tradicional', type: 'main' },
   ],
-  techSkills:  ['CRM Salesforce', 'Excel avanzado', 'Power BI', 'SAP (básico)', 'Google Workspace'],
-  softSkills:  ['Liderazgo', 'Negociación', 'Comunicación efectiva', 'Orientación a resultados', 'Trabajo en equipo'],
-  techs:       ['Salesforce', 'Excel', 'Power BI', 'SAP', 'Google Sheets', 'Slack'],
-  missing:     ['Inglés avanzado', 'HubSpot', 'SQL básico', 'Marketing digital'],
+  techSkills: ['CRM Salesforce', 'Excel avanzado', 'Power BI', 'SAP (básico)', 'Google Workspace'],
+  softSkills: ['Liderazgo', 'Negociación', 'Comunicación efectiva', 'Orientación a resultados', 'Trabajo en equipo'],
+  techs: ['Salesforce', 'Excel', 'Power BI', 'SAP', 'Google Sheets', 'Slack'],
+  missing: ['Inglés avanzado', 'HubSpot', 'SQL básico', 'Marketing digital'],
   experiencia: [
     { role: 'Ejecutiva de Ventas Sr.', company: 'Grupo Arcor', period: 'Mar 2021 – Presente · 5 años', desc: 'Gestión de cartera de 80+ clientes en canal moderno. Cumplimiento de objetivos anuales en 118%. Coordinación de equipo de 3 vendedores jr.' },
-    { role: 'Asesora Comercial',       company: 'Danone Argentina', period: 'Jun 2019 – Feb 2021 · 1 año 8 meses', desc: 'Atención y desarrollo de cuentas en canal supermercadista regional. Incorporación de 15 nuevas cuentas en el primer año.' },
-    { role: 'Promotora de Ventas',     company: 'Unilever',     period: 'Ene 2018 – May 2019 · 1 año 4 meses', desc: 'Activaciones en punto de venta y seguimiento de métricas de sell-out en Córdoba Capital.' },
+    { role: 'Asesora Comercial', company: 'Danone Argentina', period: 'Jun 2019 – Feb 2021 · 1 año 8 meses', desc: 'Atención y desarrollo de cuentas en canal supermercadista regional. Incorporación de 15 nuevas cuentas en el primer año.' },
+    { role: 'Promotora de Ventas', company: 'Unilever', period: 'Ene 2018 – May 2019 · 1 año 4 meses', desc: 'Activaciones en punto de venta y seguimiento de métricas de sell-out en Córdoba Capital.' },
   ],
 };
 
 const POSTULACIONES = [
-  { id:1, title:'Vendedor/a Senior',       company:'Grupo Arcor',    logo:'A', logoColor:'#5C6BC0', fecha:'hace 2 días',  status:'entrevista', match:97 },
-  { id:2, title:'Ejecutiva de Cuentas',    company:'Nestlé',         logo:'N', logoColor:'#11998E', fecha:'hace 4 días',  status:'revisada',   match:91 },
-  { id:3, title:'Key Account Manager',     company:'P&G Argentina',  logo:'P', logoColor:'#7C4DFF', fecha:'hace 6 días',  status:'pendiente',  match:88 },
-  { id:4, title:'Gerente Comercial Jr.',   company:'Molinos Río',    logo:'M', logoColor:'#F7971E', fecha:'hace 1 semana',status:'pendiente',  match:84 },
-  { id:5, title:'Asesor/a de Ventas',      company:'Coca-Cola',      logo:'C', logoColor:'#E65100', fecha:'hace 2 semanas',status:'rechazada', match:79 },
-  { id:6, title:'Representante Comercial', company:'3M Argentina',   logo:'3', logoColor:'#5C6BC0', fecha:'hace 2 semanas',status:'pendiente',  match:76 },
-  { id:7, title:'Coordinadora de Ventas',  company:'Bimbo',          logo:'B', logoColor:'#11998E', fecha:'hace 3 semanas',status:'revisada',  match:74 },
-  { id:8, title:'Trade Marketing Analyst', company:'Pepsico',        logo:'P', logoColor:'#7C4DFF', fecha:'hace 1 mes',   status:'rechazada',  match:71 },
+  { id: 1, title: 'Vendedor/a Senior', company: 'Grupo Arcor', logo: 'A', logoColor: '#5C6BC0', fecha: 'hace 2 días', status: 'entrevista', match: 97 },
+  { id: 2, title: 'Ejecutiva de Cuentas', company: 'Nestlé', logo: 'N', logoColor: '#11998E', fecha: 'hace 4 días', status: 'revisada', match: 91 },
+  { id: 3, title: 'Key Account Manager', company: 'P&G Argentina', logo: 'P', logoColor: '#7C4DFF', fecha: 'hace 6 días', status: 'pendiente', match: 88 },
+  { id: 4, title: 'Gerente Comercial Jr.', company: 'Molinos Río', logo: 'M', logoColor: '#F7971E', fecha: 'hace 1 semana', status: 'pendiente', match: 84 },
+  { id: 5, title: 'Asesor/a de Ventas', company: 'Coca-Cola', logo: 'C', logoColor: '#E65100', fecha: 'hace 2 semanas', status: 'rechazada', match: 79 },
+  { id: 6, title: 'Representante Comercial', company: '3M Argentina', logo: '3', logoColor: '#5C6BC0', fecha: 'hace 2 semanas', status: 'pendiente', match: 76 },
+  { id: 7, title: 'Coordinadora de Ventas', company: 'Bimbo', logo: 'B', logoColor: '#11998E', fecha: 'hace 3 semanas', status: 'revisada', match: 74 },
+  { id: 8, title: 'Trade Marketing Analyst', company: 'Pepsico', logo: 'P', logoColor: '#7C4DFF', fecha: 'hace 1 mes', status: 'rechazada', match: 71 },
 ];
 
 const RECOMENDADAS = [
-  { id:1,  title:'Vendedor/a Senior',     company:'Arcor',       location:'Córdoba',   logo:'A', logoColor:'#5C6BC0', tags:['Presencial','FMCG'],    tagTypes:['',''],       salary:'$450.000 – $650.000', time:'hace 1h',  match:97 },
-  { id:2,  title:'Key Account Manager',   company:'Unilever',    location:'Buenos Aires',logo:'U',logoColor:'#11998E',tags:['Híbrido','B2B'],        tagTypes:['',''],       salary:'$600.000 – $850.000', time:'hace 3h',  match:94 },
-  { id:3,  title:'Ejecutiva de Cuentas',  company:'Nestlé',      location:'Remoto',    logo:'N', logoColor:'#7C4DFF', tags:['Remoto','FMCG'],        tagTypes:['remote',''], salary:'$500.000 – $700.000', time:'hace 5h',  match:91 },
-  { id:4,  title:'Sales Manager',         company:'Danone',      location:'Córdoba',   logo:'D', logoColor:'#F7971E', tags:['Presencial','Canal mod'],tagTypes:['',''],       salary:'$700.000 – $950.000', time:'hace 8h',  match:89 },
-  { id:5,  title:'Trade Marketing Sr.',   company:'Pepsico',     location:'Buenos Aires',logo:'P',logoColor:'#E65100',tags:['Híbrido','Urgente'],    tagTypes:['','hot'],    salary:'$550.000 – $780.000', time:'hace 1d',  match:86 },
-  { id:6,  title:'Representante Comercial',company:'3M',         location:'Rosario',   logo:'3', logoColor:'#5C6BC0', tags:['Presencial'],           tagTypes:[''],          salary:'$380.000 – $520.000', time:'hace 2d',  match:83 },
+  { id: 1, title: 'Vendedor/a Senior', company: 'Arcor', location: 'Córdoba', logo: 'A', logoColor: '#5C6BC0', tags: ['Presencial', 'FMCG'], tagTypes: ['', ''], salary: '$450.000 – $650.000', time: 'hace 1h', match: 97 },
+  { id: 2, title: 'Key Account Manager', company: 'Unilever', location: 'Buenos Aires', logo: 'U', logoColor: '#11998E', tags: ['Híbrido', 'B2B'], tagTypes: ['', ''], salary: '$600.000 – $850.000', time: 'hace 3h', match: 94 },
+  { id: 3, title: 'Ejecutiva de Cuentas', company: 'Nestlé', location: 'Remoto', logo: 'N', logoColor: '#7C4DFF', tags: ['Remoto', 'FMCG'], tagTypes: ['remote', ''], salary: '$500.000 – $700.000', time: 'hace 5h', match: 91 },
+  { id: 4, title: 'Sales Manager', company: 'Danone', location: 'Córdoba', logo: 'D', logoColor: '#F7971E', tags: ['Presencial', 'Canal mod'], tagTypes: ['', ''], salary: '$700.000 – $950.000', time: 'hace 8h', match: 89 },
+  { id: 5, title: 'Trade Marketing Sr.', company: 'Pepsico', location: 'Buenos Aires', logo: 'P', logoColor: '#E65100', tags: ['Híbrido', 'Urgente'], tagTypes: ['', 'hot'], salary: '$550.000 – $780.000', time: 'hace 1d', match: 86 },
+  { id: 6, title: 'Representante Comercial', company: '3M', location: 'Rosario', logo: '3', logoColor: '#5C6BC0', tags: ['Presencial'], tagTypes: [''], salary: '$380.000 – $520.000', time: 'hace 2d', match: 83 },
 ];
 
 /* ─────────────────────────────────
@@ -128,9 +128,9 @@ function renderScore() {
   const nivelEl = document.getElementById('scoreLevel');
   if (nivelEl) {
     const nivelMap = {
-      bueno:   { cls: 'score-level--bueno',   icon: '✓', label: 'CV Competitivo' },
+      bueno: { cls: 'score-level--bueno', icon: '✓', label: 'CV Competitivo' },
       regular: { cls: 'score-level--regular', icon: '⚠', label: 'Necesita mejoras' },
-      bajo:    { cls: 'score-level--bajo',     icon: '✗', label: 'CV incompleto' },
+      bajo: { cls: 'score-level--bajo', icon: '✗', label: 'CV incompleto' },
     };
     const n = nivelMap[nivel] || nivelMap.regular;
     nivelEl.className = `score-level ${n.cls}`;
@@ -186,11 +186,11 @@ function renderSkills() {
    RENDER ANÁLISIS IA DETALLADO
 ───────────────────────────────── */
 function renderIAAnalysis() {
-  const techEl    = document.getElementById('iaTechSkills');
-  const softEl    = document.getElementById('iaSoftSkills');
-  const techsEl   = document.getElementById('iaTechs');
-  const missEl    = document.getElementById('iaMissing');
-  const expEl     = document.getElementById('expTimeline');
+  const techEl = document.getElementById('iaTechSkills');
+  const softEl = document.getElementById('iaSoftSkills');
+  const techsEl = document.getElementById('iaTechs');
+  const missEl = document.getElementById('iaMissing');
+  const expEl = document.getElementById('expTimeline');
 
   if (techEl) techEl.innerHTML = CANDIDATO.techSkills.map((s) => `<span class="ia-tag">${s}</span>`).join('');
   if (softEl) softEl.innerHTML = CANDIDATO.softSkills.map((s) => `<span class="ia-tag">${s}</span>`).join('');
@@ -218,10 +218,10 @@ function renderIAAnalysis() {
    RENDER POSTULACIONES
 ───────────────────────────────── */
 const STATUS_LABELS = {
-  pendiente:  'Pendiente',
-  revisada:   'CV revisado',
+  pendiente: 'Pendiente',
+  revisada: 'CV revisado',
   entrevista: 'Entrevista',
-  rechazada:  'No seleccionado',
+  rechazada: 'No seleccionado',
 };
 
 function renderPostulaciones(filter = 'todas') {
@@ -381,17 +381,46 @@ function initCopySummary() {
 }
 
 /* ─────────────────────────────────
-   GUARDAR PERFIL (simulado)
+   GUARDAR PERFIL
 ───────────────────────────────── */
 function initSaveProfile() {
   document.getElementById('btnSaveProfile')?.addEventListener('click', async () => {
     const btn = document.getElementById('btnSaveProfile');
+    const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+
+    if (!session.candidatoId) {
+      showToast('No se encontró tu perfil', 'error');
+      return;
+    }
+
     btn.disabled = true;
     btn.textContent = 'Guardando…';
-    await delay(1200);
-    btn.disabled = false;
-    btn.textContent = 'Guardar cambios';
-    showToast('Perfil actualizado correctamente', 'success');
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/profile/candidato/${session.candidatoId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: document.querySelector('input[value="Valentina González"]')?.value || undefined,
+          ubicacion: document.querySelector('input[placeholder="Ej: Córdoba, Argentina"]')?.value || undefined,
+          telefono: document.querySelector('input[type="text"]:nth-of-type(4)')?.value || undefined,
+        }),
+      });
+
+      btn.disabled = false;
+      btn.textContent = 'Guardar cambios';
+
+      if (res.ok) {
+        showToast('Perfil actualizado correctamente', 'success');
+      } else {
+        showToast('Error al guardar', 'error');
+      }
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Guardar cambios';
+      showToast('No se pudo conectar con el servidor', 'error');
+    }
   });
 }
 
@@ -409,7 +438,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Actualizar nombre en el saludo
   if (session.nombre) {
     const firstName = session.nombre.split(' ')[0];
-    const greetEl   = document.querySelector('.greeting-title');
+    const greetEl = document.querySelector('.greeting-title');
     if (greetEl) greetEl.textContent = `¡Hola, ${firstName}! 👋`;
 
     // Actualizar avatar
@@ -424,7 +453,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Cargar postulaciones reales si hay candidatoId
   if (session.candidatoId) {
     try {
-      const res  = await fetch(`http://localhost:3000/api/applications?candidatoId=${session.candidatoId}`);
+      const res = await fetch(`http://localhost:3000/api/applications?candidatoId=${session.candidatoId}`);
       const data = await res.json();
 
       if (res.ok && Array.isArray(data)) {
@@ -432,14 +461,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         POSTULACIONES.length = 0;
         data.forEach((p) => {
           POSTULACIONES.push({
-            id:      p.ofertaId,
-            title:   p.oferta?.titulo   || 'Oferta',
+            id: p.ofertaId,
+            title: p.oferta?.titulo || 'Oferta',
             company: p.oferta?.empresa?.nombre || 'Empresa',
-            logo:    p.oferta?.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+            logo: p.oferta?.empresa?.nombre?.charAt(0).toUpperCase() || '?',
             logoColor: '#5C6BC0',
-            fecha:   new Date(p.creadoEn).toLocaleDateString('es-AR'),
-            status:  p.estado.toLowerCase(),
-            match:   p.matchIA || null,
+            fecha: new Date(p.creadoEn).toLocaleDateString('es-AR'),
+            status: p.estado.toLowerCase(),
+            match: p.matchIA || null,
           });
         });
 

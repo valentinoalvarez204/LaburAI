@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Patch, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { JwtGuard } from '../auth/jwt.guard';
 import { ApplicationsService } from './applications.service';
 
 @Controller('applications')
 export class ApplicationsController {
   constructor(private readonly applicationsService: ApplicationsService) {}
 
-  // POST /api/applications
+  // POST /api/applications — requiere token
   @Post()
+  @UseGuards(JwtGuard)
   create(@Body() body: {
     candidatoId: string;
     ofertaId: string;
@@ -17,8 +19,10 @@ export class ApplicationsController {
 
   // GET /api/applications?candidatoId=XXX
   @Get()
-  findAll(@Query('candidatoId') candidatoId?: string,
-          @Query('ofertaId')    ofertaId?: string) {
+  findAll(
+    @Query('candidatoId') candidatoId?: string,
+    @Query('ofertaId')    ofertaId?: string,
+  ) {
     if (candidatoId) return this.applicationsService.findByCandidato(candidatoId);
     if (ofertaId)    return this.applicationsService.findByOferta(ofertaId);
     return [];

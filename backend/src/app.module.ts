@@ -4,6 +4,7 @@ import { PrismaService } from './prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { JobsModule } from './jobs/jobs.module';
 import { ApplicationsModule } from './applications/applications.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { ApplicationsModule } from './applications/applications.module';
     AuthModule,
     JobsModule,
     ApplicationsModule,
+    ProfileModule,
   ],
   providers: [PrismaService],
   exports: [PrismaService],

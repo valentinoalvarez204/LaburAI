@@ -11,37 +11,37 @@ const EMPRESA = {
 };
 
 const OFERTAS_DATA = [
-  { id:1, title:'Vendedor/a Senior',          area:'Ventas y Comercial',      modalidad:'Presencial', ubicacion:'Córdoba',     status:'activa',  postulaciones:34, vistas:620, dias:5  },
-  { id:2, title:'Administrativo/a Contable',  area:'Administración y RRHH',   modalidad:'Remoto',     ubicacion:'Remoto',      status:'activa',  postulaciones:8,  vistas:310, dias:3  },
-  { id:3, title:'Analista de Marketing',      area:'Diseño y Creatividad',    modalidad:'Híbrido',    ubicacion:'Buenos Aires',status:'activa',  postulaciones:5,  vistas:190, dias:1  },
-  { id:4, title:'Supervisor/a de Producción', area:'Construcción e Ing.',     modalidad:'Presencial', ubicacion:'Villa del Rosario',status:'cerrada',postulaciones:22,vistas:480,dias:30},
-  { id:5, title:'Promotor/a de Ventas',       area:'Ventas y Comercial',      modalidad:'Presencial', ubicacion:'Córdoba',     status:'cerrada', postulaciones:41, vistas:850, dias:45 },
+  { id: 1, title: 'Vendedor/a Senior', area: 'Ventas y Comercial', modalidad: 'Presencial', ubicacion: 'Córdoba', status: 'activa', postulaciones: 34, vistas: 620, dias: 5 },
+  { id: 2, title: 'Administrativo/a Contable', area: 'Administración y RRHH', modalidad: 'Remoto', ubicacion: 'Remoto', status: 'activa', postulaciones: 8, vistas: 310, dias: 3 },
+  { id: 3, title: 'Analista de Marketing', area: 'Diseño y Creatividad', modalidad: 'Híbrido', ubicacion: 'Buenos Aires', status: 'activa', postulaciones: 5, vistas: 190, dias: 1 },
+  { id: 4, title: 'Supervisor/a de Producción', area: 'Construcción e Ing.', modalidad: 'Presencial', ubicacion: 'Villa del Rosario', status: 'cerrada', postulaciones: 22, vistas: 480, dias: 30 },
+  { id: 5, title: 'Promotor/a de Ventas', area: 'Ventas y Comercial', modalidad: 'Presencial', ubicacion: 'Córdoba', status: 'cerrada', postulaciones: 41, vistas: 850, dias: 45 },
 ];
 
 const CANDIDATOS_DATA = [
-  { id:1,  rank:1,  nombre:'Valentina González', iniciales:'VG', color:'linear-gradient(135deg,#5C6BC0,#7C4DFF)', ofertaId:1, oferta:'Vendedor/a Senior',         exp:'5 años · Ventas B2B',   match:97, skills:['Ventas B2B','CRM','Negociación'], missing:0 },
-  { id:2,  rank:2,  nombre:'Martín Fernández',   iniciales:'MF', color:'linear-gradient(135deg,#11998E,#38EF7D)', ofertaId:1, oferta:'Vendedor/a Senior',         exp:'4 años · FMCG',         match:91, skills:['Canal moderno','Retail','SAP'],   missing:1 },
-  { id:3,  rank:3,  nombre:'Carolina Ramos',     iniciales:'CR', color:'linear-gradient(135deg,#F7971E,#FFD200)', ofertaId:1, oferta:'Vendedor/a Senior',         exp:'3 años · Consumo masivo',match:88, skills:['Negociación','Excel','B2B'],    missing:2 },
-  { id:4,  rank:4,  nombre:'Diego Salinas',      iniciales:'DS', color:'linear-gradient(135deg,#667EEA,#764BA2)', ofertaId:1, oferta:'Vendedor/a Senior',         exp:'3 años · Retail',        match:84, skills:['CRM','Ventas','Canal trad.'],  missing:1 },
-  { id:5,  rank:5,  nombre:'Lucia Herrera',      iniciales:'LH', color:'linear-gradient(135deg,#F953C6,#B91D73)', ofertaId:1, oferta:'Vendedor/a Senior',         exp:'2 años · Ventas',        match:79, skills:['Ventas','Comunicación'],       missing:3 },
-  { id:6,  rank:1,  nombre:'Tomás Burgos',       iniciales:'TB', color:'linear-gradient(135deg,#5C6BC0,#7C4DFF)', ofertaId:2, oferta:'Administrativo/a Contable',  exp:'5 años · SAP FI',        match:94, skills:['SAP','Excel','Contabilidad'],  missing:0 },
-  { id:7,  rank:2,  nombre:'Florencia Ríos',     iniciales:'FR', color:'linear-gradient(135deg,#11998E,#38EF7D)', ofertaId:2, oferta:'Administrativo/a Contable',  exp:'3 años · Contable',      match:87, skills:['Excel','AFIP','Conciliaciones'],missing:1 },
-  { id:8,  rank:1,  nombre:'Ignacio Vega',       iniciales:'IV', color:'linear-gradient(135deg,#F7971E,#FFD200)', ofertaId:3, oferta:'Analista de Marketing',     exp:'4 años · Mktg digital',  match:92, skills:['Meta Ads','Canva','Analytics'], missing:0 },
+  { id: 1, rank: 1, nombre: 'Valentina González', iniciales: 'VG', color: 'linear-gradient(135deg,#5C6BC0,#7C4DFF)', ofertaId: 1, oferta: 'Vendedor/a Senior', exp: '5 años · Ventas B2B', match: 97, skills: ['Ventas B2B', 'CRM', 'Negociación'], missing: 0 },
+  { id: 2, rank: 2, nombre: 'Martín Fernández', iniciales: 'MF', color: 'linear-gradient(135deg,#11998E,#38EF7D)', ofertaId: 1, oferta: 'Vendedor/a Senior', exp: '4 años · FMCG', match: 91, skills: ['Canal moderno', 'Retail', 'SAP'], missing: 1 },
+  { id: 3, rank: 3, nombre: 'Carolina Ramos', iniciales: 'CR', color: 'linear-gradient(135deg,#F7971E,#FFD200)', ofertaId: 1, oferta: 'Vendedor/a Senior', exp: '3 años · Consumo masivo', match: 88, skills: ['Negociación', 'Excel', 'B2B'], missing: 2 },
+  { id: 4, rank: 4, nombre: 'Diego Salinas', iniciales: 'DS', color: 'linear-gradient(135deg,#667EEA,#764BA2)', ofertaId: 1, oferta: 'Vendedor/a Senior', exp: '3 años · Retail', match: 84, skills: ['CRM', 'Ventas', 'Canal trad.'], missing: 1 },
+  { id: 5, rank: 5, nombre: 'Lucia Herrera', iniciales: 'LH', color: 'linear-gradient(135deg,#F953C6,#B91D73)', ofertaId: 1, oferta: 'Vendedor/a Senior', exp: '2 años · Ventas', match: 79, skills: ['Ventas', 'Comunicación'], missing: 3 },
+  { id: 6, rank: 1, nombre: 'Tomás Burgos', iniciales: 'TB', color: 'linear-gradient(135deg,#5C6BC0,#7C4DFF)', ofertaId: 2, oferta: 'Administrativo/a Contable', exp: '5 años · SAP FI', match: 94, skills: ['SAP', 'Excel', 'Contabilidad'], missing: 0 },
+  { id: 7, rank: 2, nombre: 'Florencia Ríos', iniciales: 'FR', color: 'linear-gradient(135deg,#11998E,#38EF7D)', ofertaId: 2, oferta: 'Administrativo/a Contable', exp: '3 años · Contable', match: 87, skills: ['Excel', 'AFIP', 'Conciliaciones'], missing: 1 },
+  { id: 8, rank: 1, nombre: 'Ignacio Vega', iniciales: 'IV', color: 'linear-gradient(135deg,#F7971E,#FFD200)', ofertaId: 3, oferta: 'Analista de Marketing', exp: '4 años · Mktg digital', match: 92, skills: ['Meta Ads', 'Canva', 'Analytics'], missing: 0 },
 ];
 
 const ACTIVIDAD = [
-  { icon:'👤', type:'postul',  text:'<strong>Valentina González</strong> se postuló a Vendedor/a Senior',                  time:'hace 12 min' },
-  { icon:'👤', type:'postul',  text:'<strong>Diego Salinas</strong> se postuló a Vendedor/a Senior',                       time:'hace 1h'     },
-  { icon:'✓',  type:'ok',     text:'La IA analizó <strong>5 nuevos CVs</strong> de la oferta Vendedor/a Senior',           time:'hace 2h'     },
-  { icon:'👤', type:'postul',  text:'<strong>Tomás Burgos</strong> se postuló a Administrativo/a Contable',                time:'hace 3h'     },
-  { icon:'⭐', type:'revisar', text:'<strong>Martín Fernández</strong> actualizó su CV — match subió de 85% a 91%',        time:'hace 5h'     },
-  { icon:'✓',  type:'ok',     text:'LaburAI sugirió <strong>3 candidatos destacados</strong> para Analista de Marketing',  time:'ayer'        },
+  { icon: '👤', type: 'postul', text: '<strong>Valentina González</strong> se postuló a Vendedor/a Senior', time: 'hace 12 min' },
+  { icon: '👤', type: 'postul', text: '<strong>Diego Salinas</strong> se postuló a Vendedor/a Senior', time: 'hace 1h' },
+  { icon: '✓', type: 'ok', text: 'La IA analizó <strong>5 nuevos CVs</strong> de la oferta Vendedor/a Senior', time: 'hace 2h' },
+  { icon: '👤', type: 'postul', text: '<strong>Tomás Burgos</strong> se postuló a Administrativo/a Contable', time: 'hace 3h' },
+  { icon: '⭐', type: 'revisar', text: '<strong>Martín Fernández</strong> actualizó su CV — match subió de 85% a 91%', time: 'hace 5h' },
+  { icon: '✓', type: 'ok', text: 'LaburAI sugirió <strong>3 candidatos destacados</strong> para Analista de Marketing', time: 'ayer' },
 ];
 
 /* ─────────────────────────────────
    NAVEGACIÓN
 ───────────────────────────────── */
-const SECTIONS = ['overview','ofertas','candidatos','publicar','empresa'];
+const SECTIONS = ['overview', 'ofertas', 'candidatos', 'publicar', 'empresa'];
 
 function switchSection(id) {
   // Sidebar nav
@@ -72,8 +72,8 @@ function initNav() {
     a.addEventListener('click', (e) => { e.preventDefault(); switchSection(a.dataset.section); });
   });
   // Botones "Nueva oferta"
-  ['btnNuevaOferta','btnNuevaOfertaHero'].forEach((id) => {
-    document.getElementById(id)?.addEventListener('click', () => window.location.href='publicar-oferta.html');
+  ['btnNuevaOferta', 'btnNuevaOfertaHero'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('click', () => window.location.href = 'publicar-oferta.html');
   });
   // Links internos (dash-card headers "Ver todas →")
   document.querySelectorAll('[data-section]').forEach((el) => {
@@ -89,8 +89,8 @@ function initNav() {
 /* ─────────────────────────────────
    SIDEBAR MOBILE
 ───────────────────────────────── */
-function openSidebar()  { document.getElementById('dashSidebar')?.classList.add('open'); document.getElementById('dashOverlay')?.classList.add('visible'); document.body.style.overflow='hidden'; }
-function closeSidebar() { document.getElementById('dashSidebar')?.classList.remove('open'); document.getElementById('dashOverlay')?.classList.remove('visible'); document.body.style.overflow=''; }
+function openSidebar() { document.getElementById('dashSidebar')?.classList.add('open'); document.getElementById('dashOverlay')?.classList.add('visible'); document.body.style.overflow = 'hidden'; }
+function closeSidebar() { document.getElementById('dashSidebar')?.classList.remove('open'); document.getElementById('dashOverlay')?.classList.remove('visible'); document.body.style.overflow = ''; }
 
 function initDashSidebar() {
   document.getElementById('hamburger')?.addEventListener('click', () => {
@@ -128,11 +128,11 @@ function renderOfertasMini() {
 function renderTopCandidatos() {
   const el = document.getElementById('topCandidatos');
   if (!el) return;
-  const top = [...CANDIDATOS_DATA].sort((a,b) => b.match - a.match).slice(0,4);
-  const rankClass = ['gold','silver','bronze',''];
+  const top = [...CANDIDATOS_DATA].sort((a, b) => b.match - a.match).slice(0, 4);
+  const rankClass = ['gold', 'silver', 'bronze', ''];
   el.innerHTML = top.map((c, i) => `
     <div class="tc-item" onclick="switchSection('candidatos')">
-      <div class="tc-rank tc-rank--${rankClass[i]}">#${i+1}</div>
+      <div class="tc-rank tc-rank--${rankClass[i]}">#${i + 1}</div>
       <div class="tc-av" style="background:${c.color}">${c.iniciales}</div>
       <div class="tc-info">
         <div class="tc-name">${c.nombre}</div>
@@ -176,7 +176,7 @@ function renderOfertas(filter = 'todas') {
           <span class="or-badge">${o.area}</span>
           <span class="or-badge">${o.modalidad}</span>
           <span class="or-badge">${o.ubicacion}</span>
-          <span class="or-badge" style="${o.status==='activa'?'background:#E8F5E9;color:#2E7D32;border-color:#A5D6A7':''}">
+          <span class="or-badge" style="${o.status === 'activa' ? 'background:#E8F5E9;color:#2E7D32;border-color:#A5D6A7' : ''}">
             ${o.status === 'activa' ? '● Activa' : '○ Cerrada'}
           </span>
         </div>
@@ -198,7 +198,7 @@ function renderOfertas(filter = 'todas') {
       <div class="or-actions">
         <button class="or-btn or-btn--primary" onclick="switchSection('candidatos')">Ver candidatos</button>
         <button class="or-btn">Editar</button>
-        ${o.status==='activa'?'<button class="or-btn">Cerrar</button>':''}
+        ${o.status === 'activa' ? '<button class="or-btn">Cerrar</button>' : ''}
       </div>
     </div>`).join('');
 }
@@ -219,7 +219,7 @@ function initOfertasTabs() {
 
 // SVG gradient inyectado una sola vez
 function injectGradient() {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
   svg.innerHTML = `<defs><linearGradient id="candGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5C6BC0"/><stop offset="100%" stop-color="#7C4DFF"/></linearGradient></defs>`;
   document.body.prepend(svg);
@@ -239,19 +239,19 @@ function renderCandidatos(ofertaId = 'todas') {
   }
 
   // Ordenar por match
-  const sorted = [...list].sort((a,b) => b.match - a.match);
+  const sorted = [...list].sort((a, b) => b.match - a.match);
 
   el.innerHTML = sorted.map((c, i) => {
     const rankCls = i === 0 ? 'cand-rank--1' : i === 1 ? 'cand-rank--2' : i === 2 ? 'cand-rank--3' : '';
-    const skills  = c.skills.map((s) => `<span class="cand-skill match">${s}</span>`).join('');
-    const missing = c.missing > 0 ? `<div class="cand-missing">Faltan ${c.missing} habilidad${c.missing>1?'es':''}</div>` : '';
-    const circ    = 2 * Math.PI * 24;
-    const offset  = circ * (1 - c.match / 100);
+    const skills = c.skills.map((s) => `<span class="cand-skill match">${s}</span>`).join('');
+    const missing = c.missing > 0 ? `<div class="cand-missing">Faltan ${c.missing} habilidad${c.missing > 1 ? 'es' : ''}</div>` : '';
+    const circ = 2 * Math.PI * 24;
+    const offset = circ * (1 - c.match / 100);
 
     return `
       <div class="cand-card" data-id="${c.id}">
         ${missing}
-        <div class="cand-rank ${rankCls}">#${i+1}</div>
+        <div class="cand-rank ${rankCls}">#${i + 1}</div>
         <div class="cand-av" style="background:${c.color}">${c.iniciales}</div>
         <div class="cand-info">
           <div class="cand-name">${c.nombre}</div>
@@ -281,7 +281,7 @@ function renderCandidatos(ofertaId = 'todas') {
   setTimeout(() => {
     el.querySelectorAll('.csr-fill').forEach((ring, i) => {
       const circ = 2 * Math.PI * 24;
-      const pct  = sorted[i]?.match ?? 0;
+      const pct = sorted[i]?.match ?? 0;
       ring.style.transition = `stroke-dashoffset 1s ease ${i * 0.1}s`;
       ring.style.strokeDasharray = circ;
       ring.style.strokeDashoffset = circ; // reset
@@ -303,12 +303,12 @@ function initSelectOferta() {
 /* ─────────────────────────────────
    ACCIONES
 ───────────────────────────────── */
-window.agendarEntrevista = function(id) {
+window.agendarEntrevista = function (id) {
   const c = CANDIDATOS_DATA.find((x) => x.id === id);
   if (!c) return;
   showToast(`Entrevista agendada con ${c.nombre}`, 'success');
 };
-window.verPerfil = function(id) {
+window.verPerfil = function (id) {
   window.location.href = `oferta-detalle.html?id=${id}`;
 };
 
@@ -343,17 +343,17 @@ function initGuardarEmpresa() {
    PUBLICAR OFERTA — estado y lógica
 ───────────────────────────────── */
 const pubState = {
-  titulo:'', rubro:'', modalidad:'Presencial',
-  ubicacion:'', jornada:'Full time',
-  desc:'', skills:[], resp:[], benef:[],
-  salMin:'', salMax:'', salNeg:false, salConf:false,
+  titulo: '', rubro: '', modalidad: 'Presencial',
+  ubicacion: '', jornada: 'Full time',
+  desc: '', skills: [], resp: [], benef: [],
+  salMin: '', salMax: '', salNeg: false, salConf: false,
 };
 const PUB_CHECKLIST = [
-  { label:'Título del puesto',      check: () => pubState.titulo.length > 3    },
-  { label:'Área / Rubro',           check: () => pubState.rubro !== ''          },
-  { label:'Ubicación',              check: () => pubState.ubicacion.length > 2  },
-  { label:'Descripción del puesto', check: () => pubState.desc.length >= 50    },
-  { label:'Habilidades requeridas', check: () => pubState.skills.length > 0    },
+  { label: 'Título del puesto', check: () => pubState.titulo.length > 3 },
+  { label: 'Área / Rubro', check: () => pubState.rubro !== '' },
+  { label: 'Ubicación', check: () => pubState.ubicacion.length > 2 },
+  { label: 'Descripción del puesto', check: () => pubState.desc.length >= 50 },
+  { label: 'Habilidades requeridas', check: () => pubState.skills.length > 0 },
 ];
 
 function initPublicarForm() {
@@ -365,23 +365,23 @@ function initPublicarForm() {
       pubUpdatePreview(); pubUpdateChecklist();
     });
   });
-  [['pub-titulo','titulo'],['pub-ubicacion','ubicacion'],['pub-sal-min','salMin'],['pub-sal-max','salMax']].forEach(([id, key]) => {
-    document.getElementById(id)?.addEventListener('input', (e) => { pubState[key]=e.target.value; pubUpdatePreview(); pubUpdateChecklist(); });
+  [['pub-titulo', 'titulo'], ['pub-ubicacion', 'ubicacion'], ['pub-sal-min', 'salMin'], ['pub-sal-max', 'salMax']].forEach(([id, key]) => {
+    document.getElementById(id)?.addEventListener('input', (e) => { pubState[key] = e.target.value; pubUpdatePreview(); pubUpdateChecklist(); });
   });
-  document.getElementById('pub-rubro')?.addEventListener('change',  (e) => { pubState.rubro   = e.target.value; pubUpdateChecklist(); });
+  document.getElementById('pub-rubro')?.addEventListener('change', (e) => { pubState.rubro = e.target.value; pubUpdateChecklist(); });
   document.getElementById('pub-jornada')?.addEventListener('change', (e) => { pubState.jornada = e.target.value; pubUpdatePreview(); });
   const descEl = document.getElementById('pub-desc');
   const charEl = document.getElementById('pub-chars');
-  descEl?.addEventListener('input', (e) => { pubState.desc=e.target.value; if(charEl) charEl.textContent=e.target.value.length; pubUpdateChecklist(); });
-  document.getElementById('pub-sal-neg')?.addEventListener('change',  (e) => { pubState.salNeg  = e.target.checked; pubUpdatePreview(); pubUpdateChecklist(); });
+  descEl?.addEventListener('input', (e) => { pubState.desc = e.target.value; if (charEl) charEl.textContent = e.target.value.length; pubUpdateChecklist(); });
+  document.getElementById('pub-sal-neg')?.addEventListener('change', (e) => { pubState.salNeg = e.target.checked; pubUpdatePreview(); pubUpdateChecklist(); });
   document.getElementById('pub-sal-conf')?.addEventListener('change', (e) => { pubState.salConf = e.target.checked; pubUpdatePreview(); });
-  pubInitTags('pub-skills-input','pub-skills-list','skills','pub-tag--skill');
-  pubInitTags('pub-resp-input',  'pub-resp-list',  'resp',  'pub-tag--resp');
+  pubInitTags('pub-skills-input', 'pub-skills-list', 'skills', 'pub-tag--skill');
+  pubInitTags('pub-resp-input', 'pub-resp-list', 'resp', 'pub-tag--resp');
   pubInitTags('pub-benef-input', 'pub-benef-list', 'benef', 'pub-tag--benef');
   const fechaEl = document.getElementById('pub-fecha');
   if (fechaEl) fechaEl.min = new Date().toISOString().split('T')[0];
   document.getElementById('btnPublicar')?.addEventListener('click', pubHandleSubmit);
-  document.getElementById('btnBorrador')?.addEventListener('click', () => showToast('Borrador guardado','success'));
+  document.getElementById('btnBorrador')?.addEventListener('click', () => showToast('Borrador guardado', 'success'));
   document.getElementById('btnPublicarOtra')?.addEventListener('click', () => {
     document.getElementById('pubSuccess')?.classList.add('hidden');
     document.querySelector('.publicar-layout')?.classList.remove('hidden');
@@ -392,80 +392,80 @@ function initPublicarForm() {
 
 function pubInitTags(inputId, listId, stateKey, tagClass) {
   const input = document.getElementById(inputId);
-  const list  = document.getElementById(listId);
+  const list = document.getElementById(listId);
   if (!input || !list) return;
   function render() {
-    list.innerHTML = pubState[stateKey].map((t,i) => `<span class="pub-tag ${tagClass}">${t}<button class="pub-tag-x" data-i="${i}">×</button></span>`).join('');
+    list.innerHTML = pubState[stateKey].map((t, i) => `<span class="pub-tag ${tagClass}">${t}<button class="pub-tag-x" data-i="${i}">×</button></span>`).join('');
     list.querySelectorAll('.pub-tag-x').forEach((btn) => {
-      btn.addEventListener('click', (e) => { e.stopPropagation(); pubState[stateKey].splice(+btn.dataset.i,1); render(); pubUpdateChecklist(); });
+      btn.addEventListener('click', (e) => { e.stopPropagation(); pubState[stateKey].splice(+btn.dataset.i, 1); render(); pubUpdateChecklist(); });
     });
   }
   function add(val) {
-    const clean = val.trim().replace(/,$/,'');
+    const clean = val.trim().replace(/,$/, '');
     if (!clean || pubState[stateKey].includes(clean)) return;
-    pubState[stateKey].push(clean); input.value=''; render(); pubUpdateChecklist();
+    pubState[stateKey].push(clean); input.value = ''; render(); pubUpdateChecklist();
   }
   input.addEventListener('keydown', (e) => {
-    if (e.key==='Enter'||e.key===',') { e.preventDefault(); add(input.value); }
-    if (e.key==='Backspace'&&!input.value&&pubState[stateKey].length) { pubState[stateKey].pop(); render(); pubUpdateChecklist(); }
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); add(input.value); }
+    if (e.key === 'Backspace' && !input.value && pubState[stateKey].length) { pubState[stateKey].pop(); render(); pubUpdateChecklist(); }
   });
   input.addEventListener('blur', () => { if (input.value.trim()) add(input.value); });
 }
 
 function pubUpdatePreview() {
-  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
-  set('prev-titulo',   pubState.titulo    || 'Tu oferta aparecerá así');
-  set('prev-ubicacion',pubState.ubicacion || 'Ubicación');
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('prev-titulo', pubState.titulo || 'Tu oferta aparecerá así');
+  set('prev-ubicacion', pubState.ubicacion || 'Ubicación');
   const mEl = document.getElementById('prev-modalidad');
-  if (mEl) { mEl.textContent=pubState.modalidad; mEl.className=`job-tag ${pubState.modalidad==='Remoto'?'remote':''}`; }
+  if (mEl) { mEl.textContent = pubState.modalidad; mEl.className = `job-tag ${pubState.modalidad === 'Remoto' ? 'remote' : ''}`; }
   set('prev-jornada', pubState.jornada);
   const sEl = document.getElementById('prev-salario');
   if (sEl) {
-    if      (pubState.salNeg)                        sEl.textContent='Salario a convenir';
-    else if (pubState.salConf)                       sEl.textContent='Salario confidencial';
-    else if (pubState.salMin && pubState.salMax)     sEl.textContent=`$${pubState.salMin} – $${pubState.salMax}`;
-    else                                             sEl.textContent='Salario a confirmar';
+    if (pubState.salNeg) sEl.textContent = 'Salario a convenir';
+    else if (pubState.salConf) sEl.textContent = 'Salario confidencial';
+    else if (pubState.salMin && pubState.salMax) sEl.textContent = `$${pubState.salMin} – $${pubState.salMax}`;
+    else sEl.textContent = 'Salario a confirmar';
   }
 }
 
 function pubUpdateChecklist() {
-  const el   = document.getElementById('pub-checklist-items');
+  const el = document.getElementById('pub-checklist-items');
   const fill = document.getElementById('pub-cl-fill');
-  const pct  = document.getElementById('pub-cl-pct');
+  const pct = document.getElementById('pub-cl-pct');
   if (!el) return;
   const done = PUB_CHECKLIST.filter((c) => c.check()).length;
-  const p    = Math.round((done / PUB_CHECKLIST.length) * 100);
+  const p = Math.round((done / PUB_CHECKLIST.length) * 100);
   el.innerHTML = PUB_CHECKLIST.map((c) => {
     const ok = c.check();
-    return `<div class="pub-cl-item ${ok?'done':''}"><div class="pub-cl-dot ${ok?'done':''}">✓</div>${c.label}</div>`;
+    return `<div class="pub-cl-item ${ok ? 'done' : ''}"><div class="pub-cl-dot ${ok ? 'done' : ''}">✓</div>${c.label}</div>`;
   }).join('');
-  if (fill) fill.style.width = p+'%';
-  if (pct)  pct.textContent  = p+'%';
+  if (fill) fill.style.width = p + '%';
+  if (pct) pct.textContent = p + '%';
 }
 
 async function pubHandleSubmit() {
   let ok = true;
-  [['pub-titulo','pub-err-titulo',()=>pubState.titulo.trim().length>0,'El título es obligatorio.'],
-   ['pub-rubro', 'pub-err-rubro', ()=>pubState.rubro!=='',             'Seleccioná un rubro.'],
-   ['pub-ubicacion','pub-err-ubicacion',()=>pubState.ubicacion.trim().length>0,'La ubicación es obligatoria.'],
-   ['pub-desc','pub-err-desc',()=>pubState.desc.length>=50,'La descripción debe tener al menos 50 caracteres.'],
-  ].forEach(([,errId,check,msg]) => {
+  [['pub-titulo', 'pub-err-titulo', () => pubState.titulo.trim().length > 0, 'El título es obligatorio.'],
+  ['pub-rubro', 'pub-err-rubro', () => pubState.rubro !== '', 'Seleccioná un rubro.'],
+  ['pub-ubicacion', 'pub-err-ubicacion', () => pubState.ubicacion.trim().length > 0, 'La ubicación es obligatoria.'],
+  ['pub-desc', 'pub-err-desc', () => pubState.desc.length >= 50, 'La descripción debe tener al menos 50 caracteres.'],
+  ].forEach(([, errId, check, msg]) => {
     const errEl = document.getElementById(errId);
     if (errEl) errEl.textContent = check() ? '' : msg;
     if (!check()) ok = false;
   });
-  if (!ok) { document.querySelector('.pub-error:not(:empty)')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  if (!ok) { document.querySelector('.pub-error:not(:empty)')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
 
-  const btn=document.getElementById('btnPublicar');
-  const txt=btn?.querySelector('.pub-btn-text');
-  const spin=btn?.querySelector('.pub-spinner');
-  if(btn) btn.disabled=true;
-  if(txt) txt.style.display='none';
-  if(spin) spin.classList.remove('hidden');
+  const btn = document.getElementById('btnPublicar');
+  const txt = btn?.querySelector('.pub-btn-text');
+  const spin = btn?.querySelector('.pub-spinner');
+  if (btn) btn.disabled = true;
+  if (txt) txt.style.display = 'none';
+  if (spin) spin.classList.remove('hidden');
   await delay(2000);
-  if(btn) btn.disabled=false;
-  if(txt) txt.style.display='';
-  if(spin) spin.classList.add('hidden');
+  if (btn) btn.disabled = false;
+  if (txt) txt.style.display = '';
+  if (spin) spin.classList.add('hidden');
 
   document.querySelector('.publicar-layout')?.classList.add('hidden');
   const success = document.getElementById('pubSuccess');
@@ -478,18 +478,18 @@ async function pubHandleSubmit() {
 }
 
 function animateCounterId(id, from, to, dur) {
-  const el=document.getElementById(id); if(!el) return;
-  const s=performance.now();
-  function t(n){ const p=Math.min((n-s)/dur,1); el.textContent=Math.floor(from+(1-Math.pow(2,-10*p))*(to-from)).toLocaleString('es-AR'); if(p<1) requestAnimationFrame(t); }
+  const el = document.getElementById(id); if (!el) return;
+  const s = performance.now();
+  function t(n) { const p = Math.min((n - s) / dur, 1); el.textContent = Math.floor(from + (1 - Math.pow(2, -10 * p)) * (to - from)).toLocaleString('es-AR'); if (p < 1) requestAnimationFrame(t); }
   requestAnimationFrame(t);
 }
 
 function pubResetForm() {
-  Object.assign(pubState,{titulo:'',rubro:'',modalidad:'Presencial',ubicacion:'',jornada:'Full time',desc:'',skills:[],resp:[],benef:[],salMin:'',salMax:'',salNeg:false,salConf:false});
-  ['pub-titulo','pub-ubicacion','pub-desc','pub-sal-min','pub-sal-max'].forEach((id)=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  ['pub-sal-neg','pub-sal-conf'].forEach((id)=>{ const el=document.getElementById(id); if(el) el.checked=false; });
-  ['pub-skills-list','pub-resp-list','pub-benef-list'].forEach((id)=>{ const el=document.getElementById(id); if(el) el.innerHTML=''; });
-  document.querySelectorAll('.pub-radio').forEach((b)=>b.classList.toggle('active',b.dataset.val==='Presencial'));
+  Object.assign(pubState, { titulo: '', rubro: '', modalidad: 'Presencial', ubicacion: '', jornada: 'Full time', desc: '', skills: [], resp: [], benef: [], salMin: '', salMax: '', salNeg: false, salConf: false });
+  ['pub-titulo', 'pub-ubicacion', 'pub-desc', 'pub-sal-min', 'pub-sal-max'].forEach((id) => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['pub-sal-neg', 'pub-sal-conf'].forEach((id) => { const el = document.getElementById(id); if (el) el.checked = false; });
+  ['pub-skills-list', 'pub-resp-list', 'pub-benef-list'].forEach((id) => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+  document.querySelectorAll('.pub-radio').forEach((b) => b.classList.toggle('active', b.dataset.val === 'Presencial'));
   pubUpdatePreview(); pubUpdateChecklist();
 }
 
@@ -515,26 +515,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Cargar ofertas reales de la empresa
   if (session.empresaId) {
     try {
-      const res  = await fetch('http://localhost:3000/api/jobs');
+      const res = await fetch(`http://localhost:3000/api/jobs?empresaId=${session.empresaId}`);
       const data = await res.json();
 
       // Filtrar solo las ofertas de esta empresa
-      const misOfertas = data.filter((j) => j.empresaId === session.empresaId);
+      const misOfertas = data;
 
       if (misOfertas.length) {
         // Reemplazar datos hardcodeados
         OFERTAS_DATA.length = 0;
         misOfertas.forEach((j) => {
           OFERTAS_DATA.push({
-            id:            j.id,
-            title:         j.titulo,
-            area:          j.rubro,
-            modalidad:     j.modalidad,
-            ubicacion:     j.ubicacion,
-            status:        j.activa ? 'activa' : 'cerrada',
+            id: j.id,
+            title: j.titulo,
+            area: j.rubro,
+            modalidad: j.modalidad,
+            ubicacion: j.ubicacion,
+            status: j.activa ? 'activa' : 'cerrada',
             postulaciones: j.postulaciones?.length || 0,
-            vistas:        0,
-            dias:          Math.floor((Date.now() - new Date(j.creadoEn)) / 86400000),
+            vistas: 0,
+            dias: Math.floor((Date.now() - new Date(j.creadoEn)) / 86400000),
           });
         });
 
@@ -558,17 +558,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           CANDIDATOS_DATA.length = 0;
           candidatosData.forEach((p, i) => {
             CANDIDATOS_DATA.push({
-              id:       i + 1,
-              rank:     i + 1,
-              nombre:   `${p.candidato?.nombre || 'Candidato'} ${p.candidato?.apellido || ''}`.trim(),
+              id: i + 1,
+              rank: i + 1,
+              nombre: `${p.candidato?.nombre || 'Candidato'} ${p.candidato?.apellido || ''}`.trim(),
               iniciales: (p.candidato?.nombre?.charAt(0) || 'C') + (p.candidato?.apellido?.charAt(0) || ''),
-              color:    'linear-gradient(135deg,#5C6BC0,#7C4DFF)',
+              color: 'linear-gradient(135deg,#5C6BC0,#7C4DFF)',
               ofertaId: p.ofertaId,
-              oferta:   misOfertas[0]?.titulo || 'Oferta',
-              exp:      p.candidato?.habilidades?.join(', ') || 'Sin datos',
-              match:    p.matchIA || 0,
-              skills:   p.candidato?.habilidades?.slice(0, 3) || [],
-              missing:  0,
+              oferta: misOfertas[0]?.titulo || 'Oferta',
+              exp: p.candidato?.habilidades?.join(', ') || 'Sin datos',
+              match: p.matchIA || 0,
+              skills: p.candidato?.habilidades?.slice(0, 3) || [],
+              missing: 0,
             });
           });
 
