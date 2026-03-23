@@ -5,127 +5,38 @@
 ══════════════════════════════════════════ */
 
 /* ─────────────────────────────────
-   DATOS: Ofertas de trabajo
+   DATOS: Ofertas de trabajo (ahora desde API)
 ───────────────────────────────── */
-const JOBS = [
-  {
-    id: 1,
-    title: 'Vendedor/a Senior',
-    company: 'Grupo Arcor',
-    location: 'Córdoba',
-    logo: 'A', logoColor: '#5C6BC0',
-    tags: ['Presencial', 'FMCG', 'B2B'],
-    tagTypes: ['', '', ''],
-    salary: '$450.000 – $650.000',
-    time: 'hace 1h',
-    match: 97,
-    filter: ['todos', 'fulltime'],
-  },
-  {
-    id: 2,
-    title: 'Enfermero/a General',
-    company: 'Clínica Sucre',
-    location: 'Buenos Aires',
-    logo: 'C', logoColor: '#11998E',
-    tags: ['Presencial', 'Guardia', 'Urgente'],
-    tagTypes: ['', '', 'hot'],
-    salary: '$380.000 – $520.000',
-    time: 'hace 3h',
-    match: 93,
-    filter: ['todos', 'fulltime'],
-  },
-  {
-    id: 3,
-    title: 'Administrativo/a Contable',
-    company: 'Techint',
-    location: 'Remoto',
-    logo: 'T', logoColor: '#7C4DFF',
-    tags: ['Remoto', 'SAP', 'Excel'],
-    tagTypes: ['remote', '', ''],
-    salary: '$420.000 – $580.000',
-    time: 'hace 5h',
-    match: 91,
-    filter: ['todos', 'remoto', 'fulltime'],
-  },
-  {
-    id: 4,
-    title: 'Maestro/a de Primaria',
-    company: 'Colegio San Martín',
-    location: 'Rosario',
-    logo: 'S', logoColor: '#F7971E',
-    tags: ['Presencial', 'Turno tarde', 'Part time'],
-    tagTypes: ['', '', ''],
-    salary: '$290.000 – $370.000',
-    time: 'hace 8h',
-    match: 88,
-    filter: ['todos', 'recientes'],
-  },
-  {
-    id: 5,
-    title: 'Encargado/a de Depósito',
-    company: 'DHL Argentina',
-    location: 'Buenos Aires',
-    logo: 'D', logoColor: '#E65100',
-    tags: ['Presencial', 'Logística', 'Urgente'],
-    tagTypes: ['', '', 'hot'],
-    salary: '$360.000 – $480.000',
-    time: 'hace 1d',
-    match: 86,
-    filter: ['todos', 'recientes', 'fulltime'],
-  },
-  {
-    id: 6,
-    title: 'Desarrollador/a Backend',
-    company: 'Naranja X',
-    location: 'Córdoba / Remoto',
-    logo: 'N', logoColor: '#5C6BC0',
-    tags: ['Remoto', 'NestJS', 'Full time'],
-    tagTypes: ['remote', '', ''],
-    salary: '$2.800 – $4.200 USD',
-    time: 'hace 1d',
-    match: 85,
-    filter: ['todos', 'remoto', 'fulltime'],
-  },
-  {
-    id: 7,
-    title: 'Chef de Partida',
-    company: 'Restaurante El Federal',
-    location: 'CABA',
-    logo: 'E', logoColor: '#11998E',
-    tags: ['Presencial', 'Cocina fría', 'Part time'],
-    tagTypes: ['', '', ''],
-    salary: '$320.000 – $430.000',
-    time: 'hace 2d',
-    match: 82,
-    filter: ['todos', 'recientes'],
-  },
-  {
-    id: 8,
-    title: 'Analista de RRHH',
-    company: 'Banco Galicia',
-    location: 'Remoto',
-    logo: 'B', logoColor: '#7C4DFF',
-    tags: ['Remoto', 'Selección', 'Full time'],
-    tagTypes: ['remote', '', ''],
-    salary: '$480.000 – $620.000',
-    time: 'hace 2d',
-    match: 80,
-    filter: ['todos', 'remoto', 'fulltime'],
-  },
-  {
-    id: 9,
-    title: 'Electricista Industrial',
-    company: 'YPF',
-    location: 'Neuquén',
-    logo: 'Y', logoColor: '#F7971E',
-    tags: ['Presencial', 'MT/BT', 'Urgente'],
-    tagTypes: ['', '', 'hot'],
-    salary: '$520.000 – $700.000',
-    time: 'hace 3d',
-    match: 78,
-    filter: ['todos', 'recientes'],
-  },
-];
+let JOBS = [];
+
+async function fetchHomeJobs() {
+  try {
+    const res = await fetch('http://localhost:3000/api/jobs');
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+
+    JOBS = data.map(job => ({
+      id: job.id,
+      title: job.titulo,
+      company: job.empresa?.nombre || 'Empresa',
+      location: job.ubicacion,
+      logo: job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+      logoColor: '#5C6BC0',
+      tags: [job.modalidad, job.jornada],
+      tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', ''],
+      salary: job.salarioMin && job.salarioMax 
+        ? `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`
+        : 'Salario a convenir',
+      time: new Date(job.creadoEn).toLocaleDateString('es-AR'),
+      match: null, // El match se calcula en el dashboard o detalle
+      filter: ['todos', job.modalidad === 'Remoto' ? 'remoto' : '', job.jornada.toLowerCase().replace(' ', '')].filter(Boolean)
+    }));
+    
+    renderJobs('todos');
+  } catch (err) {
+    console.error('Error cargando ofertas en home:', err);
+  }
+}
 
 /* ─────────────────────────────────
    HAMBURGER
@@ -366,6 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initCtaSession();
   initChips();
   initSearch();
-  renderJobs('todos');
+  fetchHomeJobs();
   initTabs();
 });

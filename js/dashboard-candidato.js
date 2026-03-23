@@ -14,100 +14,29 @@
 /* ─────────────────────────────────
    DATOS DEL CANDIDATO
 ───────────────────────────────── */
-const CANDIDATO = {
-  nombre: 'Valentina González',
-  score: 82,
-
-  // Criterios reales que componen el score
+/* ─────────────────────────────────
+   DATOS DEL CANDIDATO (ahora desde API)
+───────────────────────────────── */
+let CANDIDATO = {
+  nombre: '',
+  score: 0,
   scoreData: {
-    total: 82,
-    // nivel: bueno (75-100) / regular (50-74) / bajo (0-49)
-    nivel: 'bueno',
-    tip: 'Para llegar a <strong>90+</strong> agregá tu perfil de LinkedIn y un objetivo profesional al inicio del CV. Con esos dos cambios tu score subiría aproximadamente 10 puntos.',
-    criterios: [
-      {
-        icono: '💼',
-        label: 'Experiencia laboral',
-        estado: 'ok',
-        puntos: '25/25',
-        detalle: '<strong>3 posiciones detectadas</strong> · 5 años de experiencia total · Último cargo: Ejecutiva de Ventas Sr. en Arcor',
-      },
-      {
-        icono: '🎓',
-        label: 'Formación académica',
-        estado: 'ok',
-        puntos: '20/20',
-        detalle: '<strong>Universitario completo</strong> · Lic. en Comercialización · Universidad Siglo 21',
-      },
-      {
-        icono: '🛠️',
-        label: 'Habilidades y tecnologías',
-        estado: 'ok',
-        puntos: '18/20',
-        detalle: '<strong>12 habilidades detectadas</strong> · 6 tecnologías · Falta especificar nivel de idiomas',
-      },
-      {
-        icono: '📋',
-        label: 'Completitud del perfil',
-        estado: 'warn',
-        puntos: '12/20',
-        detalle: 'Faltan: <strong>LinkedIn, foto, objetivo profesional</strong> · Teléfono y ubicación sí están presentes',
-      },
-      {
-        icono: '✍️',
-        label: 'Claridad y estructura',
-        estado: 'ok',
-        puntos: '7/15',
-        detalle: 'Estructura <strong>clara y ordenada</strong> · Longitud adecuada (2 páginas) · Ortografía correcta',
-      },
-    ],
+    total: 0,
+    nivel: 'bajo',
+    tip: 'Subí tu CV para que la IA lo analice y genere tu reporte de compatibilidad.',
+    criterios: []
   },
-
-  resumen: 'Profesional con más de 5 años de experiencia en ventas B2B y gestión de cuentas en el sector de consumo masivo. Sólido historial en cumplimiento de objetivos comerciales, negociación y desarrollo de carteras de clientes en canales modernos y tradicionales. Orientada a resultados, con alta capacidad de adaptación y excelentes habilidades comunicacionales.',
-  habilidades: [
-    { name: 'Ventas B2B', type: 'main' },
-    { name: 'Negociación', type: 'main' },
-    { name: 'Gestión de cuentas', type: 'main' },
-    { name: 'CRM Salesforce', type: 'tech' },
-    { name: 'Excel avanzado', type: 'tech' },
-    { name: 'Power BI', type: 'tech' },
-    { name: 'Liderazgo', type: 'soft' },
-    { name: 'Comunicación', type: 'soft' },
-    { name: 'Trabajo en equipo', type: 'soft' },
-    { name: 'Adaptabilidad', type: 'soft' },
-    { name: 'Canal moderno', type: 'main' },
-    { name: 'Canal tradicional', type: 'main' },
-  ],
-  techSkills: ['CRM Salesforce', 'Excel avanzado', 'Power BI', 'SAP (básico)', 'Google Workspace'],
-  softSkills: ['Liderazgo', 'Negociación', 'Comunicación efectiva', 'Orientación a resultados', 'Trabajo en equipo'],
-  techs: ['Salesforce', 'Excel', 'Power BI', 'SAP', 'Google Sheets', 'Slack'],
-  missing: ['Inglés avanzado', 'HubSpot', 'SQL básico', 'Marketing digital'],
-  experiencia: [
-    { role: 'Ejecutiva de Ventas Sr.', company: 'Grupo Arcor', period: 'Mar 2021 – Presente · 5 años', desc: 'Gestión de cartera de 80+ clientes en canal moderno. Cumplimiento de objetivos anuales en 118%. Coordinación de equipo de 3 vendedores jr.' },
-    { role: 'Asesora Comercial', company: 'Danone Argentina', period: 'Jun 2019 – Feb 2021 · 1 año 8 meses', desc: 'Atención y desarrollo de cuentas en canal supermercadista regional. Incorporación de 15 nuevas cuentas en el primer año.' },
-    { role: 'Promotora de Ventas', company: 'Unilever', period: 'Ene 2018 – May 2019 · 1 año 4 meses', desc: 'Activaciones en punto de venta y seguimiento de métricas de sell-out en Córdoba Capital.' },
-  ],
+  resumen: 'Analizando perfil...',
+  habilidades: [],
+  techSkills: [],
+  softSkills: [],
+  techs: [],
+  missing: [],
+  experiencia: [],
 };
 
-const POSTULACIONES = [
-  { id: 1, title: 'Vendedor/a Senior', company: 'Grupo Arcor', logo: 'A', logoColor: '#5C6BC0', fecha: 'hace 2 días', status: 'entrevista', match: 97 },
-  { id: 2, title: 'Ejecutiva de Cuentas', company: 'Nestlé', logo: 'N', logoColor: '#11998E', fecha: 'hace 4 días', status: 'revisada', match: 91 },
-  { id: 3, title: 'Key Account Manager', company: 'P&G Argentina', logo: 'P', logoColor: '#7C4DFF', fecha: 'hace 6 días', status: 'pendiente', match: 88 },
-  { id: 4, title: 'Gerente Comercial Jr.', company: 'Molinos Río', logo: 'M', logoColor: '#F7971E', fecha: 'hace 1 semana', status: 'pendiente', match: 84 },
-  { id: 5, title: 'Asesor/a de Ventas', company: 'Coca-Cola', logo: 'C', logoColor: '#E65100', fecha: 'hace 2 semanas', status: 'rechazada', match: 79 },
-  { id: 6, title: 'Representante Comercial', company: '3M Argentina', logo: '3', logoColor: '#5C6BC0', fecha: 'hace 2 semanas', status: 'pendiente', match: 76 },
-  { id: 7, title: 'Coordinadora de Ventas', company: 'Bimbo', logo: 'B', logoColor: '#11998E', fecha: 'hace 3 semanas', status: 'revisada', match: 74 },
-  { id: 8, title: 'Trade Marketing Analyst', company: 'Pepsico', logo: 'P', logoColor: '#7C4DFF', fecha: 'hace 1 mes', status: 'rechazada', match: 71 },
-];
-
-const RECOMENDADAS = [
-  { id: 1, title: 'Vendedor/a Senior', company: 'Arcor', location: 'Córdoba', logo: 'A', logoColor: '#5C6BC0', tags: ['Presencial', 'FMCG'], tagTypes: ['', ''], salary: '$450.000 – $650.000', time: 'hace 1h', match: 97 },
-  { id: 2, title: 'Key Account Manager', company: 'Unilever', location: 'Buenos Aires', logo: 'U', logoColor: '#11998E', tags: ['Híbrido', 'B2B'], tagTypes: ['', ''], salary: '$600.000 – $850.000', time: 'hace 3h', match: 94 },
-  { id: 3, title: 'Ejecutiva de Cuentas', company: 'Nestlé', location: 'Remoto', logo: 'N', logoColor: '#7C4DFF', tags: ['Remoto', 'FMCG'], tagTypes: ['remote', ''], salary: '$500.000 – $700.000', time: 'hace 5h', match: 91 },
-  { id: 4, title: 'Sales Manager', company: 'Danone', location: 'Córdoba', logo: 'D', logoColor: '#F7971E', tags: ['Presencial', 'Canal mod'], tagTypes: ['', ''], salary: '$700.000 – $950.000', time: 'hace 8h', match: 89 },
-  { id: 5, title: 'Trade Marketing Sr.', company: 'Pepsico', location: 'Buenos Aires', logo: 'P', logoColor: '#E65100', tags: ['Híbrido', 'Urgente'], tagTypes: ['', 'hot'], salary: '$550.000 – $780.000', time: 'hace 1d', match: 86 },
-  { id: 6, title: 'Representante Comercial', company: '3M', location: 'Rosario', logo: '3', logoColor: '#5C6BC0', tags: ['Presencial'], tagTypes: [''], salary: '$380.000 – $520.000', time: 'hace 2d', match: 83 },
-];
+let POSTULACIONES = [];
+let RECOMENDADAS = [];
 
 /* ─────────────────────────────────
    RENDER SCORE DEL CV
@@ -431,68 +360,129 @@ function initSaveProfile() {
 /* ─────────────────────────────────
    INIT
 ───────────────────────────────── */
-document.addEventListener('DOMContentLoaded', async () => {
-  // Cargar datos del perfil desde localStorage
-  const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+/* ─────────────────────────────────
+   FETCH DATOS REALES
+───────────────────────────────── */
+async function fetchProfile(candidatoId) {
+  try {
+    const res = await fetch(`http://localhost:3000/api/profile/candidato/${candidatoId}`);
+    const data = await res.json();
+    if (!res.ok) return;
 
-  // Actualizar nombre en el saludo
-  if (session.nombre) {
-    const firstName = session.nombre.split(' ')[0];
+    // Mapear datos de la API al objeto CANDIDATO
+    CANDIDATO.nombre = `${data.usuario?.nombre || ''} ${data.usuario?.apellido || ''}`.trim();
+    CANDIDATO.score = data.scoreCV || 0;
+    CANDIDATO.resumen = data.resumenIA || 'Subí tu CV para que la IA genere un resumen de tu perfil profesional.';
+    
+    // Score data (parcial, a mejorar cuando integremos la IA real)
+    CANDIDATO.scoreData = {
+      total: data.scoreCV || 0,
+      nivel: (data.scoreCV >= 75) ? 'bueno' : (data.scoreCV >= 50 ? 'regular' : 'bajo'),
+      tip: data.scoreCV > 0 ? '¡Buen trabajo! Seguí mejorando tu perfil para aumentar tu visibilidad.' : 'Subí tu CV para obtener un análisis detallado.',
+      criterios: [
+        { icono: '💼', label: 'Experiencia laboral', estado: data.scoreCV > 10 ? 'ok' : 'warn', puntos: '-', detalle: 'Datos extraídos de tu CV' },
+        { icono: '🎓', label: 'Formación académica', estado: data.scoreCV > 10 ? 'ok' : 'warn', puntos: '-', detalle: 'Datos extraídos de tu CV' },
+      ]
+    };
+
+    // Habilidades
+    if (data.habilidades) {
+      CANDIDATO.habilidades = data.habilidades.split(',').map(s => ({ name: s.trim(), type: 'main' }));
+    }
+
+    renderScore();
+    renderSkills();
+    renderIAAnalysis();
+    
+    // Actualizar UI
+    const firstName = CANDIDATO.nombre.split(' ')[0];
     const greetEl = document.querySelector('.greeting-title');
     if (greetEl) greetEl.textContent = `¡Hola, ${firstName}! 👋`;
-
-    // Actualizar avatar
-    document.querySelectorAll('.sp-avatar, .avatar-circle').forEach((el) => {
+    
+    document.querySelectorAll('.sp-avatar, .avatar-circle').forEach(el => {
       el.textContent = firstName.charAt(0).toUpperCase();
     });
-    document.querySelectorAll('.sp-name, .avatar-name').forEach((el) => {
-      el.textContent = session.nombre;
+    document.querySelectorAll('.sp-name, .avatar-name').forEach(el => {
+      el.textContent = CANDIDATO.nombre;
     });
-  }
 
-  // Cargar postulaciones reales si hay candidatoId
+  } catch (err) {
+    console.error('Error fetching profile:', err);
+  }
+}
+
+async function fetchRecommendations() {
+  try {
+    const res = await fetch('http://localhost:3000/api/jobs');
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+
+    RECOMENDADAS = data.slice(0, 6).map(job => ({
+      id: job.id,
+      title: job.titulo,
+      company: job.empresa?.nombre || 'Empresa',
+      location: job.ubicacion,
+      logo: job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+      logoColor: '#5C6BC0',
+      tags: [job.modalidad, job.jornada],
+      tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', ''],
+      salary: job.salarioMin ? `$${job.salarioMin.toLocaleString('es-AR')}` : 'A convenir',
+      time: 'Reciente',
+      match: 85 // Mock match
+    }));
+
+    renderRecomendadas();
+  } catch (err) {
+    console.error('Error fetching recommendations:', err);
+  }
+}
+
+
+/* ─────────────────────────────────
+   INIT
+───────────────────────────────── */
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1. Validar sesión
+  const session = requireSession();
+  if (!session) return;
+
+  // 2. Cargar perfil si es candidato
   if (session.candidatoId) {
+    fetchProfile(session.candidatoId);
+
+    // Cargar postulaciones reales
     try {
       const res = await fetch(`http://localhost:3000/api/applications?candidatoId=${session.candidatoId}`);
       const data = await res.json();
-
       if (res.ok && Array.isArray(data)) {
-        // Reemplazar datos hardcodeados con datos reales
-        POSTULACIONES.length = 0;
-        data.forEach((p) => {
-          POSTULACIONES.push({
-            id: p.ofertaId,
-            title: p.oferta?.titulo || 'Oferta',
-            company: p.oferta?.empresa?.nombre || 'Empresa',
-            logo: p.oferta?.empresa?.nombre?.charAt(0).toUpperCase() || '?',
-            logoColor: '#5C6BC0',
-            fecha: new Date(p.creadoEn).toLocaleDateString('es-AR'),
-            status: p.estado.toLowerCase(),
-            match: p.matchIA || null,
-          });
-        });
-
-        // Actualizar badge del sidebar
+        POSTULACIONES = data.map(p => ({
+          id: p.ofertaId,
+          title: p.oferta?.titulo || 'Oferta',
+          company: p.oferta?.empresa?.nombre || 'Empresa',
+          logo: p.oferta?.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+          logoColor: '#5C6BC0',
+          fecha: new Date(p.creadoEn).toLocaleDateString('es-AR'),
+          status: p.estado.toLowerCase(),
+          match: p.matchIA || 0,
+        }));
+        
         const badge = document.querySelector('.snav-item[data-section="postulaciones"] .snav-badge');
-        if (badge) badge.textContent = data.length;
-
-        // Actualizar stat
+        if (badge) badge.textContent = POSTULACIONES.length;
+        
         const statEl = document.querySelector('.dstat-num');
-        if (statEl) statEl.textContent = data.length;
+        if (statEl) statEl.textContent = POSTULACIONES.length;
+        
+        renderPostulaciones();
       }
     } catch (err) {
       console.error('Error cargando postulaciones:', err);
     }
   }
 
-  // Render
-  renderScore();
-  renderSkills();
-  renderIAAnalysis();
-  renderPostulaciones();
-  renderRecomendadas();
+  // 3. Cargar recomendaciones
+  fetchRecommendations();
 
-  // Interacciones
+  // 4. Interacciones
   initSidebarNav();
   initDashSidebar();
   initAvatarDropdown();
