@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Param, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { JwtGuard } from '../auth/jwt.guard';
 import { JobsService } from './jobs.service';
 
 @Controller('jobs')
@@ -6,17 +7,16 @@ export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
   // GET /api/jobs
-  // GET /api/jobs?q=ventas&rubro=ventas&modalidad=remoto
-@Get()
-findAll(
-  @Query('q')          q?: string,
-  @Query('rubro')      rubro?: string,
-  @Query('modalidad')  modalidad?: string,
-  @Query('ubicacion')  ubicacion?: string,
-  @Query('empresaId')  empresaId?: string,    // ← agregar esto
-) {
-  return this.jobsService.findAll({ q, rubro, modalidad, ubicacion, empresaId });
-}
+  @Get()
+  findAll(
+    @Query('q')         q?: string,
+    @Query('rubro')     rubro?: string,
+    @Query('modalidad') modalidad?: string,
+    @Query('ubicacion') ubicacion?: string,
+    @Query('empresaId') empresaId?: string,
+  ) {
+    return this.jobsService.findAll({ q, rubro, modalidad, ubicacion, empresaId });
+  }
 
   // GET /api/jobs/:id
   @Get(':id')
@@ -24,8 +24,9 @@ findAll(
     return this.jobsService.findOne(id);
   }
 
-  // POST /api/jobs
+  // POST /api/jobs — requiere token
   @Post()
+  @UseGuards(JwtGuard)
   create(@Body() body: {
     titulo: string;
     descripcion: string;
