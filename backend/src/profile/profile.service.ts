@@ -41,6 +41,15 @@ export class ProfileService {
     });
   }
 
+  // Actualizar la URL del CV
+  async updateCvUrl(candidatoId: string, cvUrl: string) {
+    return this.prisma.candidato.update({
+      where: { id: candidatoId },
+      data: { cvUrl },
+      select: { id: true, cvUrl: true },
+    });
+  }
+
   // Obtener perfil de la empresa
   async getEmpresa(empresaId: string) {
     const empresa = await this.prisma.empresa.findUnique({

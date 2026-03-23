@@ -1,20 +1,23 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
   // Permite que el frontend se conecte al backend
-  app.enableCors({
-    origin: '*',
-  });
+  app.enableCors({ origin: '*' });
 
   // Valida los datos que llegan al backend
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     transform: true,
   }));
+
+  // Sirve los archivos subidos (ej: CVs en /uploads/cvs/)
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
 
   // Todas las rutas empiezan con /api
   app.setGlobalPrefix('api');

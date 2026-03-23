@@ -1,6 +1,20 @@
-import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  Query,
+  UseGuards,
+  Req,
+  ForbiddenException,
+} from '@nestjs/common';
 import { JwtGuard } from '../auth/jwt.guard';
 import { JobsService } from './jobs.service';
+import { CreateJobDto } from './dto/create-job.dto';
+import { UpdateJobDto } from './dto/update-job.dto';
 
 @Controller('jobs')
 export class JobsController {
@@ -24,29 +38,28 @@ export class JobsController {
     return this.jobsService.findOne(id);
   }
 
-  // POST /api/jobs — requiere token
+  // POST /api/jobs — solo empresas autenticadas
   @Post()
   @UseGuards(JwtGuard)
-  create(@Body() body: {
-    titulo: string;
-    descripcion: string;
-    rubro: string;
-    modalidad: string;
-    ubicacion: string;
-    jornada: string;
-    experiencia?: string;
-    estudios?: string;
-    salarioMin?: number;
-    salarioMax?: number;
-    habilidades?: string[];
-    empresaId: string;
-  }) {
+  create(@Body() body: CreateJobDto) {
     return this.jobsService.create(body);
   }
-  // PATCH /api/jobs/:id/cerrar — requiere token
+
+  // PATCH /api/jobs/:id — editar oferta (solo la empresa dueña)
+  @Patch(':id')
+  @UseGuards(JwtGuard)
+  update(
+    @Param('id') id: string,
+    @Body() body: UpdateJobDto,
+    @Req() req: any,
+  ) {
+    return this.jobsService.update(id, body, req.user.sub);
+  }
+
+  // PATCH /api/jobs/:id/cerrar — cerrar oferta (solo la empresa dueña)
   @Patch(':id/cerrar')
   @UseGuards(JwtGuard)
-  cerrar(@Param('id') id: string) {
-    return this.jobsService.close(id);
+  cerrar(@Param('id') id: string, @Req() req: any) {
+    return this.jobsService.close(id, req.user.sub);
   }
 }

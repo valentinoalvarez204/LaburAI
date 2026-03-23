@@ -1,24 +1,24 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class JobsService {
   constructor(private prisma: PrismaService) {}
 
-  // Obtener todas las ofertas activas
-async findAll(filtros?: {
+  // Obtener todas las ofertas activas (con filtros opcionales)
+  async findAll(filtros?: {
     q?: string;
     rubro?: string;
     modalidad?: string;
     ubicacion?: string;
-    empresaId?: string;        // ← agregar esto
+    empresaId?: string;
   }) {
     const where: any = { activa: true };
 
     if (filtros?.rubro)     { where.rubro     = { contains: filtros.rubro,     mode: 'insensitive' }; }
     if (filtros?.modalidad) { where.modalidad  = { contains: filtros.modalidad, mode: 'insensitive' }; }
     if (filtros?.ubicacion) { where.ubicacion  = { contains: filtros.ubicacion, mode: 'insensitive' }; }
-    if (filtros?.empresaId) { where.empresaId  = filtros.empresaId; }   // ← agregar esto
+    if (filtros?.empresaId) { where.empresaId  = filtros.empresaId; }
     if (filtros?.q) {
       where.OR = [
         { titulo:      { contains: filtros.q, mode: 'insensitive' } },
@@ -27,18 +27,18 @@ async findAll(filtros?: {
       ];
     }
 
-return this.prisma.ofertaLaboral.findMany({
-  where,
-  include: {
-    empresa: {
-      select: { nombre: true, industria: true, ubicacion: true },
-    },
-    postulaciones: {
-      select: { id: true, estado: true },
-    },
-  },
-  orderBy: { creadoEn: 'desc' },
-});
+    return this.prisma.ofertaLaboral.findMany({
+      where,
+      include: {
+        empresa: {
+          select: { nombre: true, industria: true, ubicacion: true },
+        },
+        postulaciones: {
+          select: { id: true, estado: true },
+        },
+      },
+      orderBy: { creadoEn: 'desc' },
+    });
   }
 
   // Obtener una oferta por ID
@@ -74,18 +74,50 @@ return this.prisma.ofertaLaboral.findMany({
     return this.prisma.ofertaLaboral.create({
       data,
       include: {
-        empresa: {
-          select: { nombre: true },
-        },
+        empresa: { select: { nombre: true } },
       },
     });
   }
 
-  // Cerrar una oferta
-  async close(id: string) {
+  // Editar una oferta (verifica que el usuario sea dueño de la empresa)
+  async update(id: string, data: Partial<{
+    titulo: string;
+    descripcion: string;
+    rubro: string;
+    modalidad: string;
+    ubicacion: string;
+    jornada: string;
+    experiencia: string;
+    estudios: string;
+    salarioMin: number;
+    salarioMax: number;
+    habilidades: string[];
+  }>, usuarioId: string) {
+    await this.assertOwnership(id, usuarioId);
+    return this.prisma.ofertaLaboral.update({
+      where: { id },
+      data,
+    });
+  }
+
+  // Cerrar una oferta (verifica que el usuario sea dueño de la empresa)
+  async close(id: string, usuarioId: string) {
+    await this.assertOwnership(id, usuarioId);
     return this.prisma.ofertaLaboral.update({
       where: { id },
       data: { activa: false },
     });
+  }
+
+  // Verifica que la oferta pertenezca a la empresa del usuario autenticado
+  private async assertOwnership(ofertaId: string, usuarioId: string) {
+    const oferta = await this.prisma.ofertaLaboral.findUnique({
+      where: { id: ofertaId },
+      include: { empresa: true },
+    });
+    if (!oferta) throw new NotFoundException('Oferta no encontrada');
+    if (oferta.empresa.usuarioId !== usuarioId) {
+      throw new ForbiddenException('No tenés permiso para modificar esta oferta');
+    }
   }
 }
