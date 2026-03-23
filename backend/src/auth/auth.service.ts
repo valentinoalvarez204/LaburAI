@@ -74,6 +74,31 @@ export class AuthService {
     };
   }
 
+  async me(usuarioId: string) {
+    const usuario = await this.prisma.usuario.findUnique({
+      where: { id: usuarioId },
+      include: {
+        candidato: true,
+        empresa: true,
+      },
+    });
+    if (!usuario) throw new Error('Usuario no encontrado');
+
+    const nombre =
+      usuario.rol === 'CANDIDATO'
+        ? `${usuario.candidato?.nombre} ${usuario.candidato?.apellido}`
+        : usuario.empresa?.nombre;
+
+    return {
+      id: usuario.id,
+      email: usuario.email,
+      rol: usuario.rol,
+      nombre,
+      candidatoId: usuario.candidato?.id || null,
+      empresaId: usuario.empresa?.id || null,
+    };
+  }
+
   async login(data: { email: string; password: string }) {
     // Buscar usuario
     const usuario = await this.prisma.usuario.findUnique({

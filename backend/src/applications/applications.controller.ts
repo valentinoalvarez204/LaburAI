@@ -28,8 +28,9 @@ export class ApplicationsController {
     return [];
   }
 
-  // PATCH /api/applications/:id/estado
+  // PATCH /api/applications/:id/estado — solo empresas autenticadas
   @Patch(':id/estado')
+  @UseGuards(JwtGuard)
   updateEstado(
     @Param('id') id: string,
     @Body() body: { estado: 'PENDIENTE' | 'REVISADA' | 'ENTREVISTA' | 'RECHAZADA' },
