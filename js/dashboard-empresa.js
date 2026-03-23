@@ -496,7 +496,93 @@ function pubResetForm() {
 /* ─────────────────────────────────
    INIT
 ───────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Cargar sesión
+  const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+
+  // Actualizar nombre de la empresa en el sidebar y topbar
+  if (session.nombre) {
+    document.querySelectorAll('.sp-name, .avatar-name').forEach((el) => {
+      el.textContent = session.nombre;
+    });
+    document.querySelectorAll('.sp-avatar, .avatar-circle').forEach((el) => {
+      el.textContent = session.nombre.charAt(0).toUpperCase();
+    });
+    const greetEl = document.querySelector('.greeting-title');
+    if (greetEl) greetEl.textContent = `Bienvenido, ${session.nombre} 🏢`;
+  }
+
+  // Cargar ofertas reales de la empresa
+  if (session.empresaId) {
+    try {
+      const res  = await fetch('http://localhost:3000/api/jobs');
+      const data = await res.json();
+
+      // Filtrar solo las ofertas de esta empresa
+      const misOfertas = data.filter((j) => j.empresaId === session.empresaId);
+
+      if (misOfertas.length) {
+        // Reemplazar datos hardcodeados
+        OFERTAS_DATA.length = 0;
+        misOfertas.forEach((j) => {
+          OFERTAS_DATA.push({
+            id:            j.id,
+            title:         j.titulo,
+            area:          j.rubro,
+            modalidad:     j.modalidad,
+            ubicacion:     j.ubicacion,
+            status:        j.activa ? 'activa' : 'cerrada',
+            postulaciones: j.postulaciones?.length || 0,
+            vistas:        0,
+            dias:          Math.floor((Date.now() - new Date(j.creadoEn)) / 86400000),
+          });
+        });
+
+        // Actualizar stats
+        const activas = OFERTAS_DATA.filter((o) => o.status === 'activa').length;
+        const totalPostulaciones = OFERTAS_DATA.reduce((acc, o) => acc + o.postulaciones, 0);
+
+        // Actualizar badge del sidebar
+        const badge = document.querySelector('.snav-item[data-section="ofertas"] .snav-badge');
+        if (badge) badge.textContent = activas;
+      }
+
+      // Cargar candidatos de todas las ofertas de la empresa
+      if (misOfertas.length) {
+        const candidatosRes = await fetch(
+          `http://localhost:3000/api/applications?ofertaId=${misOfertas[0].id}`
+        );
+        const candidatosData = await candidatosRes.json();
+
+        if (candidatosRes.ok && Array.isArray(candidatosData)) {
+          CANDIDATOS_DATA.length = 0;
+          candidatosData.forEach((p, i) => {
+            CANDIDATOS_DATA.push({
+              id:       i + 1,
+              rank:     i + 1,
+              nombre:   `${p.candidato?.nombre || 'Candidato'} ${p.candidato?.apellido || ''}`.trim(),
+              iniciales: (p.candidato?.nombre?.charAt(0) || 'C') + (p.candidato?.apellido?.charAt(0) || ''),
+              color:    'linear-gradient(135deg,#5C6BC0,#7C4DFF)',
+              ofertaId: p.ofertaId,
+              oferta:   misOfertas[0]?.titulo || 'Oferta',
+              exp:      p.candidato?.habilidades?.join(', ') || 'Sin datos',
+              match:    p.matchIA || 0,
+              skills:   p.candidato?.habilidades?.slice(0, 3) || [],
+              missing:  0,
+            });
+          });
+
+          // Actualizar badge candidatos
+          const candBadge = document.querySelector('.snav-item[data-section="candidatos"] .snav-badge');
+          if (candBadge) candBadge.textContent = candidatosData.length;
+        }
+      }
+
+    } catch (err) {
+      console.error('Error cargando datos de empresa:', err);
+    }
+  }
+
   injectGradient();
   renderOfertasMini();
   renderTopCandidatos();
@@ -510,4 +596,3 @@ document.addEventListener('DOMContentLoaded', () => {
   initSelectOferta();
   initPublicarForm();
 });
-

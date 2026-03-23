@@ -402,8 +402,61 @@ function initSaveProfile() {
 /* ─────────────────────────────────
    INIT
 ───────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
-  // Render data
+document.addEventListener('DOMContentLoaded', async () => {
+  // Cargar datos del perfil desde localStorage
+  const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+
+  // Actualizar nombre en el saludo
+  if (session.nombre) {
+    const firstName = session.nombre.split(' ')[0];
+    const greetEl   = document.querySelector('.greeting-title');
+    if (greetEl) greetEl.textContent = `¡Hola, ${firstName}! 👋`;
+
+    // Actualizar avatar
+    document.querySelectorAll('.sp-avatar, .avatar-circle').forEach((el) => {
+      el.textContent = firstName.charAt(0).toUpperCase();
+    });
+    document.querySelectorAll('.sp-name, .avatar-name').forEach((el) => {
+      el.textContent = session.nombre;
+    });
+  }
+
+  // Cargar postulaciones reales si hay candidatoId
+  if (session.candidatoId) {
+    try {
+      const res  = await fetch(`http://localhost:3000/api/applications?candidatoId=${session.candidatoId}`);
+      const data = await res.json();
+
+      if (res.ok && Array.isArray(data)) {
+        // Reemplazar datos hardcodeados con datos reales
+        POSTULACIONES.length = 0;
+        data.forEach((p) => {
+          POSTULACIONES.push({
+            id:      p.ofertaId,
+            title:   p.oferta?.titulo   || 'Oferta',
+            company: p.oferta?.empresa?.nombre || 'Empresa',
+            logo:    p.oferta?.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+            logoColor: '#5C6BC0',
+            fecha:   new Date(p.creadoEn).toLocaleDateString('es-AR'),
+            status:  p.estado.toLowerCase(),
+            match:   p.matchIA || null,
+          });
+        });
+
+        // Actualizar badge del sidebar
+        const badge = document.querySelector('.snav-item[data-section="postulaciones"] .snav-badge');
+        if (badge) badge.textContent = data.length;
+
+        // Actualizar stat
+        const statEl = document.querySelector('.dstat-num');
+        if (statEl) statEl.textContent = data.length;
+      }
+    } catch (err) {
+      console.error('Error cargando postulaciones:', err);
+    }
+  }
+
+  // Render
   renderScore();
   renderSkills();
   renderIAAnalysis();
@@ -417,37 +470,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initPostulacionesFiltros();
   initReanalyze();
   initCopySummary();
-
-  let perfilClickCount = 0;
-  document.querySelector('.avatar-dropdown')?.addEventListener('click', (e) => {
-  if (e.target.textContent.trim() === 'Mi perfil') {
-    const current = document.getElementById('perfil');
-    if (current && !current.classList.contains('hidden')) {
-      perfilClickCount++;
-      if (perfilClickCount >= 3) {
-        perfilClickCount = 0;
-        const emoji = document.createElement('div');
-        emoji.textContent = '😵';
-        Object.assign(emoji.style, {
-          position: 'fixed', bottom: '-50px', left: Math.random() * 80 + 10 + '%',
-          fontSize: '2.5rem', zIndex: '9999', transition: 'bottom 2s ease-out, opacity 1s ease-in 1.5s',
-          opacity: '1', pointerEvents: 'none'
-        });
-        document.body.appendChild(emoji);
-        requestAnimationFrame(() => {
-          emoji.style.bottom = '110vh';
-          emoji.style.opacity = '0';
-        });
-        setTimeout(() => emoji.remove(), 2500);
-      }
-    } else {
-      perfilClickCount = 0;
-    }
-  }
-});
-  
   initSaveProfile();
-
-  const section = getParam('section');
-  if (section) switchSection(section);
 });
