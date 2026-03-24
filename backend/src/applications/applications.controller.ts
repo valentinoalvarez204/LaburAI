@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { JwtGuard } from '../auth/jwt.guard';
 import { ApplicationsService } from './applications.service';
 
@@ -9,11 +9,17 @@ export class ApplicationsController {
   // POST /api/applications — requiere token
   @Post()
   @UseGuards(JwtGuard)
-  create(@Body() body: {
-    candidatoId: string;
-    ofertaId: string;
-    cartaMotivacion?: string;
-  }) {
+  create(
+    @Req() req: any,
+    @Body() body: {
+      candidatoId: string;
+      ofertaId: string;
+      cartaMotivacion?: string;
+    }
+  ) {
+    if (req.user?.rol === 'EMPRESA') {
+      throw new ForbiddenException('Las empresas no pueden postularse a ofertas.');
+    }
     return this.applicationsService.create(body);
   }
 
