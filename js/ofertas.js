@@ -16,23 +16,7 @@
 /* ─────────────────────────────────
    DATOS
 ───────────────────────────────── */
-const OFERTAS = [
-  { id:1,  title:'Vendedor/a Senior',           company:'Grupo Arcor',       location:'Córdoba',           logo:'A', logoColor:'#5C6BC0', tags:['Presencial','FMCG','B2B'],         tagTypes:['','',''],          salary:'$450.000 – $650.000', salaryNum:450000, time:'hace 1h',  match:97, rubro:'ventas',         modalidad:'presencial', jornada:'fulltime',  exp:'3-5',    desc:'Buscamos vendedor/a senior con experiencia en canal moderno y tradicional. Gestión de cartera de clientes, cumplimiento de objetivos y reporte a gerencia comercial.' },
-  { id:2,  title:'Enfermero/a General',          company:'Clínica Sucre',     location:'Buenos Aires',      logo:'C', logoColor:'#11998E', tags:['Presencial','Guardia','Urgente'],  tagTypes:['','','hot'],        salary:'$380.000 – $520.000', salaryNum:380000, time:'hace 3h',  match:93, rubro:'salud',          modalidad:'presencial', jornada:'fulltime',  exp:'1-2',    desc:'Necesitamos enfermero/a para turno guardia en área de internación general. Imprescindible matrícula habilitante y experiencia mínima de 1 año en clínica u hospital.' },
-  { id:3,  title:'Administrativo/a Contable',    company:'Techint',           location:'Remoto',            logo:'T', logoColor:'#7C4DFF', tags:['Remoto','SAP','Full time'],       tagTypes:['remote','',''],     salary:'$420.000 – $580.000', salaryNum:420000, time:'hace 5h',  match:91, rubro:'administracion', modalidad:'remoto',    jornada:'fulltime',  exp:'3-5',    desc:'Posición de trabajo remoto para el área de administración contable. Se requiere manejo de SAP, conocimientos de facturación, conciliaciones bancarias y liquidación de impuestos.' },
-  { id:4,  title:'Maestro/a de Primaria',        company:'Colegio San Martín',location:'Rosario',           logo:'S', logoColor:'#F7971E', tags:['Presencial','Turno tarde'],       tagTypes:['',''],             salary:'$290.000 – $370.000', salaryNum:290000, time:'hace 8h',  match:88, rubro:'educacion',      modalidad:'presencial', jornada:'parttime',  exp:'1-2',    desc:'Buscamos maestro/a de nivel primario para turno tarde. Título docente habilitante excluyente. Valoramos experiencia en modalidad activa y manejo de herramientas digitales.' },
-  { id:5,  title:'Encargado/a de Depósito',      company:'DHL Argentina',     location:'Buenos Aires',      logo:'D', logoColor:'#E65100', tags:['Presencial','Logística','Urgente'],tagTypes:['','','hot'],        salary:'$360.000 – $480.000', salaryNum:360000, time:'hace 1d',  match:86, rubro:'logistica',      modalidad:'presencial', jornada:'fulltime',  exp:'3-5',    desc:'Responsable de la gestión operativa del depósito: recepción, almacenamiento, despacho y control de inventario. Manejo de sistemas WMS y personal a cargo.' },
-  { id:6,  title:'Desarrollador/a Backend',      company:'Naranja X',         location:'Córdoba / Remoto',  logo:'N', logoColor:'#5C6BC0', tags:['Remoto','NestJS','Full time'],     tagTypes:['remote','',''],     salary:'$2.800 – $4.200 USD', salaryNum:800000, time:'hace 1d',  match:85, rubro:'tecnologia',     modalidad:'hibrido',   jornada:'fulltime',  exp:'3-5',    desc:'Buscamos developer backend con experiencia en NestJS, PostgreSQL y arquitectura de microservicios. Trabajo en equipo ágil con entregas continuas.' },
-  { id:7,  title:'Chef de Partida',              company:'El Federal',         location:'CABA',              logo:'E', logoColor:'#11998E', tags:['Presencial','Cocina fría'],       tagTypes:['',''],             salary:'$320.000 – $430.000', salaryNum:320000, time:'hace 2d',  match:82, rubro:'gastronomia',    modalidad:'presencial', jornada:'parttime',  exp:'1-2',    desc:'Restaurante gastronómico busca chef de partida para cocina fría. Horarios rotativos. Se valora creatividad en preparación de entradas y ensaladas de autor.' },
-  { id:8,  title:'Analista de RRHH',             company:'Banco Galicia',      location:'Remoto',            logo:'B', logoColor:'#7C4DFF', tags:['Remoto','Selección','Full time'],  tagTypes:['remote','',''],     salary:'$480.000 – $620.000', salaryNum:480000, time:'hace 2d',  match:80, rubro:'administracion', modalidad:'remoto',    jornada:'fulltime',  exp:'3-5',    desc:'Posición de analista de RRHH enfocada en selección de personal y employer branding. Manejo de ATS, entrevistas por competencias y coordinación con headhunters.' },
-  { id:9,  title:'Electricista Industrial',      company:'YPF',                location:'Neuquén',           logo:'Y', logoColor:'#F7971E', tags:['Presencial','MT/BT','Urgente'],   tagTypes:['','','hot'],        salary:'$520.000 – $700.000', salaryNum:520000, time:'hace 3d',  match:78, rubro:'construccion',   modalidad:'presencial', jornada:'fulltime',  exp:'3-5',    desc:'Electricista industrial para planta en Vaca Muerta. Habilitación para trabajos en MT/BT excluyente. Posición de planta con todos los beneficios de convenio.' },
-  { id:10, title:'Diseñador/a UX/UI',            company:'MercadoLibre',       location:'Remoto',            logo:'M', logoColor:'#5C6BC0', tags:['Remoto','Figma','Full time'],      tagTypes:['remote','',''],     salary:'$3.000 – $4.500 USD', salaryNum:900000, time:'hace 3d',  match:76, rubro:'diseno',         modalidad:'remoto',    jornada:'fulltime',  exp:'3-5',    desc:'Diseñador/a UX/UI para equipo de producto. Experiencia con Figma, design systems y metodologías de research. Se trabaja en features de alto impacto para millones de usuarios.' },
-  { id:11, title:'Contador/a Público/a',         company:'PwC Argentina',      location:'Buenos Aires',      logo:'P', logoColor:'#E65100', tags:['Híbrido','AFIP','Big 4'],         tagTypes:['','',''],          salary:'$550.000 – $750.000', salaryNum:550000, time:'hace 4d',  match:74, rubro:'finanzas',       modalidad:'hibrido',   jornada:'fulltime',  exp:'3-5',    desc:'Contador/a para división de auditoría externa. Manejo de IFRS, conocimiento de normas contables locales y experiencia en clientes de mediana y gran envergadura.' },
-  { id:12, title:'Vendedor/a Inmobiliario/a',    company:'RE/MAX Argentina',   location:'Córdoba',           logo:'R', logoColor:'#11998E', tags:['Presencial','Comisiones'],        tagTypes:['',''],             salary:'Comisiones',           salaryNum:0,      time:'hace 4d',  match:72, rubro:'ventas',         modalidad:'presencial', jornada:'freelance', exp:'sin-exp', desc:'Buscamos asesores inmobiliarios para sumarse a la red RE/MAX. No se requiere experiencia previa. Capacitación inicial incluida y esquema 100% comisionable.' },
-  { id:13, title:'Operario/a de Producción',     company:'Arcor S.A.',         location:'Villa del Rosario', logo:'A', logoColor:'#7C4DFF', tags:['Presencial','Sin experiencia'],   tagTypes:['','new'],           salary:'$320.000 – $380.000', salaryNum:320000, time:'hace 5d',  match:70, rubro:'construccion',   modalidad:'presencial', jornada:'fulltime',  exp:'sin-exp', desc:'Ingresá a una de las empresas líderes de la industria alimentaria. No se requiere experiencia. Capacitación en planta. Se valora secundario completo y disponibilidad horaria.' },
-  { id:14, title:'Community Manager',            company:'Agencia Bumerán',    location:'Remoto',            logo:'B', logoColor:'#F7971E', tags:['Remoto','Redes sociales'],        tagTypes:['remote',''],        salary:'$280.000 – $390.000', salaryNum:280000, time:'hace 6d',  match:68, rubro:'diseno',         modalidad:'remoto',    jornada:'parttime',  exp:'1-2',    desc:'CM para gestión de redes sociales de múltiples clientes. Conocimiento de Meta Ads, Canva y manejo de herramientas de programación de contenidos como Hootsuite o Later.' },
-  { id:15, title:'Médico/a Clínico/a',           company:'OSDE',               location:'Buenos Aires',      logo:'O', logoColor:'#11998E', tags:['Presencial','Consultorio'],       tagTypes:['',''],             salary:'$650.000 – $900.000', salaryNum:650000, time:'hace 1w',  match:66, rubro:'salud',          modalidad:'presencial', jornada:'fulltime',  exp:'5+',     desc:'Médico/a clínico/a para atención en consultorio externo. Matrícula habilitante y especialidad excluyentes. Posición en relación de dependencia con beneficios.' },
-];
+const OFERTAS = [];
 
 /* ─────────────────────────────────
    ESTADO DE LA APP
@@ -96,22 +80,26 @@ function initAccordion() {
    FILTROS — checkboxes + slider
 ───────────────────────────────── */
 function initFilters() {
-  // Checkboxes
-  document.querySelectorAll('.filter-group-body input[type="checkbox"]').forEach((cb) => {
-    cb.addEventListener('change', () => {
-      const name  = cb.name;
-      const value = cb.value;
-      if (!state.filters[name]) state.filters[name] = [];
+  // Event delegation en el sidebar para los checkboxes (ya que los rubros son dinámicos)
+  const sidebar = document.getElementById('filtersSidebar');
+  if (sidebar) {
+    sidebar.addEventListener('change', (e) => {
+      if (e.target.type === 'checkbox') {
+        const cb = e.target;
+        const name  = cb.name;
+        const value = cb.value;
+        if (!state.filters[name]) state.filters[name] = [];
 
-      if (cb.checked) {
-        if (!state.filters[name].includes(value)) state.filters[name].push(value);
-      } else {
-        state.filters[name] = state.filters[name].filter((v) => v !== value);
+        if (cb.checked) {
+          if (!state.filters[name].includes(value)) state.filters[name].push(value);
+        } else {
+          state.filters[name] = state.filters[name].filter((v) => v !== value);
+        }
+        state.page = 1;
+        applyAndRender();
       }
-      state.page = 1;
-      applyAndRender();
     });
-  });
+  }
 
   // Slider de salario
   const slider  = document.getElementById('salaryRange');
@@ -427,8 +415,83 @@ function initReveal() {
 }
 
 /* ─────────────────────────────────
-   INIT
+   RENDER FILTROS DINÁMICOS
 ───────────────────────────────── */
+function renderAllFilters() {
+  renderRubroFilters();
+  renderGenericFilters('modalidad', [
+    { id: 'remoto', label: 'Remoto' },
+    { id: 'presencial', label: 'Presencial' },
+    { id: 'hibrido', label: 'Híbrido' }
+  ]);
+  renderGenericFilters('jornada', [
+    { id: 'fulltime', label: 'Full time' },
+    { id: 'parttime', label: 'Part time' },
+    { id: 'freelance', label: 'Freelance / Proyecto' }
+  ]);
+  renderGenericFilters('experiencia', [
+    { id: 'sin-exp', label: 'Sin experiencia' },
+    { id: '1-2', label: '1 – 2 años' },
+    { id: '3-5', label: '3 – 5 años' },
+    { id: '5+', label: 'Más de 5 años' }
+  ], 'exp'); // 'exp' es la clave en el objeto OFERTAS
+}
+
+function renderRubroFilters() {
+  const container = document.getElementById('rubro');
+  if (!container) return;
+
+  const RUBROS_CONFIG = [
+    { id: 'administracion', label: 'Administración y RRHH' },
+    { id: 'ventas', label: 'Ventas y Comercial' },
+    { id: 'tecnologia', label: 'Tecnología e IT' },
+    { id: 'salud', label: 'Salud y Medicina' },
+    { id: 'educacion', label: 'Educación y Docencia' },
+    { id: 'construccion', label: 'Construcción e Ing.' },
+    { id: 'gastronomia', label: 'Gastronomía y Turismo' },
+    { id: 'logistica', label: 'Logística y Transporte' },
+    { id: 'finanzas', label: 'Finanzas y Contabilidad' },
+    { id: 'diseno', label: 'Diseño y Creatividad' }
+  ];
+
+  const counts = {};
+  OFERTAS.forEach(o => counts[o.rubro] = (counts[o.rubro] || 0) + 1);
+
+  container.innerHTML = RUBROS_CONFIG.map(r => {
+    const count = counts[r.id] || 0;
+    const checked = state.filters.rubro.includes(r.id) ? 'checked' : '';
+    return `
+      <label class="filter-check">
+        <input type="checkbox" name="rubro" value="${r.id}" ${checked}/>
+        <span class="fc-box"></span>
+        ${r.label} <span class="fc-count">${count.toLocaleString('es-AR')}</span>
+      </label>`;
+  }).join('');
+}
+
+function renderGenericFilters(containerId, config, dataKey) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const key = dataKey || containerId;
+  const counts = {};
+  OFERTAS.forEach(o => counts[o[key]] = (counts[o[key]] || 0) + 1);
+
+  container.innerHTML = config.map(item => {
+    const count = counts[item.id] || 0;
+    const checked = state.filters[containerId]?.includes(item.id) ? 'checked' : '';
+    return `
+      <label class="filter-check">
+        <input type="checkbox" name="${containerId}" value="${item.id}" ${checked}/>
+        <span class="fc-box"></span>
+        ${item.label} <span class="fc-count">${count.toLocaleString('es-AR')}</span>
+      </label>`;
+  }).join('');
+}
+
+/* ─────────────────────────────────
+   INIT
+────────────────────────────────— */
 document.addEventListener('DOMContentLoaded', async () => {
   showSkeleton();
 
@@ -437,7 +500,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const res  = await fetch('http://localhost:3000/api/jobs');
     const data = await res.json();
 
-    // Vaciar array hardcodeado y llenar con datos reales
+    // Llenar con datos reales
     OFERTAS.length = 0;
     data.forEach((job) => {
       OFERTAS.push({
@@ -454,7 +517,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         : 'Salario a convenir',
         salaryNum:    job.salarioMin || 0,
         time:         new Date(job.creadoEn).toLocaleDateString('es-AR'),
-        match:        null,
+        match:        Math.floor(Math.random() * 30) + 70, // Simular match para el buscador
         rubro:        job.rubro,
         modalidad:    job.modalidad?.toLowerCase(),
         jornada:      job.jornada?.toLowerCase().replace(' ', ''),
@@ -465,32 +528,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   } catch (err) {
     console.error('Error cargando ofertas:', err);
-    showToast('No se pudieron cargar las ofertas', 'error');
   }
 
-  // Leer parámetros de URL
+  // Leer parámetros de URL (antes de renderizar filtros)
   const params = new URLSearchParams(window.location.search);
   const q      = params.get('q')     || '';
   const loc    = params.get('loc')   || '';
   const rubro  = params.get('rubro') || '';
 
-  if (q) {
-    const qIn = document.getElementById('searchQuery');
-    if (qIn) qIn.value = q;
-    state.query = q.toLowerCase();
-  }
-  if (loc) {
-    const lIn = document.getElementById('searchLocation');
-    if (lIn) lIn.value = loc;
-    state.location = loc.toLowerCase();
-  }
-  if (rubro) {
-    const cb = document.querySelector(`input[name="rubro"][value="${rubro}"]`);
-    if (cb) {
-      cb.checked = true;
-      state.filters.rubro = [rubro];
-    }
-  }
+  if (q)   state.query = q.toLowerCase();
+  if (loc) state.location = loc.toLowerCase();
+  if (rubro) state.filters.rubro = [rubro];
+
+  // Sincronizar inputs con el estado
+  const qIn = document.getElementById('searchQuery');
+  if (qIn) qIn.value = state.query;
+  const lIn = document.getElementById('searchLocation');
+  if (lIn) lIn.value = state.location;
 
   initNavbar();
   initHamburger();
@@ -500,5 +554,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   initSearch();
   initSort();
   initReveal();
+
+  // Renderizar todos los filtros dinámicos
+  renderAllFilters();
   applyAndRender();
 });
