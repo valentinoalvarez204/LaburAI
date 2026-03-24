@@ -24,7 +24,7 @@ async function fetchHomeJobs() {
       logoColor: '#5C6BC0',
       tags: [job.modalidad, job.jornada],
       tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', ''],
-      salary: job.salarioMin && job.salarioMax 
+      salary: job.salarioMin && job.salarioMax
         ? `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`
         : 'Salario a convenir',
       time: new Date(job.creadoEn).toLocaleDateString('es-AR'),
@@ -32,7 +32,7 @@ async function fetchHomeJobs() {
       rubro: job.rubro,
       filter: ['todos', job.modalidad === 'Remoto' ? 'remoto' : '', job.jornada.toLowerCase().replace(' ', '')].filter(Boolean)
     }));
-    
+
     renderJobs('todos');
     renderCategories();
   } catch (err) {
@@ -111,7 +111,7 @@ async function fetchStats() {
   try {
     const res = await fetch('http://localhost:3000/api/stats');
     const data = await res.json();
-    
+
     // Mapear etiquetas de index.html a claves de la API
     const mapping = {
       'Candidatos activos': data.candidatos,
@@ -136,7 +136,7 @@ function initCounters() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       if (e.isIntersecting) {
-        const el     = e.target;
+        const el = e.target;
         const target = parseInt(el.dataset.target, 10);
         const suffix = el.dataset.suffix || '';
         animateCounter(el, target, 1800, suffix);
@@ -168,7 +168,7 @@ function getSession() {
 function initNavSession() {
   const session = getSession();
   const actions = document.getElementById('navActions');
-  const mobile  = document.getElementById('mobileNavActions');
+  const mobile = document.getElementById('mobileNavActions');
   if (!actions) return;
 
   if (session) {
@@ -192,7 +192,7 @@ function initNavSession() {
         </div>
       </div>
       <a href="${dashboard}" class="btn-primary">Mi dashboard</a>`;
-    
+
     // init dropdown después de insertar el HTML
     initAvatarDropdown();
 
@@ -219,13 +219,13 @@ function cerrarSesion() {
 ───────────────────────────────── */
 function initCtaSession() {
   const session = getSession();
-  const inner   = document.getElementById('ctaInner');
+  const inner = document.getElementById('ctaInner');
   if (!inner || !session) return;
 
-  const dashboard  = session.rol === 'empresa'
+  const dashboard = session.rol === 'empresa'
     ? 'dashboard-empresa.html'
     : 'dashboard-candidato.html';
-  const firstName  = session.nombre.split(' ')[0];
+  const firstName = session.nombre.split(' ')[0];
 
   inner.innerHTML = `
     <div class="cta-star">✦</div>
@@ -243,9 +243,9 @@ function initCtaSession() {
    Si vacío → va igual a ofertas.html
 ───────────────────────────────── */
 function initSearch() {
-  const btn     = document.getElementById('searchBtn');
+  const btn = document.getElementById('searchBtn');
   const queryIn = document.getElementById('searchQuery');
-  const locIn   = document.getElementById('searchLocation');
+  const locIn = document.getElementById('searchLocation');
   if (!btn) return;
 
   function doSearch() {
@@ -297,9 +297,8 @@ function renderJobs(filter = 'todos') {
       .map((tag, i) => `<span class="job-tag ${job.tagTypes[i] || ''}">${tag}</span>`)
       .join('');
 
-    const badge = job.match
-      ? `<div class="match-badge">✦ ${job.match}% match</div>`
-      : '';
+    const matchVal = job.match || 0;
+    const badge = `<div class="match-badge">✦ ${matchVal}% match</div>`;
 
     return `
       <a class="job-card" href="oferta-detalle.html?id=${job.id}">
@@ -344,11 +343,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   initCtaSession();
   initChips();
   initSearch();
-  
+
   // Cargar datos reales
   fetchHomeJobs();
   await fetchStats();
   initCounters(); // Se inicia después de actualizar data-target
-  
+
   initTabs();
 });

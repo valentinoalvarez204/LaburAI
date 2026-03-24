@@ -22,13 +22,13 @@ const OFERTAS = [];
    ESTADO DE LA APP
 ───────────────────────────────── */
 const state = {
-  query:        '',
-  location:     '',
-  filters:      { rubro: [], modalidad: [], jornada: [], experiencia: [], salarioMin: 0 },
-  sort:         'relevancia',
-  page:         1,
-  perPage:      8,
-  results:      [...OFERTAS],
+  query: '',
+  location: '',
+  filters: { rubro: [], modalidad: [], jornada: [], experiencia: [], salarioMin: 0 },
+  sort: 'relevancia',
+  page: 1,
+  perPage: 8,
+  results: [...OFERTAS],
 };
 
 /* ─────────────────────────────────
@@ -40,9 +40,9 @@ const state = {
 ───────────────────────────────── */
 function initSidebarToggle() {
   const toggleBtn = document.getElementById('filtersToggleBtn');
-  const sidebar   = document.getElementById('filtersSidebar');
-  const overlay   = document.getElementById('sidebarOverlay');
-  const applyBtn  = document.getElementById('applyFiltersBtn');
+  const sidebar = document.getElementById('filtersSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const applyBtn = document.getElementById('applyFiltersBtn');
   if (!toggleBtn || !sidebar) return;
 
   function openSidebar() {
@@ -68,7 +68,7 @@ function initAccordion() {
   document.querySelectorAll('.filter-group-header').forEach((header) => {
     header.addEventListener('click', () => {
       const bodyId = header.dataset.toggle;
-      const body   = document.getElementById(bodyId);
+      const body = document.getElementById(bodyId);
       if (!body) return;
       const collapsed = body.classList.toggle('collapsed');
       header.classList.toggle('collapsed', collapsed);
@@ -86,7 +86,7 @@ function initFilters() {
     sidebar.addEventListener('change', (e) => {
       if (e.target.type === 'checkbox') {
         const cb = e.target;
-        const name  = cb.name;
+        const name = cb.name;
         const value = cb.value;
         if (!state.filters[name]) state.filters[name] = [];
 
@@ -102,7 +102,7 @@ function initFilters() {
   }
 
   // Slider de salario
-  const slider  = document.getElementById('salaryRange');
+  const slider = document.getElementById('salaryRange');
   const display = document.getElementById('salaryDisplay');
   if (slider) {
     slider.addEventListener('input', () => {
@@ -128,7 +128,7 @@ function resetFilters() {
     cb.checked = false;
   });
   // Reset slider
-  const slider  = document.getElementById('salaryRange');
+  const slider = document.getElementById('salaryRange');
   const display = document.getElementById('salaryDisplay');
   if (slider) { slider.value = 0; }
   if (display) { display.textContent = '$0'; }
@@ -140,12 +140,12 @@ function resetFilters() {
    BÚSQUEDA
 ───────────────────────────────── */
 function initSearch() {
-  const btn  = document.getElementById('searchBtn');
-  const qIn  = document.getElementById('searchQuery');
-  const lIn  = document.getElementById('searchLocation');
+  const btn = document.getElementById('searchBtn');
+  const qIn = document.getElementById('searchQuery');
+  const lIn = document.getElementById('searchLocation');
 
   function doSearch() {
-    state.query    = qIn?.value.trim().toLowerCase() ?? '';
+    state.query = qIn?.value.trim().toLowerCase() ?? '';
     state.location = lIn?.value.trim().toLowerCase() ?? '';
     state.page = 1;
     applyAndRender();
@@ -192,18 +192,18 @@ function applyFilters() {
 
   // Filtros
   const f = state.filters;
-  if (f.rubro.length)      list = list.filter((o) => f.rubro.includes(o.rubro));
-  if (f.modalidad.length)  list = list.filter((o) => f.modalidad.includes(o.modalidad));
-  if (f.jornada.length)    list = list.filter((o) => f.jornada.includes(o.jornada));
-  if (f.experiencia.length)list = list.filter((o) => f.experiencia.includes(o.exp));
-  if (f.salarioMin > 0)    list = list.filter((o) => o.salaryNum >= f.salarioMin);
+  if (f.rubro.length) list = list.filter((o) => f.rubro.includes(o.rubro));
+  if (f.modalidad.length) list = list.filter((o) => f.modalidad.includes(o.modalidad));
+  if (f.jornada.length) list = list.filter((o) => f.jornada.includes(o.jornada));
+  if (f.experiencia.length) list = list.filter((o) => f.experiencia.includes(o.exp));
+  if (f.salarioMin > 0) list = list.filter((o) => o.salaryNum >= f.salarioMin);
 
   // Ordenamiento
   switch (state.sort) {
-    case 'recientes':    list.sort((a,b) => a.id - b.id);               break;
-    case 'salario-asc':  list.sort((a,b) => a.salaryNum - b.salaryNum); break;
-    case 'salario-desc': list.sort((a,b) => b.salaryNum - a.salaryNum); break;
-    default:             list.sort((a,b) => b.match - a.match);         break;
+    case 'recientes': list.sort((a, b) => a.id - b.id); break;
+    case 'salario-asc': list.sort((a, b) => a.salaryNum - b.salaryNum); break;
+    case 'salario-desc': list.sort((a, b) => b.salaryNum - a.salaryNum); break;
+    default: list.sort((a, b) => b.match - a.match); break;
   }
 
   state.results = list;
@@ -213,24 +213,24 @@ function applyFilters() {
    CHIPS DE FILTROS ACTIVOS
 ───────────────────────────────── */
 const FILTER_LABELS = {
-  rubro:      { administracion:'Administración y RRHH', ventas:'Ventas', tecnologia:'Tecnología', salud:'Salud', educacion:'Educación', construccion:'Construcción', gastronomia:'Gastronomía', logistica:'Logística', finanzas:'Finanzas', diseno:'Diseño' },
-  modalidad:  { remoto:'Remoto', presencial:'Presencial', hibrido:'Híbrido' },
-  jornada:    { fulltime:'Full time', parttime:'Part time', freelance:'Freelance' },
-  experiencia:{ 'sin-exp':'Sin experiencia', '1-2':'1–2 años', '3-5':'3–5 años', '5+':'Más de 5 años' },
+  rubro: { administracion: 'Administración y RRHH', ventas: 'Ventas', tecnologia: 'Tecnología', salud: 'Salud', educacion: 'Educación', construccion: 'Construcción', gastronomia: 'Gastronomía', logistica: 'Logística', finanzas: 'Finanzas', diseno: 'Diseño' },
+  modalidad: { remoto: 'Remoto', presencial: 'Presencial', hibrido: 'Híbrido' },
+  jornada: { fulltime: 'Full time', parttime: 'Part time', freelance: 'Freelance' },
+  experiencia: { 'sin-exp': 'Sin experiencia', '1-2': '1–2 años', '3-5': '3–5 años', '5+': 'Más de 5 años' },
 };
 
 function renderActiveFilters() {
-  const bar     = document.getElementById('activeFiltersBar');
-  const chips   = document.getElementById('activeChips');
+  const bar = document.getElementById('activeFiltersBar');
+  const chips = document.getElementById('activeChips');
   if (!bar || !chips) return;
 
   const f = state.filters;
   const all = [
-    ...f.rubro.map((v)       => ({ name:'rubro',       value:v, label: FILTER_LABELS.rubro[v] })),
-    ...f.modalidad.map((v)   => ({ name:'modalidad',   value:v, label: FILTER_LABELS.modalidad[v] })),
-    ...f.jornada.map((v)     => ({ name:'jornada',     value:v, label: FILTER_LABELS.jornada[v] })),
-    ...f.experiencia.map((v) => ({ name:'experiencia', value:v, label: FILTER_LABELS.experiencia[v] })),
-    ...(f.salarioMin > 0 ? [{ name:'salarioMin', value:'salary', label:'Salario mín. $' + f.salarioMin.toLocaleString('es-AR') }] : []),
+    ...f.rubro.map((v) => ({ name: 'rubro', value: v, label: FILTER_LABELS.rubro[v] })),
+    ...f.modalidad.map((v) => ({ name: 'modalidad', value: v, label: FILTER_LABELS.modalidad[v] })),
+    ...f.jornada.map((v) => ({ name: 'jornada', value: v, label: FILTER_LABELS.jornada[v] })),
+    ...f.experiencia.map((v) => ({ name: 'experiencia', value: v, label: FILTER_LABELS.experiencia[v] })),
+    ...(f.salarioMin > 0 ? [{ name: 'salarioMin', value: 'salary', label: 'Salario mín. $' + f.salarioMin.toLocaleString('es-AR') }] : []),
   ];
 
   bar.style.display = all.length ? '' : 'none';
@@ -247,9 +247,9 @@ function renderActiveFilters() {
       if (name === 'salarioMin') {
         state.filters.salarioMin = 0;
         const slider = document.getElementById('salaryRange');
-        const disp   = document.getElementById('salaryDisplay');
+        const disp = document.getElementById('salaryDisplay');
         if (slider) slider.value = 0;
-        if (disp)   disp.textContent = '$0';
+        if (disp) disp.textContent = '$0';
       } else {
         state.filters[name] = state.filters[name].filter((v) => v !== value);
         const cb = document.querySelector(`input[name="${name}"][value="${value}"]`);
@@ -273,8 +273,8 @@ function renderCards() {
   const grid = document.getElementById('offersGrid');
   if (!grid) return;
 
-  const total  = state.results.length;
-  const start  = (state.page - 1) * state.perPage;
+  const total = state.results.length;
+  const start = (state.page - 1) * state.perPage;
   const pageItems = state.results.slice(start, start + state.perPage);
 
   // Actualizar contador
@@ -292,8 +292,9 @@ function renderCards() {
   }
 
   grid.innerHTML = pageItems.map((job) => {
-    const tags  = job.tags.map((t, i) => buildTagHTML(t, job.tagTypes[i])).join('');
-    const badge = job.match ? `<div class="match-badge">✦ ${job.match}% match</div>` : '';
+    const tags = job.tags.map((t, i) => buildTagHTML(t, job.tagTypes[i])).join('');
+    const matchVal = job.match || 0;
+    const badge = `<div class="match-badge">✦ ${matchVal}% match</div>`;
     return `
       <a class="job-card" href="oferta-detalle.html?id=${job.id}">
         ${badge}
@@ -323,14 +324,14 @@ function renderPagination() {
 
   const total = state.results.length;
   const pages = Math.ceil(total / state.perPage);
-  const cur   = state.page;
+  const cur = state.page;
 
   if (pages <= 1) { container.innerHTML = ''; return; }
 
   let html = '';
 
   // Prev
-  html += `<button class="page-btn arrow" onclick="goToPage(${cur-1})" ${cur===1?'disabled':''}>
+  html += `<button class="page-btn arrow" onclick="goToPage(${cur - 1})" ${cur === 1 ? 'disabled' : ''}>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
   </button>`;
 
@@ -340,12 +341,12 @@ function renderPagination() {
     if (item === '...') {
       html += `<span class="page-dots">…</span>`;
     } else {
-      html += `<button class="page-btn ${item===cur?'active':''}" onclick="goToPage(${item})">${item}</button>`;
+      html += `<button class="page-btn ${item === cur ? 'active' : ''}" onclick="goToPage(${item})">${item}</button>`;
     }
   });
 
   // Next
-  html += `<button class="page-btn arrow" onclick="goToPage(${cur+1})" ${cur===pages?'disabled':''}>
+  html += `<button class="page-btn arrow" onclick="goToPage(${cur + 1})" ${cur === pages ? 'disabled' : ''}>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
   </button>`;
 
@@ -353,13 +354,13 @@ function renderPagination() {
 }
 
 function getPaginationRange(cur, total) {
-  if (total <= 7) return Array.from({length:total},(_,i)=>i+1);
-  if (cur <= 4)   return [1,2,3,4,5,'...',total];
-  if (cur >= total-3) return [1,'...',total-4,total-3,total-2,total-1,total];
-  return [1,'...',cur-1,cur,cur+1,'...',total];
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (cur <= 4) return [1, 2, 3, 4, 5, '...', total];
+  if (cur >= total - 3) return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+  return [1, '...', cur - 1, cur, cur + 1, '...', total];
 }
 
-window.goToPage = function(page) {
+window.goToPage = function (page) {
   const pages = Math.ceil(state.results.length / state.perPage);
   if (page < 1 || page > pages) return;
   state.page = page;
@@ -497,32 +498,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cargar ofertas reales desde la API
   try {
-    const res  = await fetch('http://localhost:3000/api/jobs');
+    const res = await fetch('http://localhost:3000/api/jobs');
     const data = await res.json();
 
     // Llenar con datos reales
     OFERTAS.length = 0;
     data.forEach((job) => {
       OFERTAS.push({
-        id:           job.id,
-        title:        job.titulo,
-        company:      job.empresa?.nombre || 'Empresa',
-        location:     job.ubicacion,
-        logo:         job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
-        logoColor:    '#5C6BC0',
-        tags:         [job.modalidad, job.jornada, ...(job.habilidades?.slice(0,1) || [])],
-        tagTypes:     [job.modalidad === 'Remoto' ? 'remote' : '', '', ''],
-        salary:       job.salarioMin && job.salarioMax
-                        ? `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`
-                        : 'Salario a convenir',
-        salaryNum:    job.salarioMin || 0,
-        time:         new Date(job.creadoEn).toLocaleDateString('es-AR'),
-        match:        Math.floor(Math.random() * 30) + 70, // Simular match para el buscador
-        rubro:        job.rubro,
-        modalidad:    job.modalidad?.toLowerCase(),
-        jornada:      job.jornada?.toLowerCase().replace(' ', ''),
-        exp:          job.experiencia || '',
-        desc:         job.descripcion,
+        id: job.id,
+        title: job.titulo,
+        company: job.empresa?.nombre || 'Empresa',
+        location: job.ubicacion,
+        logo: job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+        logoColor: '#5C6BC0',
+        tags: [job.modalidad, job.jornada, ...(job.habilidades?.slice(0, 1) || [])],
+        tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', '', ''],
+        salary: job.salarioMin && job.salarioMax
+          ? `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`
+          : 'Salario a convenir',
+        salaryNum: job.salarioMin || 0,
+        time: new Date(job.creadoEn).toLocaleDateString('es-AR'),
+        match: job.matchIA || 0, // Usar match real de la API o 0 por defecto
+        rubro: job.rubro,
+        modalidad: job.modalidad?.toLowerCase(),
+        jornada: job.jornada?.toLowerCase().replace(' ', ''),
+        exp: job.experiencia || '',
+        desc: job.descripcion,
       });
     });
 
@@ -532,11 +533,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Leer parámetros de URL (antes de renderizar filtros)
   const params = new URLSearchParams(window.location.search);
-  const q      = params.get('q')     || '';
-  const loc    = params.get('loc')   || '';
-  const rubro  = params.get('rubro') || '';
+  const q = params.get('q') || '';
+  const loc = params.get('loc') || '';
+  const rubro = params.get('rubro') || '';
 
-  if (q)   state.query = q.toLowerCase();
+  if (q) state.query = q.toLowerCase();
   if (loc) state.location = loc.toLowerCase();
   if (rubro) state.filters.rubro = [rubro];
 

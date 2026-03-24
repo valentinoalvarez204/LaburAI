@@ -197,9 +197,11 @@ function renderRecomendadas() {
   if (!grid) return;
   grid.innerHTML = RECOMENDADAS.map((o) => {
     const tags = o.tags.map((t, i) => `<span class="job-tag ${o.tagTypes[i] || ''}">${t}</span>`).join('');
+    const matchVal = o.match || 0;
+    const badge = `<div class="match-badge">✦ ${matchVal}% match</div>`;
     return `
       <a class="job-card" href="oferta-detalle.html?id=${o.id}">
-        <div class="match-badge">✦ ${o.match}% match</div>
+        ${badge}
         <div class="job-card-head">
           <div class="company-logo" style="color:${o.logoColor}">${o.logo}</div>
           <div class="job-meta">
@@ -373,7 +375,7 @@ async function fetchProfile(candidatoId) {
     CANDIDATO.nombre = `${data.usuario?.nombre || ''} ${data.usuario?.apellido || ''}`.trim();
     CANDIDATO.score = data.scoreCV || 0;
     CANDIDATO.resumen = data.resumenIA || 'Subí tu CV para que la IA genere un resumen de tu perfil profesional.';
-    
+
     // Score data (parcial, a mejorar cuando integremos la IA real)
     CANDIDATO.scoreData = {
       total: data.scoreCV || 0,
@@ -393,12 +395,12 @@ async function fetchProfile(candidatoId) {
     renderScore();
     renderSkills();
     renderIAAnalysis();
-    
+
     // Actualizar UI
     const firstName = CANDIDATO.nombre.split(' ')[0];
     const greetEl = document.querySelector('.greeting-title');
     if (greetEl) greetEl.textContent = `¡Hola, ${firstName}! 👋`;
-    
+
     document.querySelectorAll('.sp-avatar, .avatar-circle').forEach(el => {
       el.textContent = firstName.charAt(0).toUpperCase();
     });
@@ -465,13 +467,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           status: p.estado.toLowerCase(),
           match: p.matchIA || 0,
         }));
-        
+
         const badge = document.querySelector('.snav-item[data-section="postulaciones"] .snav-badge');
         if (badge) badge.textContent = POSTULACIONES.length;
-        
+
         const statEl = document.querySelector('.dstat-num');
         if (statEl) statEl.textContent = POSTULACIONES.length;
-        
+
         renderPostulaciones();
       }
     } catch (err) {

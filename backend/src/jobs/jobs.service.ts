@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class JobsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // Obtener todas las ofertas activas (con filtros opcionales)
   async findAll(filtros?: {
@@ -15,15 +15,15 @@ export class JobsService {
   }) {
     const where: any = { activa: true };
 
-    if (filtros?.rubro)     { where.rubro     = { contains: filtros.rubro,     mode: 'insensitive' }; }
-    if (filtros?.modalidad) { where.modalidad  = { contains: filtros.modalidad, mode: 'insensitive' }; }
-    if (filtros?.ubicacion) { where.ubicacion  = { contains: filtros.ubicacion, mode: 'insensitive' }; }
-    if (filtros?.empresaId) { where.empresaId  = filtros.empresaId; }
+    if (filtros?.rubro) { where.rubro = { contains: filtros.rubro, mode: 'insensitive' }; }
+    if (filtros?.modalidad) { where.modalidad = { contains: filtros.modalidad, mode: 'insensitive' }; }
+    if (filtros?.ubicacion) { where.ubicacion = { contains: filtros.ubicacion, mode: 'insensitive' }; }
+    if (filtros?.empresaId) { where.empresaId = filtros.empresaId; }
     if (filtros?.q) {
       where.OR = [
-        { titulo:      { contains: filtros.q, mode: 'insensitive' } },
+        { titulo: { contains: filtros.q, mode: 'insensitive' } },
         { descripcion: { contains: filtros.q, mode: 'insensitive' } },
-        { rubro:       { contains: filtros.q, mode: 'insensitive' } },
+        { rubro: { contains: filtros.q, mode: 'insensitive' } },
       ];
     }
 
