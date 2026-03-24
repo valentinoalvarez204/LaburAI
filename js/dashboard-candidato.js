@@ -490,4 +490,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   initReanalyze();
   initCopySummary();
   initSaveProfile();
+
+  // 5. Manejar sección desde la URL (ej: ?section=perfil)
+  const params = new URLSearchParams(window.location.search);
+  const section = params.get('section');
+  if (section && SECTIONS.includes(section)) {
+    switchSection(section);
+  }
 });
