@@ -291,10 +291,16 @@ function renderCards() {
     return;
   }
 
+  // Obtener sesión para verificar rol
+  const session = getSession();
+  const isEmpresa = session?.rol === 'empresa';
+
   grid.innerHTML = pageItems.map((job) => {
     const tags = job.tags.map((t, i) => buildTagHTML(t, job.tagTypes[i])).join('');
     const matchVal = job.match || 0;
-    const badge = `<div class="match-badge">✦ ${matchVal}% match</div>`;
+    // Si es empresa, no renderizamos el badge
+    const badge = isEmpresa ? '' : `<div class="match-badge">✦ ${matchVal}% match</div>`;
+
     return `
       <a class="job-card" href="oferta-detalle.html?id=${job.id}">
         ${badge}

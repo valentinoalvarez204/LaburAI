@@ -61,12 +61,26 @@ function renderPage(oferta) {
   setText('jobTime',     oferta.time);
 
   // Match ring
-  renderMatchRing(oferta.match);
-  setText('matchPct', `${oferta.match}%`);
+  const session = getSession();
+  const isEmpresa = session?.rol === 'empresa';
+
+  if (!isEmpresa) {
+    renderMatchRing(oferta.match);
+    setText('matchPct', `${oferta.match}%`);
+  } else {
+    // Si es empresa, ocultamos todo el bloque de match
+    const matchRingBox = document.querySelector('.match-ring-box')?.parentElement;
+    if (matchRingBox) matchRingBox.style.display = 'none';
+  }
 
   // Match skills
   const skillsEl = document.getElementById('matchSkills');
-  if (skillsEl && oferta.matchSkills.length) {
+  if (isEmpresa && skillsEl) {
+    // Ocultar bloque de skills si es empresa
+    const headerTitle = skillsEl.previousElementSibling;
+    if (headerTitle) headerTitle.style.display = 'none';
+    skillsEl.style.display = 'none';
+  } else if (skillsEl && oferta.matchSkills.length) {
     skillsEl.innerHTML = oferta.matchSkills.map((s) => `
       <span class="skill-match ${s.has ? 'has' : 'miss'}">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -136,7 +150,7 @@ function renderPage(oferta) {
   setText('mabSalary', oferta.salary);
   setText('mabTitle', oferta.title);
 
-  // Sidebar — apply meta
+  // Sidebar — apply meta y CTA flotante
   const metaEl = document.getElementById('applyMeta');
   if (metaEl) {
     metaEl.innerHTML = `
@@ -152,6 +166,29 @@ function renderPage(oferta) {
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         Responde en menos de 3 días
       </div>`;
+  }
+
+  // CTAs (Botones de postulación)
+  const btnApply = document.getElementById('btnApply');
+  const btnSaveAlt = document.getElementById('btnSaveAlt');
+  const mobileApplyBar = document.getElementById('mobileApplyBar');
+  
+  if (isEmpresa) {
+    if (btnApply) btnApply.style.display = 'none';
+    if (btnSaveAlt) btnSaveAlt.style.display = 'none';
+    if (mobileApplyBar) mobileApplyBar.style.display = 'none';
+  } else {
+    // Para candidatos, preparamos el texto si es remoto o presencial (si aplicara)
+    if (btnApply) {
+      const btnText = oferta.modalidad === 'Remoto' ? 'Postularme' : 'Postulación Rápida';
+      // Mantenemos el HTML original pero seteando el texto
+      btnApply.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg> ${btnText}`;
+    }
+    const btnApplyMobile = document.getElementById('btnApplyMobile');
+    if (btnApplyMobile) {
+      const btnTextBtn = oferta.modalidad === 'Remoto' ? 'Postularme' : 'Postul. Rápida';
+      btnApplyMobile.innerText = btnTextBtn;
+    }
   }
 
   // Sidebar — info rows
@@ -437,10 +474,13 @@ function renderSimilar(oferta) {
 }
 
 function renderSimilarList(grid, list) {
+  const session = getSession();
+  const isEmpresa = session?.rol === 'empresa';
+
   grid.innerHTML = list.map((o) => {
     const tags = o.tags.map((t, i) => `<span class="job-tag ${o.tagTypes[i] || ''}">${t}</span>`).join('');
     const matchVal = o.match || 0;
-    const badge = `<div class="match-badge">✦ ${matchVal}% match</div>`;
+    const badge = isEmpresa ? '' : `<div class="match-badge">✦ ${matchVal}% match</div>`;
     return `
       <a class="job-card" href="oferta-detalle.html?id=${o.id}">
         ${badge}

@@ -238,7 +238,7 @@ function initNavSession() {
     if (navLinks) {
       if (isEmpresa) {
         navLinks.innerHTML = `
-          <a href="dashboard-empresa.html#publicar">Publicar oferta</a>
+          <a href="ofertas.html">Ver ofertas</a>
           <a href="dashboard-empresa.html#ofertas">Mis ofertas</a>
           <a href="dashboard-empresa.html">Herramientas para empresas</a>`;
       } else {
@@ -251,7 +251,7 @@ function initNavSession() {
     // 2. Menú Lateral (Mobile)
     if (mobileMenu) {
       const linksHtml = isEmpresa 
-        ? `<a href="dashboard-empresa.html#publicar">Publicar oferta</a>
+        ? `<a href="ofertas.html">Ver ofertas</a>
            <a href="dashboard-empresa.html#ofertas">Mis ofertas</a>
            <a href="dashboard-empresa.html">Herramientas para empresas</a>`
         : `<a href="ofertas.html">Buscar empleo</a>
