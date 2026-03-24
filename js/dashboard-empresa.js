@@ -577,6 +577,14 @@ function pubResetForm() {
    INIT
 ───────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
+  // 0. Manejar sección desde la URL (ej: ?section=perfil o #perfil) inmediatamente para evitar saltos
+  const params = new URLSearchParams(window.location.search);
+  const hash = window.location.hash.substring(1);
+  const initialSection = params.get('section') || hash || 'overview';
+  if (SECTIONS.includes(initialSection)) {
+    switchSection(initialSection);
+  }
+
   // 1. Validar sesión
   const session = requireSession();
   if (!session) return;
@@ -688,10 +696,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initSelectOferta();
   initPublicarForm();
 
-  // Handle section from URL (e.g., ?section=empresa)
-  const params = new URLSearchParams(window.location.search);
-  const section = params.get('section');
-  if (section && SECTIONS.includes(section)) {
-    switchSection(section);
-  }
+  // Remove redundant section handling at the end
+  initPublicarForm();
 });
