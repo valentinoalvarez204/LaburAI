@@ -107,6 +107,31 @@ function initReveal() {
   });
 }
 
+async function fetchStats() {
+  try {
+    const res = await fetch('http://localhost:3000/api/stats');
+    const data = await res.json();
+    
+    // Mapear etiquetas de index.html a claves de la API
+    const mapping = {
+      'Candidatos activos': data.candidatos,
+      'Ofertas publicadas': data.ofertas,
+      'Empresas registradas': data.empresas,
+      'Match IA exitoso': data.matchPromedio
+    };
+
+    document.querySelectorAll('.stat').forEach(statEl => {
+      const label = statEl.querySelector('.stat-label')?.textContent.trim();
+      const numEl = statEl.querySelector('.stat-num');
+      if (numEl && mapping[label] !== undefined) {
+        numEl.dataset.target = mapping[label];
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching stats:', err);
+  }
+}
+
 function initCounters() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
@@ -311,15 +336,19 @@ function initTabs() {
 /* ─────────────────────────────────
    INIT
 ───────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initNavbar();
   initHamburger();
   initReveal();
-  initCounters();
   initNavSession();
   initCtaSession();
   initChips();
   initSearch();
+  
+  // Cargar datos reales
   fetchHomeJobs();
+  await fetchStats();
+  initCounters(); // Se inicia después de actualizar data-target
+  
   initTabs();
 });
