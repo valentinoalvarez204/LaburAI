@@ -339,6 +339,3 @@
   .top-bar     { padding: 0 20px; }
   .field-row   { grid-template-columns: 1fr; }
 }
-
-.logo { font-size: 26px; }
-.logo-star { font-size: 22px; }

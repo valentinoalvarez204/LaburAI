@@ -13,31 +13,49 @@
 function initNavbar() {
   const navbar = document.getElementById('navbar');
   if (!navbar) return;
+
+  // 1. Efecto Scroll
   window.addEventListener('scroll', () => {
     navbar.classList.toggle('scrolled', window.scrollY > 20);
   }, { passive: true });
-}
 
-/* ─────────────────────────────────
-   HAMBURGER — menú mobile
-───────────────────────────────── */
-function initHamburger() {
-  const btn  = document.getElementById('hamburger');
-  const menu = document.getElementById('mobileMenu');
-  if (!btn || !menu) return;
+  // 2. Hamburger (Menú Mobile / Sidebar Dashboard)
+  const btn = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const dashSidebar = document.getElementById('dashSidebar');
+  const dashOverlay = document.getElementById('dashOverlay');
 
-  btn.addEventListener('click', () => {
-    const open = menu.classList.toggle('open');
-    btn.classList.toggle('open', open);
-    btn.setAttribute('aria-expanded', String(open));
-  });
+  if (btn) {
+    btn.addEventListener('click', () => {
+      if (dashSidebar) {
+        // En Dashboard: Abre/Cierra Sidebar
+        const open = dashSidebar.classList.toggle('open');
+        btn.classList.toggle('open', open);
+        dashOverlay?.classList.toggle('visible', open);
+        document.body.style.overflow = open ? 'hidden' : '';
+      } else if (mobileMenu) {
+        // En Páginas Públicas: Abre/Cierra Menú Mobile
+        const open = mobileMenu.classList.toggle('open');
+        btn.classList.toggle('open', open);
+      }
+    });
 
-  document.addEventListener('click', (e) => {
-    if (!btn.contains(e.target) && !menu.contains(e.target)) {
-      menu.classList.remove('open');
-      btn.classList.remove('open');
-    }
-  });
+    // Cerrar al hacer clic fuera
+    document.addEventListener('click', (e) => {
+      if (!btn.contains(e.target)) {
+        if (mobileMenu && !mobileMenu.contains(e.target)) {
+          mobileMenu.classList.remove('open');
+          btn.classList.remove('open');
+        }
+        if (dashSidebar && !dashSidebar.contains(e.target)) {
+          dashSidebar.classList.remove('open');
+          dashOverlay?.classList.remove('visible');
+          btn.classList.remove('open');
+          document.body.style.overflow = '';
+        }
+      }
+    });
+  }
 }
 
 /* ─────────────────────────────────
@@ -181,34 +199,96 @@ function getParam(key) {
   return new URLSearchParams(window.location.search).get(key);
 }
 
+
 /* ─────────────────────────────────
-   SIDEBAR DASHBOARD MOBILE
-   Abre/cierra el sidebar en mobile
-   (compartido entre dashboard candidato y empresa)
+   SESIÓN — lectura global
 ───────────────────────────────── */
-function initDashSidebar() {
-  const hamburger = document.getElementById('hamburger');
-  const sidebar   = document.getElementById('dashSidebar');
-  const overlay   = document.getElementById('dashOverlay');
-  if (!hamburger || !sidebar) return;
+function getSession() {
+  try {
+    const raw = localStorage.getItem('labuai_session');
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
 
-  function openSidebar() {
-    sidebar.classList.add('open');
-    overlay?.classList.add('visible');
-    hamburger.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeSidebar() {
-    sidebar.classList.remove('open');
-    overlay?.classList.remove('visible');
-    hamburger.classList.remove('open');
-    document.body.style.overflow = '';
-  }
+/* ─────────────────────────────────
+   NAVBAR — adaptar según sesión
+───────────────────────────────── */
+function initNavSession() {
+  const session = getSession();
+  const actions = document.getElementById('navActions');
+  const navLinks = document.querySelector('.nav-links');
+  const mobileMenu = document.getElementById('mobileMenu');
 
-  hamburger.addEventListener('click', () => {
-    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
-  });
-  overlay?.addEventListener('click', closeSidebar);
+  if (!actions) return;
+
+  if (session) {
+    const isEmpresa = session.rol === 'empresa';
+    const dashboard = isEmpresa ? 'dashboard-empresa.html' : 'dashboard-candidato.html';
+    const firstName = session.nombre.split(' ')[0];
+    const profileSection = isEmpresa ? 'empresa' : 'perfil';
+
+    // Campana de notificaciones
+    const notifHtml = `
+      <button class="topbar-notif" id="btnNotif" aria-label="Notificaciones" style="margin-right:4px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>`;
+
+    // 1. Links del Navbar (Desktop)
+    if (navLinks) {
+      if (isEmpresa) {
+        navLinks.innerHTML = `
+          <a href="dashboard-empresa.html#publicar">Publicar oferta</a>
+          <a href="dashboard-empresa.html#ofertas">Mis ofertas</a>
+          <a href="dashboard-empresa.html">Herramientas para empresas</a>`;
+      } else {
+        navLinks.innerHTML = `
+          <a href="ofertas.html">Buscar empleo</a>
+          <a href="dashboard-candidato.html#postulaciones">Mis postulaciones</a>`;
+      }
+    }
+
+    // 2. Menú Lateral (Mobile)
+    if (mobileMenu) {
+      const linksHtml = isEmpresa 
+        ? `<a href="dashboard-empresa.html#publicar">Publicar oferta</a>
+           <a href="dashboard-empresa.html#ofertas">Mis ofertas</a>
+           <a href="dashboard-empresa.html">Herramientas para empresas</a>`
+        : `<a href="ofertas.html">Buscar empleo</a>
+           <a href="dashboard-candidato.html#postulaciones">Mis postulaciones</a>`;
+
+      
+      mobileMenu.innerHTML = `
+        ${linksHtml}
+        <hr/>
+        <div id="mobileNavActions">
+          <div style="display:flex; justify-content:center; margin-bottom:12px">${notifHtml}</div>
+          <a href="${dashboard}" class="btn-primary" style="text-align:center;display:block">
+            Mi dashboard — ${firstName}
+          </a>
+          <button onclick="cerrarSesion()" class="btn-ghost" 
+            style="text-align:center;display:block;width:100%;margin-top:8px">
+            Cerrar sesión
+          </button>
+        </div>`;
+    }
+
+    // 3. Acciones (Botones derecha Desktop)
+    actions.innerHTML = `
+      ${notifHtml}
+      <div class="nav-user-btn" id="avatarMenu" style="cursor:pointer">
+        <div class="nav-avatar">${firstName.charAt(0).toUpperCase()}</div>
+        <span class="nav-user-name">${firstName}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        <div class="avatar-dropdown" id="avatarDropdown">
+          <a href="${dashboard}?section=${profileSection}">Mi perfil</a>
+          <a href="#" class="dropdown-logout" onclick="cerrarSesion(); return false;">Cerrar sesión</a>
+        </div>
+      </div>
+      <a href="${dashboard}" class="btn-primary">Mi dashboard</a>`;
+
+    initAvatarDropdown();
+  }
 }
 
 /* ─────────────────────────────────

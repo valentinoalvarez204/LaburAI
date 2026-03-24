@@ -548,7 +548,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (lIn) lIn.value = state.location;
 
   initNavbar();
-  initHamburger();
+  initNavSession();
   initSidebarToggle();
   initAccordion();
   initFilters();

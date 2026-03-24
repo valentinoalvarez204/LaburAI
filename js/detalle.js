@@ -555,7 +555,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     initNavbar();
-    initHamburger();
+    initNavSession();
     renderPage(oferta);
     initTabs();
     initSave();

@@ -415,6 +415,7 @@
   margin-bottom: 12px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -553,6 +554,3 @@
   .ai-pill { display: none; }
 }
 
-/* Cambio del tamanio del logo (esquina superior) */
-.logo { font-size: 26px; }
-.logo-star { font-size: 22px; }

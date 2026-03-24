@@ -148,71 +148,7 @@ function initCounters() {
   document.querySelectorAll('.stat-num[data-target]').forEach((el) => observer.observe(el));
 }
 
-/* ─────────────────────────────────
-   SESIÓN — leer localStorage
-   login.js guarda: { nombre, rol }
-   en labuai_session al registrarse/ingresar
-───────────────────────────────── */
-function getSession() {
-  try {
-    const raw = localStorage.getItem('labuai_session');
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-/* ─────────────────────────────────
-   NAVBAR — adaptar según sesión
-───────────────────────────────── */
-function initNavSession() {
-  const session = getSession();
-  const actions = document.getElementById('navActions');
-  const mobile = document.getElementById('mobileNavActions');
-  if (!actions) return;
-
-  if (session) {
-    const dashboard = session.rol === 'empresa'
-      ? 'dashboard-empresa.html'
-      : 'dashboard-candidato.html';
-
-    // Primer nombre solo
-    const firstName = session.nombre.split(' ')[0];
-
-    const profileSection = session.rol === 'empresa' ? 'empresa' : 'perfil';
-
-    actions.innerHTML = `
-      <div class="nav-user-btn" id="avatarMenu" style="cursor:pointer">
-        <div class="nav-avatar">${firstName.charAt(0).toUpperCase()}</div>
-        <span class="nav-user-name">${firstName}</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-        <div class="avatar-dropdown" id="avatarDropdown">
-          <a href="${dashboard}?section=${profileSection}">Mi perfil</a>
-          <a href="#" class="dropdown-logout" onclick="cerrarSesion(); return false;">Cerrar sesión</a>
-        </div>
-      </div>
-      <a href="${dashboard}" class="btn-primary">Mi dashboard</a>`;
-
-    // init dropdown después de insertar el HTML
-    initAvatarDropdown();
-
-    if (mobile) {
-      mobile.innerHTML = `
-        <a href="${dashboard}" class="btn-primary" style="text-align:center;display:block">
-          Mi dashboard — ${firstName}
-        </a>
-        <button onclick="cerrarSesion()" class="btn-ghost"
-          style="text-align:center;display:block;width:100%;margin-top:8px">
-          Cerrar sesión
-        </button>`;
-    }
-  }
-}
-
-function cerrarSesion() {
-  localStorage.removeItem('labuai_session');
-  window.location.reload();
-}
+/* Lógica de sesión movida a utils.js */
 
 /* ─────────────────────────────────
    CTA — adaptar según sesión
@@ -337,7 +273,6 @@ function initTabs() {
 ───────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
   initNavbar();
-  initHamburger();
   initReveal();
   initNavSession();
   initCtaSession();

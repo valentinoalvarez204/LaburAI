@@ -254,6 +254,26 @@ function initSidebarNav() {
       switchSection(item.dataset.section);
     });
   });
+
+  // Interceptar clics en links del navbar para navegación interna (SPA)
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (href.includes('#')) {
+      const parts = href.split('#');
+      const section = parts[1];
+      // Si el link apunta a este mismo dashboard o es relativo (#seccion)
+      if ((parts[0].includes('dashboard-candidato.html') || parts[0] === '') && section) {
+        const sections = ['reporte', 'postulaciones', 'perfil'];
+        if (sections.includes(section)) {
+          e.preventDefault();
+          switchSection(section);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+    }
+  });
 }
 
 /* ─────────────────────────────────
@@ -485,9 +505,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   fetchRecommendations();
 
   // 4. Interacciones
+  initNavbar();
+  initNavSession();
   initSidebarNav();
-  initDashSidebar();
-  initAvatarDropdown();
   initPostulacionesFiltros();
   initReanalyze();
   initCopySummary();
