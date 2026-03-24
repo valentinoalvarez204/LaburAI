@@ -188,8 +188,6 @@ function initNavSession() {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
         <div class="avatar-dropdown" id="avatarDropdown">
           <a href="${dashboard}?section=${profileSection}">Mi perfil</a>
-          <a href="${dashboard}">Configuración</a>
-          <hr/>
           <a href="#" class="dropdown-logout" onclick="cerrarSesion(); return false;">Cerrar sesión</a>
         </div>
       </div>
