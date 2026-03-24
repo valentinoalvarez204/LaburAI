@@ -671,4 +671,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   initOfertasTabs();
   initSelectOferta();
   initPublicarForm();
+
+  // Handle section from URL (e.g., ?section=empresa)
+  const params = new URLSearchParams(window.location.search);
+  const section = params.get('section');
+  if (section && SECTIONS.includes(section)) {
+    switchSection(section);
+  }
 });
