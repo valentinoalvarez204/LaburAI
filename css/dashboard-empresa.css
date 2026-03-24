@@ -16,19 +16,6 @@ body { background: var(--bg); }
   font-size: 13px;
 }
 
-/* Plan en sidebar */
-.sidebar-plan {
-  margin-top: auto;
-  padding: 14px;
-  background: var(--bg2);
-  border-radius: var(--r);
-  border: 1.5px solid var(--border);
-}
-.plan-label  { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
-.plan-name   { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text); }
-.plan-detail { font-size: 12px; color: var(--error); margin-top: 2px; margin-bottom: 8px; }
-.plan-bar    { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
-.plan-fill   { height: 100%; background: linear-gradient(90deg, var(--warning), var(--error)); border-radius: 3px; }
 
 /* ─────────────────────────────────
    HAMBURGER (mobile)
