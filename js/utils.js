@@ -288,6 +288,13 @@ function initNavSession() {
       <a href="${dashboard}" class="btn-primary">Mi dashboard</a>`;
 
     initAvatarDropdown();
+
+    // 4. Actualizar CTAs de "Publicar oferta" en la página principal
+    if (isEmpresa) {
+      document.querySelectorAll('.pub-oferta-cta').forEach(btn => {
+        btn.href = 'dashboard-empresa.html?section=publicar';
+      });
+    }
   }
 }
 
