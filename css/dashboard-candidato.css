@@ -100,27 +100,29 @@ body { background: var(--bg); }
 .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* ─────────────────────────────────
-   LAYOUT SIDEBAR + MAIN
+   LAYOUT SIDEBAR + MAIN (Estilo Ofertas)
 ───────────────────────────────── */
 .dash-layout {
   display: grid;
-  grid-template-columns: 240px 1fr;
-  min-height: calc(100vh - 60px);
+  grid-template-columns: 280px 1fr;
+  gap: 28px;
+  padding: 28px var(--pad-x) 60px;
   align-items: start;
 }
 
 /* ─────────────────────────────────
-   SIDEBAR
+   SIDEBAR (Como en Ofertas)
 ───────────────────────────────── */
 .dash-sidebar {
   background: var(--white);
-  border-right: 1px solid var(--border);
-  height: calc(100vh - 60px);
-  position: sticky; top: 60px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r2);
+  position: sticky; top: 80px;
   overflow-y: auto;
   display: flex; flex-direction: column;
   padding: 20px 12px;
   gap: 6px;
+  box-shadow: var(--shadow-sm);
 }
 
 .sidebar-profile {
@@ -178,7 +180,6 @@ body { background: var(--bg); }
    MAIN
 ───────────────────────────────── */
 .dash-main {
-  padding: 28px 32px 60px;
   min-width: 0;
   display: flex; flex-direction: column; gap: 24px;
 }
@@ -372,7 +373,6 @@ body { background: var(--bg); }
 /* ─────────────────────────────────
    HABILIDADES DETECTADAS
 ───────────────────────────────── */
-.skills-card { }
 .skills-detected { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
 .skill-detected {
   font-size: 12px; font-weight: 600;
@@ -554,16 +554,26 @@ body { background: var(--bg); }
 
 /* ─────────────────────────────────
    RESPONSIVE
+/* ─────────────────────────────────
+   RESPONSIVE
 ───────────────────────────────── */
+@media (max-width: 1024px) {
+  .dash-layout { grid-template-columns: 240px 1fr; gap: 20px; }
+}
+
 @media (max-width: 1100px) {
   .overview-row { grid-template-columns: 1fr; }
   .dash-stats   { grid-template-columns: repeat(2,1fr); }
 }
+
 @media (max-width: 860px) {
   .dash-layout  { grid-template-columns: 1fr; }
   .dash-sidebar {
-    position: fixed; top: 60px; left: 0;
-    height: calc(100vh - 60px); z-index: 300;
+    position: fixed; top: 0; left: 0;
+    width: min(320px, 85vw);
+    height: 100vh;
+    border-radius: 0;
+    z-index: 300;
     transform: translateX(-100%); transition: transform .3s ease;
     box-shadow: var(--shadow-lg);
   }
@@ -573,10 +583,10 @@ body { background: var(--bg); }
   .ia-analysis-grid { grid-template-columns: 1fr; }
   .profile-form-grid { grid-template-columns: 1fr; }
 }
+
 @media (max-width: 600px) {
-  .dash-main  { padding: 20px 16px 40px; }
+  .dash-layout { padding: 16px var(--pad-x) 40px; }
   .dash-stats { grid-template-columns: repeat(2,1fr); gap: 10px; }
   .postul-item { flex-wrap: wrap; }
   .pi-match, .pi-status { align-self: flex-start; }
 }
-.avatar-dropdown { left: auto; right: 0; }

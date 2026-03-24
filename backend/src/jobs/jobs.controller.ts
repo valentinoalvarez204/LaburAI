@@ -18,13 +18,13 @@ import { UpdateJobDto } from './dto/update-job.dto';
 
 @Controller('jobs')
 export class JobsController {
-  constructor(private readonly jobsService: JobsService) {}
+  constructor(private readonly jobsService: JobsService) { }
 
   // GET /api/jobs
   @Get()
   findAll(
-    @Query('q')         q?: string,
-    @Query('rubro')     rubro?: string,
+    @Query('q') q?: string,
+    @Query('rubro') rubro?: string,
     @Query('modalidad') modalidad?: string,
     @Query('ubicacion') ubicacion?: string,
     @Query('empresaId') empresaId?: string,

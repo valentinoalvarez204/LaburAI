@@ -422,6 +422,3 @@
 @media (max-width: 480px) {
   .cat-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 }
-
-.logo { font-size: 26px; }
-.logo-star { font-size: 22px; }

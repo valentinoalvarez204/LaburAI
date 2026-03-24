@@ -24,7 +24,7 @@ async function fetchHomeJobs() {
       logoColor: '#5C6BC0',
       tags: [job.modalidad, job.jornada],
       tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', ''],
-      salary: job.salarioMin && job.salarioMax 
+      salary: job.salarioMin && job.salarioMax
         ? `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`
         : 'Salario a convenir',
       time: new Date(job.creadoEn).toLocaleDateString('es-AR'),
@@ -32,7 +32,7 @@ async function fetchHomeJobs() {
       rubro: job.rubro,
       filter: ['todos', job.modalidad === 'Remoto' ? 'remoto' : '', job.jornada.toLowerCase().replace(' ', '')].filter(Boolean)
     }));
-    
+
     renderJobs('todos');
     renderCategories();
   } catch (err) {
@@ -111,7 +111,7 @@ async function fetchStats() {
   try {
     const res = await fetch('http://localhost:3000/api/stats');
     const data = await res.json();
-    
+
     // Mapear etiquetas de index.html a claves de la API
     const mapping = {
       'Candidatos activos': data.candidatos,
@@ -136,7 +136,7 @@ function initCounters() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       if (e.isIntersecting) {
-        const el     = e.target;
+        const el = e.target;
         const target = parseInt(el.dataset.target, 10);
         const suffix = el.dataset.suffix || '';
         animateCounter(el, target, 1800, suffix);
@@ -148,86 +148,20 @@ function initCounters() {
   document.querySelectorAll('.stat-num[data-target]').forEach((el) => observer.observe(el));
 }
 
-/* ─────────────────────────────────
-   SESIÓN — leer localStorage
-   login.js guarda: { nombre, rol }
-   en labuai_session al registrarse/ingresar
-───────────────────────────────── */
-function getSession() {
-  try {
-    const raw = localStorage.getItem('labuai_session');
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-/* ─────────────────────────────────
-   NAVBAR — adaptar según sesión
-───────────────────────────────── */
-function initNavSession() {
-  const session = getSession();
-  const actions = document.getElementById('navActions');
-  const mobile  = document.getElementById('mobileNavActions');
-  if (!actions) return;
-
-  if (session) {
-    const dashboard = session.rol === 'empresa'
-      ? 'dashboard-empresa.html'
-      : 'dashboard-candidato.html';
-
-    // Primer nombre solo
-    const firstName = session.nombre.split(' ')[0];
-
-    const profileSection = session.rol === 'empresa' ? 'empresa' : 'perfil';
-
-    actions.innerHTML = `
-      <div class="nav-user-btn" id="avatarMenu" style="cursor:pointer">
-        <div class="nav-avatar">${firstName.charAt(0).toUpperCase()}</div>
-        <span class="nav-user-name">${firstName}</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-        <div class="avatar-dropdown" id="avatarDropdown">
-          <a href="${dashboard}?section=${profileSection}">Mi perfil</a>
-          <a href="${dashboard}">Configuración</a>
-          <hr/>
-          <a href="#" class="dropdown-logout" onclick="cerrarSesion(); return false;">Cerrar sesión</a>
-        </div>
-      </div>
-      <a href="${dashboard}" class="btn-primary">Mi dashboard</a>`;
-    
-    // init dropdown después de insertar el HTML
-    initAvatarDropdown();
-
-    if (mobile) {
-      mobile.innerHTML = `
-        <a href="${dashboard}" class="btn-primary" style="text-align:center;display:block">
-          Mi dashboard — ${firstName}
-        </a>
-        <button onclick="cerrarSesion()" class="btn-ghost"
-          style="text-align:center;display:block;width:100%;margin-top:8px">
-          Cerrar sesión
-        </button>`;
-    }
-  }
-}
-
-function cerrarSesion() {
-  localStorage.removeItem('labuai_session');
-  window.location.reload();
-}
+/* Lógica de sesión movida a utils.js */
 
 /* ─────────────────────────────────
    CTA — adaptar según sesión
 ───────────────────────────────── */
 function initCtaSession() {
   const session = getSession();
-  const inner   = document.getElementById('ctaInner');
+  const inner = document.getElementById('ctaInner');
   if (!inner || !session) return;
 
-  const dashboard  = session.rol === 'empresa'
+  const dashboard = session.rol === 'empresa'
     ? 'dashboard-empresa.html'
     : 'dashboard-candidato.html';
-  const firstName  = session.nombre.split(' ')[0];
+  const firstName = session.nombre.split(' ')[0];
 
   inner.innerHTML = `
     <div class="cta-star">✦</div>
@@ -245,9 +179,9 @@ function initCtaSession() {
    Si vacío → va igual a ofertas.html
 ───────────────────────────────── */
 function initSearch() {
-  const btn     = document.getElementById('searchBtn');
+  const btn = document.getElementById('searchBtn');
   const queryIn = document.getElementById('searchQuery');
-  const locIn   = document.getElementById('searchLocation');
+  const locIn = document.getElementById('searchLocation');
   if (!btn) return;
 
   function doSearch() {
@@ -299,9 +233,8 @@ function renderJobs(filter = 'todos') {
       .map((tag, i) => `<span class="job-tag ${job.tagTypes[i] || ''}">${tag}</span>`)
       .join('');
 
-    const badge = job.match
-      ? `<div class="match-badge">✦ ${job.match}% match</div>`
-      : '';
+    const matchVal = job.match || 0;
+    const badge = `<div class="match-badge">✦ ${matchVal}% match</div>`;
 
     return `
       <a class="job-card" href="oferta-detalle.html?id=${job.id}">
@@ -340,17 +273,16 @@ function initTabs() {
 ───────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
   initNavbar();
-  initHamburger();
   initReveal();
   initNavSession();
   initCtaSession();
   initChips();
   initSearch();
-  
+
   // Cargar datos reales
   fetchHomeJobs();
   await fetchStats();
   initCounters(); // Se inicia después de actualizar data-target
-  
+
   initTabs();
 });

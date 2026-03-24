@@ -63,14 +63,30 @@ function switchSection(id) {
 }
 
 function initNav() {
-  // Sidebar
+  // Sidebar nav
   document.querySelectorAll('.snav-item[data-section]').forEach((item) => {
     item.addEventListener('click', (e) => { e.preventDefault(); switchSection(item.dataset.section); });
   });
-  // Topbar
-  document.querySelectorAll('.dash-nav a[data-section]').forEach((a) => {
-    a.addEventListener('click', (e) => { e.preventDefault(); switchSection(a.dataset.section); });
+
+  // Interceptar clics en links del navbar para navegación interna (SPA)
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (href.includes('#')) {
+      const parts = href.split('#');
+      const section = parts[1];
+      // Si el link apunta a este dashboard o es relativo (#seccion)
+      if ((parts[0].includes('dashboard-empresa.html') || parts[0] === '') && section) {
+        if (SECTIONS.includes(section)) {
+          e.preventDefault();
+          switchSection(section);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+    }
   });
+
   // Botones "Nueva oferta" → van a la sección publicar del dashboard
   ['btnNuevaOferta', 'btnNuevaOfertaHero'].forEach((id) => {
     document.getElementById(id)?.addEventListener('click', () => switchSection('publicar'));
@@ -561,6 +577,14 @@ function pubResetForm() {
    INIT
 ───────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
+  // 0. Manejar sección desde la URL (ej: ?section=perfil o #perfil) inmediatamente para evitar saltos
+  const params = new URLSearchParams(window.location.search);
+  const hash = window.location.hash.substring(1);
+  const initialSection = params.get('section') || hash || 'overview';
+  if (SECTIONS.includes(initialSection)) {
+    switchSection(initialSection);
+  }
+
   // 1. Validar sesión
   const session = requireSession();
   if (!session) return;
@@ -665,17 +689,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderActividad();
   renderOfertas();
   renderCandidatos();
+  initNavbar();
+  initNavSession();
   initNav();
-  initDashSidebar();
-  initAvatarDropdown();
   initOfertasTabs();
   initSelectOferta();
   initPublicarForm();
 
-  // Handle section from URL (e.g., ?section=empresa)
-  const params = new URLSearchParams(window.location.search);
-  const section = params.get('section');
-  if (section && SECTIONS.includes(section)) {
-    switchSection(section);
-  }
+  // Remove redundant section handling at the end
+  initPublicarForm();
 });

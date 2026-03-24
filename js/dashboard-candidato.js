@@ -197,9 +197,11 @@ function renderRecomendadas() {
   if (!grid) return;
   grid.innerHTML = RECOMENDADAS.map((o) => {
     const tags = o.tags.map((t, i) => `<span class="job-tag ${o.tagTypes[i] || ''}">${t}</span>`).join('');
+    const matchVal = o.match || 0;
+    const badge = `<div class="match-badge">✦ ${matchVal}% match</div>`;
     return `
       <a class="job-card" href="oferta-detalle.html?id=${o.id}">
-        <div class="match-badge">✦ ${o.match}% match</div>
+        ${badge}
         <div class="job-card-head">
           <div class="company-logo" style="color:${o.logoColor}">${o.logo}</div>
           <div class="job-meta">
@@ -251,6 +253,26 @@ function initSidebarNav() {
       e.preventDefault();
       switchSection(item.dataset.section);
     });
+  });
+
+  // Interceptar clics en links del navbar para navegación interna (SPA)
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (href.includes('#')) {
+      const parts = href.split('#');
+      const section = parts[1];
+      // Si el link apunta a este mismo dashboard o es relativo (#seccion)
+      if ((parts[0].includes('dashboard-candidato.html') || parts[0] === '') && section) {
+        const sections = ['reporte', 'postulaciones', 'perfil'];
+        if (sections.includes(section)) {
+          e.preventDefault();
+          switchSection(section);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+    }
   });
 }
 
@@ -373,7 +395,7 @@ async function fetchProfile(candidatoId) {
     CANDIDATO.nombre = `${data.usuario?.nombre || ''} ${data.usuario?.apellido || ''}`.trim();
     CANDIDATO.score = data.scoreCV || 0;
     CANDIDATO.resumen = data.resumenIA || 'Subí tu CV para que la IA genere un resumen de tu perfil profesional.';
-    
+
     // Score data (parcial, a mejorar cuando integremos la IA real)
     CANDIDATO.scoreData = {
       total: data.scoreCV || 0,
@@ -393,12 +415,12 @@ async function fetchProfile(candidatoId) {
     renderScore();
     renderSkills();
     renderIAAnalysis();
-    
+
     // Actualizar UI
     const firstName = CANDIDATO.nombre.split(' ')[0];
     const greetEl = document.querySelector('.greeting-title');
     if (greetEl) greetEl.textContent = `¡Hola, ${firstName}! 👋`;
-    
+
     document.querySelectorAll('.sp-avatar, .avatar-circle').forEach(el => {
       el.textContent = firstName.charAt(0).toUpperCase();
     });
@@ -442,6 +464,14 @@ async function fetchRecommendations() {
    INIT
 ───────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
+  // 0. Manejar sección desde la URL (ej: ?section=perfil o #perfil) inmediatamente para evitar saltos
+  const params = new URLSearchParams(window.location.search);
+  const hash = window.location.hash.substring(1);
+  const initialSection = params.get('section') || hash || 'overview';
+  if (SECTIONS.includes(initialSection)) {
+    switchSection(initialSection);
+  }
+
   // 1. Validar sesión
   const session = requireSession();
   if (!session) return;
@@ -465,13 +495,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           status: p.estado.toLowerCase(),
           match: p.matchIA || 0,
         }));
-        
+
         const badge = document.querySelector('.snav-item[data-section="postulaciones"] .snav-badge');
         if (badge) badge.textContent = POSTULACIONES.length;
-        
+
         const statEl = document.querySelector('.dstat-num');
         if (statEl) statEl.textContent = POSTULACIONES.length;
-        
+
         renderPostulaciones();
       }
     } catch (err) {
@@ -483,18 +513,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   fetchRecommendations();
 
   // 4. Interacciones
+  initNavbar();
+  initNavSession();
   initSidebarNav();
-  initDashSidebar();
-  initAvatarDropdown();
   initPostulacionesFiltros();
   initReanalyze();
   initCopySummary();
   initSaveProfile();
 
-  // 5. Manejar sección desde la URL (ej: ?section=perfil)
-  const params = new URLSearchParams(window.location.search);
-  const section = params.get('section');
-  if (section && SECTIONS.includes(section)) {
-    switchSection(section);
-  }
+  // Remove redundant section handling at the end
+  initSaveProfile();
 });

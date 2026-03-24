@@ -16,35 +16,19 @@
 /* ─────────────────────────────────
    DATOS
 ───────────────────────────────── */
-const OFERTAS = [
-  { id:1,  title:'Vendedor/a Senior',           company:'Grupo Arcor',       location:'Córdoba',           logo:'A', logoColor:'#5C6BC0', tags:['Presencial','FMCG','B2B'],         tagTypes:['','',''],          salary:'$450.000 – $650.000', salaryNum:450000, time:'hace 1h',  match:97, rubro:'ventas',         modalidad:'presencial', jornada:'fulltime',  exp:'3-5',    desc:'Buscamos vendedor/a senior con experiencia en canal moderno y tradicional. Gestión de cartera de clientes, cumplimiento de objetivos y reporte a gerencia comercial.' },
-  { id:2,  title:'Enfermero/a General',          company:'Clínica Sucre',     location:'Buenos Aires',      logo:'C', logoColor:'#11998E', tags:['Presencial','Guardia','Urgente'],  tagTypes:['','','hot'],        salary:'$380.000 – $520.000', salaryNum:380000, time:'hace 3h',  match:93, rubro:'salud',          modalidad:'presencial', jornada:'fulltime',  exp:'1-2',    desc:'Necesitamos enfermero/a para turno guardia en área de internación general. Imprescindible matrícula habilitante y experiencia mínima de 1 año en clínica u hospital.' },
-  { id:3,  title:'Administrativo/a Contable',    company:'Techint',           location:'Remoto',            logo:'T', logoColor:'#7C4DFF', tags:['Remoto','SAP','Full time'],       tagTypes:['remote','',''],     salary:'$420.000 – $580.000', salaryNum:420000, time:'hace 5h',  match:91, rubro:'administracion', modalidad:'remoto',    jornada:'fulltime',  exp:'3-5',    desc:'Posición de trabajo remoto para el área de administración contable. Se requiere manejo de SAP, conocimientos de facturación, conciliaciones bancarias y liquidación de impuestos.' },
-  { id:4,  title:'Maestro/a de Primaria',        company:'Colegio San Martín',location:'Rosario',           logo:'S', logoColor:'#F7971E', tags:['Presencial','Turno tarde'],       tagTypes:['',''],             salary:'$290.000 – $370.000', salaryNum:290000, time:'hace 8h',  match:88, rubro:'educacion',      modalidad:'presencial', jornada:'parttime',  exp:'1-2',    desc:'Buscamos maestro/a de nivel primario para turno tarde. Título docente habilitante excluyente. Valoramos experiencia en modalidad activa y manejo de herramientas digitales.' },
-  { id:5,  title:'Encargado/a de Depósito',      company:'DHL Argentina',     location:'Buenos Aires',      logo:'D', logoColor:'#E65100', tags:['Presencial','Logística','Urgente'],tagTypes:['','','hot'],        salary:'$360.000 – $480.000', salaryNum:360000, time:'hace 1d',  match:86, rubro:'logistica',      modalidad:'presencial', jornada:'fulltime',  exp:'3-5',    desc:'Responsable de la gestión operativa del depósito: recepción, almacenamiento, despacho y control de inventario. Manejo de sistemas WMS y personal a cargo.' },
-  { id:6,  title:'Desarrollador/a Backend',      company:'Naranja X',         location:'Córdoba / Remoto',  logo:'N', logoColor:'#5C6BC0', tags:['Remoto','NestJS','Full time'],     tagTypes:['remote','',''],     salary:'$2.800 – $4.200 USD', salaryNum:800000, time:'hace 1d',  match:85, rubro:'tecnologia',     modalidad:'hibrido',   jornada:'fulltime',  exp:'3-5',    desc:'Buscamos developer backend con experiencia en NestJS, PostgreSQL y arquitectura de microservicios. Trabajo en equipo ágil con entregas continuas.' },
-  { id:7,  title:'Chef de Partida',              company:'El Federal',         location:'CABA',              logo:'E', logoColor:'#11998E', tags:['Presencial','Cocina fría'],       tagTypes:['',''],             salary:'$320.000 – $430.000', salaryNum:320000, time:'hace 2d',  match:82, rubro:'gastronomia',    modalidad:'presencial', jornada:'parttime',  exp:'1-2',    desc:'Restaurante gastronómico busca chef de partida para cocina fría. Horarios rotativos. Se valora creatividad en preparación de entradas y ensaladas de autor.' },
-  { id:8,  title:'Analista de RRHH',             company:'Banco Galicia',      location:'Remoto',            logo:'B', logoColor:'#7C4DFF', tags:['Remoto','Selección','Full time'],  tagTypes:['remote','',''],     salary:'$480.000 – $620.000', salaryNum:480000, time:'hace 2d',  match:80, rubro:'administracion', modalidad:'remoto',    jornada:'fulltime',  exp:'3-5',    desc:'Posición de analista de RRHH enfocada en selección de personal y employer branding. Manejo de ATS, entrevistas por competencias y coordinación con headhunters.' },
-  { id:9,  title:'Electricista Industrial',      company:'YPF',                location:'Neuquén',           logo:'Y', logoColor:'#F7971E', tags:['Presencial','MT/BT','Urgente'],   tagTypes:['','','hot'],        salary:'$520.000 – $700.000', salaryNum:520000, time:'hace 3d',  match:78, rubro:'construccion',   modalidad:'presencial', jornada:'fulltime',  exp:'3-5',    desc:'Electricista industrial para planta en Vaca Muerta. Habilitación para trabajos en MT/BT excluyente. Posición de planta con todos los beneficios de convenio.' },
-  { id:10, title:'Diseñador/a UX/UI',            company:'MercadoLibre',       location:'Remoto',            logo:'M', logoColor:'#5C6BC0', tags:['Remoto','Figma','Full time'],      tagTypes:['remote','',''],     salary:'$3.000 – $4.500 USD', salaryNum:900000, time:'hace 3d',  match:76, rubro:'diseno',         modalidad:'remoto',    jornada:'fulltime',  exp:'3-5',    desc:'Diseñador/a UX/UI para equipo de producto. Experiencia con Figma, design systems y metodologías de research. Se trabaja en features de alto impacto para millones de usuarios.' },
-  { id:11, title:'Contador/a Público/a',         company:'PwC Argentina',      location:'Buenos Aires',      logo:'P', logoColor:'#E65100', tags:['Híbrido','AFIP','Big 4'],         tagTypes:['','',''],          salary:'$550.000 – $750.000', salaryNum:550000, time:'hace 4d',  match:74, rubro:'finanzas',       modalidad:'hibrido',   jornada:'fulltime',  exp:'3-5',    desc:'Contador/a para división de auditoría externa. Manejo de IFRS, conocimiento de normas contables locales y experiencia en clientes de mediana y gran envergadura.' },
-  { id:12, title:'Vendedor/a Inmobiliario/a',    company:'RE/MAX Argentina',   location:'Córdoba',           logo:'R', logoColor:'#11998E', tags:['Presencial','Comisiones'],        tagTypes:['',''],             salary:'Comisiones',           salaryNum:0,      time:'hace 4d',  match:72, rubro:'ventas',         modalidad:'presencial', jornada:'freelance', exp:'sin-exp', desc:'Buscamos asesores inmobiliarios para sumarse a la red RE/MAX. No se requiere experiencia previa. Capacitación inicial incluida y esquema 100% comisionable.' },
-  { id:13, title:'Operario/a de Producción',     company:'Arcor S.A.',         location:'Villa del Rosario', logo:'A', logoColor:'#7C4DFF', tags:['Presencial','Sin experiencia'],   tagTypes:['','new'],           salary:'$320.000 – $380.000', salaryNum:320000, time:'hace 5d',  match:70, rubro:'construccion',   modalidad:'presencial', jornada:'fulltime',  exp:'sin-exp', desc:'Ingresá a una de las empresas líderes de la industria alimentaria. No se requiere experiencia. Capacitación en planta. Se valora secundario completo y disponibilidad horaria.' },
-  { id:14, title:'Community Manager',            company:'Agencia Bumerán',    location:'Remoto',            logo:'B', logoColor:'#F7971E', tags:['Remoto','Redes sociales'],        tagTypes:['remote',''],        salary:'$280.000 – $390.000', salaryNum:280000, time:'hace 6d',  match:68, rubro:'diseno',         modalidad:'remoto',    jornada:'parttime',  exp:'1-2',    desc:'CM para gestión de redes sociales de múltiples clientes. Conocimiento de Meta Ads, Canva y manejo de herramientas de programación de contenidos como Hootsuite o Later.' },
-  { id:15, title:'Médico/a Clínico/a',           company:'OSDE',               location:'Buenos Aires',      logo:'O', logoColor:'#11998E', tags:['Presencial','Consultorio'],       tagTypes:['',''],             salary:'$650.000 – $900.000', salaryNum:650000, time:'hace 1w',  match:66, rubro:'salud',          modalidad:'presencial', jornada:'fulltime',  exp:'5+',     desc:'Médico/a clínico/a para atención en consultorio externo. Matrícula habilitante y especialidad excluyentes. Posición en relación de dependencia con beneficios.' },
-];
+const OFERTAS = [];
 
 /* ─────────────────────────────────
    ESTADO DE LA APP
 ───────────────────────────────── */
 const state = {
-  query:        '',
-  location:     '',
-  filters:      { rubro: [], modalidad: [], jornada: [], experiencia: [], salarioMin: 0 },
-  sort:         'relevancia',
-  page:         1,
-  perPage:      8,
-  results:      [...OFERTAS],
+  query: '',
+  location: '',
+  filters: { rubro: [], modalidad: [], jornada: [], experiencia: [], salarioMin: 0 },
+  sort: 'relevancia',
+  page: 1,
+  perPage: 8,
+  results: [...OFERTAS],
 };
 
 /* ─────────────────────────────────
@@ -56,9 +40,9 @@ const state = {
 ───────────────────────────────── */
 function initSidebarToggle() {
   const toggleBtn = document.getElementById('filtersToggleBtn');
-  const sidebar   = document.getElementById('filtersSidebar');
-  const overlay   = document.getElementById('sidebarOverlay');
-  const applyBtn  = document.getElementById('applyFiltersBtn');
+  const sidebar = document.getElementById('filtersSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const applyBtn = document.getElementById('applyFiltersBtn');
   if (!toggleBtn || !sidebar) return;
 
   function openSidebar() {
@@ -84,7 +68,7 @@ function initAccordion() {
   document.querySelectorAll('.filter-group-header').forEach((header) => {
     header.addEventListener('click', () => {
       const bodyId = header.dataset.toggle;
-      const body   = document.getElementById(bodyId);
+      const body = document.getElementById(bodyId);
       if (!body) return;
       const collapsed = body.classList.toggle('collapsed');
       header.classList.toggle('collapsed', collapsed);
@@ -96,25 +80,29 @@ function initAccordion() {
    FILTROS — checkboxes + slider
 ───────────────────────────────── */
 function initFilters() {
-  // Checkboxes
-  document.querySelectorAll('.filter-group-body input[type="checkbox"]').forEach((cb) => {
-    cb.addEventListener('change', () => {
-      const name  = cb.name;
-      const value = cb.value;
-      if (!state.filters[name]) state.filters[name] = [];
+  // Event delegation en el sidebar para los checkboxes (ya que los rubros son dinámicos)
+  const sidebar = document.getElementById('filtersSidebar');
+  if (sidebar) {
+    sidebar.addEventListener('change', (e) => {
+      if (e.target.type === 'checkbox') {
+        const cb = e.target;
+        const name = cb.name;
+        const value = cb.value;
+        if (!state.filters[name]) state.filters[name] = [];
 
-      if (cb.checked) {
-        if (!state.filters[name].includes(value)) state.filters[name].push(value);
-      } else {
-        state.filters[name] = state.filters[name].filter((v) => v !== value);
+        if (cb.checked) {
+          if (!state.filters[name].includes(value)) state.filters[name].push(value);
+        } else {
+          state.filters[name] = state.filters[name].filter((v) => v !== value);
+        }
+        state.page = 1;
+        applyAndRender();
       }
-      state.page = 1;
-      applyAndRender();
     });
-  });
+  }
 
   // Slider de salario
-  const slider  = document.getElementById('salaryRange');
+  const slider = document.getElementById('salaryRange');
   const display = document.getElementById('salaryDisplay');
   if (slider) {
     slider.addEventListener('input', () => {
@@ -140,7 +128,7 @@ function resetFilters() {
     cb.checked = false;
   });
   // Reset slider
-  const slider  = document.getElementById('salaryRange');
+  const slider = document.getElementById('salaryRange');
   const display = document.getElementById('salaryDisplay');
   if (slider) { slider.value = 0; }
   if (display) { display.textContent = '$0'; }
@@ -152,12 +140,12 @@ function resetFilters() {
    BÚSQUEDA
 ───────────────────────────────── */
 function initSearch() {
-  const btn  = document.getElementById('searchBtn');
-  const qIn  = document.getElementById('searchQuery');
-  const lIn  = document.getElementById('searchLocation');
+  const btn = document.getElementById('searchBtn');
+  const qIn = document.getElementById('searchQuery');
+  const lIn = document.getElementById('searchLocation');
 
   function doSearch() {
-    state.query    = qIn?.value.trim().toLowerCase() ?? '';
+    state.query = qIn?.value.trim().toLowerCase() ?? '';
     state.location = lIn?.value.trim().toLowerCase() ?? '';
     state.page = 1;
     applyAndRender();
@@ -204,18 +192,18 @@ function applyFilters() {
 
   // Filtros
   const f = state.filters;
-  if (f.rubro.length)      list = list.filter((o) => f.rubro.includes(o.rubro));
-  if (f.modalidad.length)  list = list.filter((o) => f.modalidad.includes(o.modalidad));
-  if (f.jornada.length)    list = list.filter((o) => f.jornada.includes(o.jornada));
-  if (f.experiencia.length)list = list.filter((o) => f.experiencia.includes(o.exp));
-  if (f.salarioMin > 0)    list = list.filter((o) => o.salaryNum >= f.salarioMin);
+  if (f.rubro.length) list = list.filter((o) => f.rubro.includes(o.rubro));
+  if (f.modalidad.length) list = list.filter((o) => f.modalidad.includes(o.modalidad));
+  if (f.jornada.length) list = list.filter((o) => f.jornada.includes(o.jornada));
+  if (f.experiencia.length) list = list.filter((o) => f.experiencia.includes(o.exp));
+  if (f.salarioMin > 0) list = list.filter((o) => o.salaryNum >= f.salarioMin);
 
   // Ordenamiento
   switch (state.sort) {
-    case 'recientes':    list.sort((a,b) => a.id - b.id);               break;
-    case 'salario-asc':  list.sort((a,b) => a.salaryNum - b.salaryNum); break;
-    case 'salario-desc': list.sort((a,b) => b.salaryNum - a.salaryNum); break;
-    default:             list.sort((a,b) => b.match - a.match);         break;
+    case 'recientes': list.sort((a, b) => a.id - b.id); break;
+    case 'salario-asc': list.sort((a, b) => a.salaryNum - b.salaryNum); break;
+    case 'salario-desc': list.sort((a, b) => b.salaryNum - a.salaryNum); break;
+    default: list.sort((a, b) => b.match - a.match); break;
   }
 
   state.results = list;
@@ -225,24 +213,24 @@ function applyFilters() {
    CHIPS DE FILTROS ACTIVOS
 ───────────────────────────────── */
 const FILTER_LABELS = {
-  rubro:      { administracion:'Administración y RRHH', ventas:'Ventas', tecnologia:'Tecnología', salud:'Salud', educacion:'Educación', construccion:'Construcción', gastronomia:'Gastronomía', logistica:'Logística', finanzas:'Finanzas', diseno:'Diseño' },
-  modalidad:  { remoto:'Remoto', presencial:'Presencial', hibrido:'Híbrido' },
-  jornada:    { fulltime:'Full time', parttime:'Part time', freelance:'Freelance' },
-  experiencia:{ 'sin-exp':'Sin experiencia', '1-2':'1–2 años', '3-5':'3–5 años', '5+':'Más de 5 años' },
+  rubro: { administracion: 'Administración y RRHH', ventas: 'Ventas', tecnologia: 'Tecnología', salud: 'Salud', educacion: 'Educación', construccion: 'Construcción', gastronomia: 'Gastronomía', logistica: 'Logística', finanzas: 'Finanzas', diseno: 'Diseño' },
+  modalidad: { remoto: 'Remoto', presencial: 'Presencial', hibrido: 'Híbrido' },
+  jornada: { fulltime: 'Full time', parttime: 'Part time', freelance: 'Freelance' },
+  experiencia: { 'sin-exp': 'Sin experiencia', '1-2': '1–2 años', '3-5': '3–5 años', '5+': 'Más de 5 años' },
 };
 
 function renderActiveFilters() {
-  const bar     = document.getElementById('activeFiltersBar');
-  const chips   = document.getElementById('activeChips');
+  const bar = document.getElementById('activeFiltersBar');
+  const chips = document.getElementById('activeChips');
   if (!bar || !chips) return;
 
   const f = state.filters;
   const all = [
-    ...f.rubro.map((v)       => ({ name:'rubro',       value:v, label: FILTER_LABELS.rubro[v] })),
-    ...f.modalidad.map((v)   => ({ name:'modalidad',   value:v, label: FILTER_LABELS.modalidad[v] })),
-    ...f.jornada.map((v)     => ({ name:'jornada',     value:v, label: FILTER_LABELS.jornada[v] })),
-    ...f.experiencia.map((v) => ({ name:'experiencia', value:v, label: FILTER_LABELS.experiencia[v] })),
-    ...(f.salarioMin > 0 ? [{ name:'salarioMin', value:'salary', label:'Salario mín. $' + f.salarioMin.toLocaleString('es-AR') }] : []),
+    ...f.rubro.map((v) => ({ name: 'rubro', value: v, label: FILTER_LABELS.rubro[v] })),
+    ...f.modalidad.map((v) => ({ name: 'modalidad', value: v, label: FILTER_LABELS.modalidad[v] })),
+    ...f.jornada.map((v) => ({ name: 'jornada', value: v, label: FILTER_LABELS.jornada[v] })),
+    ...f.experiencia.map((v) => ({ name: 'experiencia', value: v, label: FILTER_LABELS.experiencia[v] })),
+    ...(f.salarioMin > 0 ? [{ name: 'salarioMin', value: 'salary', label: 'Salario mín. $' + f.salarioMin.toLocaleString('es-AR') }] : []),
   ];
 
   bar.style.display = all.length ? '' : 'none';
@@ -259,9 +247,9 @@ function renderActiveFilters() {
       if (name === 'salarioMin') {
         state.filters.salarioMin = 0;
         const slider = document.getElementById('salaryRange');
-        const disp   = document.getElementById('salaryDisplay');
+        const disp = document.getElementById('salaryDisplay');
         if (slider) slider.value = 0;
-        if (disp)   disp.textContent = '$0';
+        if (disp) disp.textContent = '$0';
       } else {
         state.filters[name] = state.filters[name].filter((v) => v !== value);
         const cb = document.querySelector(`input[name="${name}"][value="${value}"]`);
@@ -285,8 +273,8 @@ function renderCards() {
   const grid = document.getElementById('offersGrid');
   if (!grid) return;
 
-  const total  = state.results.length;
-  const start  = (state.page - 1) * state.perPage;
+  const total = state.results.length;
+  const start = (state.page - 1) * state.perPage;
   const pageItems = state.results.slice(start, start + state.perPage);
 
   // Actualizar contador
@@ -303,9 +291,16 @@ function renderCards() {
     return;
   }
 
+  // Obtener sesión para verificar rol
+  const session = getSession();
+  const isEmpresa = session?.rol === 'empresa';
+
   grid.innerHTML = pageItems.map((job) => {
-    const tags  = job.tags.map((t, i) => buildTagHTML(t, job.tagTypes[i])).join('');
-    const badge = job.match ? `<div class="match-badge">✦ ${job.match}% match</div>` : '';
+    const tags = job.tags.map((t, i) => buildTagHTML(t, job.tagTypes[i])).join('');
+    const matchVal = job.match || 0;
+    // Si es empresa, no renderizamos el badge
+    const badge = isEmpresa ? '' : `<div class="match-badge">✦ ${matchVal}% match</div>`;
+
     return `
       <a class="job-card" href="oferta-detalle.html?id=${job.id}">
         ${badge}
@@ -335,14 +330,14 @@ function renderPagination() {
 
   const total = state.results.length;
   const pages = Math.ceil(total / state.perPage);
-  const cur   = state.page;
+  const cur = state.page;
 
   if (pages <= 1) { container.innerHTML = ''; return; }
 
   let html = '';
 
   // Prev
-  html += `<button class="page-btn arrow" onclick="goToPage(${cur-1})" ${cur===1?'disabled':''}>
+  html += `<button class="page-btn arrow" onclick="goToPage(${cur - 1})" ${cur === 1 ? 'disabled' : ''}>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
   </button>`;
 
@@ -352,12 +347,12 @@ function renderPagination() {
     if (item === '...') {
       html += `<span class="page-dots">…</span>`;
     } else {
-      html += `<button class="page-btn ${item===cur?'active':''}" onclick="goToPage(${item})">${item}</button>`;
+      html += `<button class="page-btn ${item === cur ? 'active' : ''}" onclick="goToPage(${item})">${item}</button>`;
     }
   });
 
   // Next
-  html += `<button class="page-btn arrow" onclick="goToPage(${cur+1})" ${cur===pages?'disabled':''}>
+  html += `<button class="page-btn arrow" onclick="goToPage(${cur + 1})" ${cur === pages ? 'disabled' : ''}>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
   </button>`;
 
@@ -365,13 +360,13 @@ function renderPagination() {
 }
 
 function getPaginationRange(cur, total) {
-  if (total <= 7) return Array.from({length:total},(_,i)=>i+1);
-  if (cur <= 4)   return [1,2,3,4,5,'...',total];
-  if (cur >= total-3) return [1,'...',total-4,total-3,total-2,total-1,total];
-  return [1,'...',cur-1,cur,cur+1,'...',total];
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (cur <= 4) return [1, 2, 3, 4, 5, '...', total];
+  if (cur >= total - 3) return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+  return [1, '...', cur - 1, cur, cur + 1, '...', total];
 }
 
-window.goToPage = function(page) {
+window.goToPage = function (page) {
   const pages = Math.ceil(state.results.length / state.perPage);
   if (page < 1 || page > pages) return;
   state.page = page;
@@ -427,78 +422,147 @@ function initReveal() {
 }
 
 /* ─────────────────────────────────
-   INIT
+   RENDER FILTROS DINÁMICOS
 ───────────────────────────────── */
+function renderAllFilters() {
+  renderRubroFilters();
+  renderGenericFilters('modalidad', [
+    { id: 'remoto', label: 'Remoto' },
+    { id: 'presencial', label: 'Presencial' },
+    { id: 'hibrido', label: 'Híbrido' }
+  ]);
+  renderGenericFilters('jornada', [
+    { id: 'fulltime', label: 'Full time' },
+    { id: 'parttime', label: 'Part time' },
+    { id: 'freelance', label: 'Freelance / Proyecto' }
+  ]);
+  renderGenericFilters('experiencia', [
+    { id: 'sin-exp', label: 'Sin experiencia' },
+    { id: '1-2', label: '1 – 2 años' },
+    { id: '3-5', label: '3 – 5 años' },
+    { id: '5+', label: 'Más de 5 años' }
+  ], 'exp'); // 'exp' es la clave en el objeto OFERTAS
+}
+
+function renderRubroFilters() {
+  const container = document.getElementById('rubro');
+  if (!container) return;
+
+  const RUBROS_CONFIG = [
+    { id: 'administracion', label: 'Administración y RRHH' },
+    { id: 'ventas', label: 'Ventas y Comercial' },
+    { id: 'tecnologia', label: 'Tecnología e IT' },
+    { id: 'salud', label: 'Salud y Medicina' },
+    { id: 'educacion', label: 'Educación y Docencia' },
+    { id: 'construccion', label: 'Construcción e Ing.' },
+    { id: 'gastronomia', label: 'Gastronomía y Turismo' },
+    { id: 'logistica', label: 'Logística y Transporte' },
+    { id: 'finanzas', label: 'Finanzas y Contabilidad' },
+    { id: 'diseno', label: 'Diseño y Creatividad' }
+  ];
+
+  const counts = {};
+  OFERTAS.forEach(o => counts[o.rubro] = (counts[o.rubro] || 0) + 1);
+
+  container.innerHTML = RUBROS_CONFIG.map(r => {
+    const count = counts[r.id] || 0;
+    const checked = state.filters.rubro.includes(r.id) ? 'checked' : '';
+    return `
+      <label class="filter-check">
+        <input type="checkbox" name="rubro" value="${r.id}" ${checked}/>
+        <span class="fc-box"></span>
+        ${r.label} <span class="fc-count">${count.toLocaleString('es-AR')}</span>
+      </label>`;
+  }).join('');
+}
+
+function renderGenericFilters(containerId, config, dataKey) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const key = dataKey || containerId;
+  const counts = {};
+  OFERTAS.forEach(o => counts[o[key]] = (counts[o[key]] || 0) + 1);
+
+  container.innerHTML = config.map(item => {
+    const count = counts[item.id] || 0;
+    const checked = state.filters[containerId]?.includes(item.id) ? 'checked' : '';
+    return `
+      <label class="filter-check">
+        <input type="checkbox" name="${containerId}" value="${item.id}" ${checked}/>
+        <span class="fc-box"></span>
+        ${item.label} <span class="fc-count">${count.toLocaleString('es-AR')}</span>
+      </label>`;
+  }).join('');
+}
+
+/* ─────────────────────────────────
+   INIT
+────────────────────────────────— */
 document.addEventListener('DOMContentLoaded', async () => {
   showSkeleton();
 
   // Cargar ofertas reales desde la API
   try {
-    const res  = await fetch('http://localhost:3000/api/jobs');
+    const res = await fetch('http://localhost:3000/api/jobs');
     const data = await res.json();
 
-    // Vaciar array hardcodeado y llenar con datos reales
+    // Llenar con datos reales
     OFERTAS.length = 0;
     data.forEach((job) => {
       OFERTAS.push({
-        id:           job.id,
-        title:        job.titulo,
-        company:      job.empresa?.nombre || 'Empresa',
-        location:     job.ubicacion,
-        logo:         job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
-        logoColor:    '#5C6BC0',
-        tags:         [job.modalidad, job.jornada, ...(job.habilidades?.slice(0,1) || [])],
-        tagTypes:     [job.modalidad === 'Remoto' ? 'remote' : '', '', ''],
-        salary:       job.salarioMin && job.salarioMax
-                        ? `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`
-                        : 'Salario a convenir',
-        salaryNum:    job.salarioMin || 0,
-        time:         new Date(job.creadoEn).toLocaleDateString('es-AR'),
-        match:        null,
-        rubro:        job.rubro,
-        modalidad:    job.modalidad?.toLowerCase(),
-        jornada:      job.jornada?.toLowerCase().replace(' ', ''),
-        exp:          job.experiencia || '',
-        desc:         job.descripcion,
+        id: job.id,
+        title: job.titulo,
+        company: job.empresa?.nombre || 'Empresa',
+        location: job.ubicacion,
+        logo: job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+        logoColor: '#5C6BC0',
+        tags: [job.modalidad, job.jornada, ...(job.habilidades?.slice(0, 1) || [])],
+        tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', '', ''],
+        salary: job.salarioMin && job.salarioMax
+          ? `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`
+          : 'Salario a convenir',
+        salaryNum: job.salarioMin || 0,
+        time: new Date(job.creadoEn).toLocaleDateString('es-AR'),
+        match: job.matchIA || 0, // Usar match real de la API o 0 por defecto
+        rubro: job.rubro,
+        modalidad: job.modalidad?.toLowerCase(),
+        jornada: job.jornada?.toLowerCase().replace(' ', ''),
+        exp: job.experiencia || '',
+        desc: job.descripcion,
       });
     });
 
   } catch (err) {
     console.error('Error cargando ofertas:', err);
-    showToast('No se pudieron cargar las ofertas', 'error');
   }
 
-  // Leer parámetros de URL
+  // Leer parámetros de URL (antes de renderizar filtros)
   const params = new URLSearchParams(window.location.search);
-  const q      = params.get('q')     || '';
-  const loc    = params.get('loc')   || '';
-  const rubro  = params.get('rubro') || '';
+  const q = params.get('q') || '';
+  const loc = params.get('loc') || '';
+  const rubro = params.get('rubro') || '';
 
-  if (q) {
-    const qIn = document.getElementById('searchQuery');
-    if (qIn) qIn.value = q;
-    state.query = q.toLowerCase();
-  }
-  if (loc) {
-    const lIn = document.getElementById('searchLocation');
-    if (lIn) lIn.value = loc;
-    state.location = loc.toLowerCase();
-  }
-  if (rubro) {
-    const cb = document.querySelector(`input[name="rubro"][value="${rubro}"]`);
-    if (cb) {
-      cb.checked = true;
-      state.filters.rubro = [rubro];
-    }
-  }
+  if (q) state.query = q.toLowerCase();
+  if (loc) state.location = loc.toLowerCase();
+  if (rubro) state.filters.rubro = [rubro];
+
+  // Sincronizar inputs con el estado
+  const qIn = document.getElementById('searchQuery');
+  if (qIn) qIn.value = state.query;
+  const lIn = document.getElementById('searchLocation');
+  if (lIn) lIn.value = state.location;
 
   initNavbar();
-  initHamburger();
+  initNavSession();
   initSidebarToggle();
   initAccordion();
   initFilters();
   initSearch();
   initSort();
   initReveal();
+
+  // Renderizar todos los filtros dinámicos
+  renderAllFilters();
   applyAndRender();
 });
