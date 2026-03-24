@@ -5,127 +5,81 @@
 ══════════════════════════════════════════ */
 
 /* ─────────────────────────────────
-   DATOS: Ofertas de trabajo
+   DATOS: Ofertas de trabajo (ahora desde API)
 ───────────────────────────────── */
-const JOBS = [
-  {
-    id: 1,
-    title: 'Vendedor/a Senior',
-    company: 'Grupo Arcor',
-    location: 'Córdoba',
-    logo: 'A', logoColor: '#5C6BC0',
-    tags: ['Presencial', 'FMCG', 'B2B'],
-    tagTypes: ['', '', ''],
-    salary: '$450.000 – $650.000',
-    time: 'hace 1h',
-    match: 97,
-    filter: ['todos', 'fulltime'],
-  },
-  {
-    id: 2,
-    title: 'Enfermero/a General',
-    company: 'Clínica Sucre',
-    location: 'Buenos Aires',
-    logo: 'C', logoColor: '#11998E',
-    tags: ['Presencial', 'Guardia', 'Urgente'],
-    tagTypes: ['', '', 'hot'],
-    salary: '$380.000 – $520.000',
-    time: 'hace 3h',
-    match: 93,
-    filter: ['todos', 'fulltime'],
-  },
-  {
-    id: 3,
-    title: 'Administrativo/a Contable',
-    company: 'Techint',
-    location: 'Remoto',
-    logo: 'T', logoColor: '#7C4DFF',
-    tags: ['Remoto', 'SAP', 'Excel'],
-    tagTypes: ['remote', '', ''],
-    salary: '$420.000 – $580.000',
-    time: 'hace 5h',
-    match: 91,
-    filter: ['todos', 'remoto', 'fulltime'],
-  },
-  {
-    id: 4,
-    title: 'Maestro/a de Primaria',
-    company: 'Colegio San Martín',
-    location: 'Rosario',
-    logo: 'S', logoColor: '#F7971E',
-    tags: ['Presencial', 'Turno tarde', 'Part time'],
-    tagTypes: ['', '', ''],
-    salary: '$290.000 – $370.000',
-    time: 'hace 8h',
-    match: 88,
-    filter: ['todos', 'recientes'],
-  },
-  {
-    id: 5,
-    title: 'Encargado/a de Depósito',
-    company: 'DHL Argentina',
-    location: 'Buenos Aires',
-    logo: 'D', logoColor: '#E65100',
-    tags: ['Presencial', 'Logística', 'Urgente'],
-    tagTypes: ['', '', 'hot'],
-    salary: '$360.000 – $480.000',
-    time: 'hace 1d',
-    match: 86,
-    filter: ['todos', 'recientes', 'fulltime'],
-  },
-  {
-    id: 6,
-    title: 'Desarrollador/a Backend',
-    company: 'Naranja X',
-    location: 'Córdoba / Remoto',
-    logo: 'N', logoColor: '#5C6BC0',
-    tags: ['Remoto', 'NestJS', 'Full time'],
-    tagTypes: ['remote', '', ''],
-    salary: '$2.800 – $4.200 USD',
-    time: 'hace 1d',
-    match: 85,
-    filter: ['todos', 'remoto', 'fulltime'],
-  },
-  {
-    id: 7,
-    title: 'Chef de Partida',
-    company: 'Restaurante El Federal',
-    location: 'CABA',
-    logo: 'E', logoColor: '#11998E',
-    tags: ['Presencial', 'Cocina fría', 'Part time'],
-    tagTypes: ['', '', ''],
-    salary: '$320.000 – $430.000',
-    time: 'hace 2d',
-    match: 82,
-    filter: ['todos', 'recientes'],
-  },
-  {
-    id: 8,
-    title: 'Analista de RRHH',
-    company: 'Banco Galicia',
-    location: 'Remoto',
-    logo: 'B', logoColor: '#7C4DFF',
-    tags: ['Remoto', 'Selección', 'Full time'],
-    tagTypes: ['remote', '', ''],
-    salary: '$480.000 – $620.000',
-    time: 'hace 2d',
-    match: 80,
-    filter: ['todos', 'remoto', 'fulltime'],
-  },
-  {
-    id: 9,
-    title: 'Electricista Industrial',
-    company: 'YPF',
-    location: 'Neuquén',
-    logo: 'Y', logoColor: '#F7971E',
-    tags: ['Presencial', 'MT/BT', 'Urgente'],
-    tagTypes: ['', '', 'hot'],
-    salary: '$520.000 – $700.000',
-    time: 'hace 3d',
-    match: 78,
-    filter: ['todos', 'recientes'],
-  },
-];
+let JOBS = [];
+
+async function fetchHomeJobs() {
+  try {
+    const res = await fetch('http://localhost:3000/api/jobs');
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+
+    JOBS = data.map(job => ({
+      id: job.id,
+      title: job.titulo,
+      company: job.empresa?.nombre || 'Empresa',
+      location: job.ubicacion,
+      logo: job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+      logoColor: '#5C6BC0',
+      tags: [job.modalidad, job.jornada],
+      tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', ''],
+      salary: job.salarioMin && job.salarioMax 
+        ? `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`
+        : 'Salario a convenir',
+      time: new Date(job.creadoEn).toLocaleDateString('es-AR'),
+      match: null,
+      rubro: job.rubro,
+      filter: ['todos', job.modalidad === 'Remoto' ? 'remoto' : '', job.jornada.toLowerCase().replace(' ', '')].filter(Boolean)
+    }));
+    
+    renderJobs('todos');
+    renderCategories();
+  } catch (err) {
+    console.error('Error cargando ofertas en home:', err);
+  }
+}
+
+/* ─────────────────────────────────
+   RENDER CATEGORIAS (áreas)
+───────────────────────────────── */
+function renderCategories() {
+  const grid = document.getElementById('catGrid');
+  if (!grid) return;
+
+  const RUBROS_MAP = {
+    administracion: { label: 'Administración y RRHH', icon: '💼' },
+    ventas: { label: 'Ventas y Comercial', icon: '🛒' },
+    tecnologia: { label: 'Tecnología e IT', icon: '💻' },
+    salud: { label: 'Salud y Medicina', icon: '🏥' },
+    educacion: { label: 'Educación y Docencia', icon: '🎓' },
+    construccion: { label: 'Construcción e Ingeniería', icon: '🏗️' },
+    gastronomia: { label: 'Gastronomía y Turismo', icon: '🍽️' },
+    logistica: { label: 'Logística y Transporte', icon: '🚚' },
+    finanzas: { label: 'Finanzas y Contabilidad', icon: '📊' },
+    diseno: { label: 'Diseño y Creatividad', icon: '🎨' },
+    legal: { label: 'Legal y Jurídico', icon: '⚖️' },
+    agro: { label: 'Agro y Medioambiente', icon: '🌱' },
+  };
+
+  // Contar ofertas por rubro
+  const counts = {};
+  JOBS.forEach(j => {
+    if (j.rubro) counts[j.rubro] = (counts[j.rubro] || 0) + 1;
+  });
+
+  // Mostrar todos los rubros definidos, incluso con 0 ofertas
+  grid.innerHTML = Object.keys(RUBROS_MAP).map(r => {
+    const meta = RUBROS_MAP[r];
+    const count = counts[r] || 0;
+    return `
+      <a class="cat-card" href="ofertas.html?rubro=${r}">
+        <div class="cat-icon">${meta.icon}</div>
+        <div class="cat-name">${meta.label}</div>
+        <div class="cat-count">${count} oferta${count !== 1 ? 's' : ''}</div>
+      </a>`;
+  }).join('');
+}
 
 /* ─────────────────────────────────
    HAMBURGER
@@ -151,6 +105,31 @@ function initReveal() {
     }
     observer.observe(el);
   });
+}
+
+async function fetchStats() {
+  try {
+    const res = await fetch('http://localhost:3000/api/stats');
+    const data = await res.json();
+    
+    // Mapear etiquetas de index.html a claves de la API
+    const mapping = {
+      'Candidatos activos': data.candidatos,
+      'Ofertas publicadas': data.ofertas,
+      'Empresas registradas': data.empresas,
+      'Match IA exitoso': data.matchPromedio
+    };
+
+    document.querySelectorAll('.stat').forEach(statEl => {
+      const label = statEl.querySelector('.stat-label')?.textContent.trim();
+      const numEl = statEl.querySelector('.stat-num');
+      if (numEl && mapping[label] !== undefined) {
+        numEl.dataset.target = mapping[label];
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching stats:', err);
+  }
 }
 
 function initCounters() {
@@ -357,15 +336,19 @@ function initTabs() {
 /* ─────────────────────────────────
    INIT
 ───────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initNavbar();
   initHamburger();
   initReveal();
-  initCounters();
   initNavSession();
   initCtaSession();
   initChips();
   initSearch();
-  renderJobs('todos');
+  
+  // Cargar datos reales
+  fetchHomeJobs();
+  await fetchStats();
+  initCounters(); // Se inicia después de actualizar data-target
+  
   initTabs();
 });

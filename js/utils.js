@@ -211,8 +211,32 @@ function initDashSidebar() {
   overlay?.addEventListener('click', closeSidebar);
 }
 
-// Cerrar sesion ----
-  function cerrarSesion() {
-    localStorage.removeItem('labuai_session');
+/* ─────────────────────────────────
+   CERRAR SESIÓN
+───────────────────────────────── */
+function cerrarSesion() {
+  localStorage.removeItem('labuai_session');
   window.location.href = 'index.html';
+}
+
+/* ─────────────────────────────────
+   REQUIRE SESSION
+   Llamar al inicio de páginas privadas.
+   Si no hay sesión → redirige a login.
+   Uso: const session = requireSession();
+        if (!session) return;
+───────────────────────────────── */
+function requireSession() {
+  try {
+    const raw = localStorage.getItem('labuai_session');
+    const session = raw ? JSON.parse(raw) : null;
+    if (!session?.token) {
+      window.location.href = 'login.html';
+      return null;
+    }
+    return session;
+  } catch {
+    window.location.href = 'login.html';
+    return null;
+  }
 }

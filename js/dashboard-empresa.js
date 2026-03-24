@@ -561,18 +561,21 @@ function pubResetForm() {
    INIT
 ───────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
-  const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+  // 1. Validar sesión
+  const session = requireSession();
+  if (!session) return;
 
   // Actualizar nombre en sidebar y topbar
   if (session.nombre) {
+    const empresaNombre = session.nombre;
     document.querySelectorAll('.sp-name, .avatar-name').forEach((el) => {
-      el.textContent = session.nombre;
+      el.textContent = empresaNombre;
     });
     document.querySelectorAll('.sp-avatar, .avatar-circle').forEach((el) => {
-      el.textContent = session.nombre.charAt(0).toUpperCase();
+      el.textContent = empresaNombre.charAt(0).toUpperCase();
     });
     const greetEl = document.querySelector('.greeting-title');
-    if (greetEl) greetEl.textContent = `Bienvenido, ${session.nombre} 🏢`;
+    if (greetEl) greetEl.textContent = `Bienvenido, ${empresaNombre} 🏢`;
   }
 
   // Cargar ofertas reales de la empresa
