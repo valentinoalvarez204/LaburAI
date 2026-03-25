@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LaburAI — Detalle de Postulación</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/base.css"/>
+  <link rel="stylesheet" href="css/dashboard-empresa.css"/>
+  <link rel="stylesheet" href="css/candidato-postulacion.css"/>
+</head>
+<body class="is-dashboard">
+
+  <!-- ══ NAVBAR ══ -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
+      <div class="nav-links">
+        <!-- Links dinámicos vía utils.js -->
+      </div>
+      <div class="nav-actions" id="navActions">
+        <!-- Acciones dinámicas vía utils.js -->
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <!-- Menú mobile dinámico vía utils.js -->
+    </div>
+  </nav>
+
+  <!-- ══ LAYOUT ══ -->
+  <div class="dash-layout">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="dash-sidebar" id="dashSidebar">
+      <div class="sidebar-profile">
+        <div class="sp-avatar sp-avatar--empresa" id="sidebarAvatar">?</div>
+        <div class="sp-info">
+          <div class="sp-name" id="sidebarName">Empresa</div>
+          <div class="sp-role">Cuenta empresa · Activa</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
+    </aside>
+
+    <!-- ── MAIN ── -->
+    <main class="dash-main">
+      
+      <!-- Loading Overlay -->
+      <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Cargando detalles de postulación...</p>
+      </div>
+
+      <div class="detail-container hidden" id="detailContent">
+        
+        <!-- Header -->
+        <header class="detail-header">
+          <div class="header-breadcrumb">
+            <a href="dashboard-empresa.html#candidatos" class="btn-back">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              Volver al listado
+            </a>
+            <h1 class="page-title">Detalle de Postulación</h1>
+          </div>
+        </header>
+
+        <div class="detail-grid">
+          
+          <!-- LEFT: Profile & Application Info -->
+          <div class="detail-main">
+            
+            <!-- Candidate Info Card -->
+            <section class="dash-card profile-card">
+              <div class="profile-header">
+                <div id="candInitials" class="profile-avatar">?</div>
+                <div class="profile-id-info">
+                  <h2 id="candFullName" class="profile-name">Cargando...</h2>
+                  <p id="candLocation" class="profile-location">📍 ---</p>
+                  <div class="profile-tags" id="candKeySkills">
+                    <!-- Dynamic skills -->
+                  </div>
+                </div>
+                <div class="profile-actions">
+                  <a id="linkedinBtn" href="#" target="_blank" class="btn-linkedin">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                    LinkedIn
+                  </a>
+                </div>
+              </div>
+              
+              <div class="profile-body">
+                <div class="body-group">
+                  <h3>Sobre el candidato</h3>
+                  <p id="candSummary" class="text-secondary">Cargando análisis de perfil...</p>
+                </div>
+                <div class="body-grid">
+                  <div class="body-group">
+                    <h3>Habilidades técnicas</h3>
+                    <div id="candSkillsList" class="pills-row"></div>
+                  </div>
+                  <div class="body-group">
+                    <h3>Contacto</h3>
+                    <div class="contact-list">
+                      <div class="contact-row">
+                        <span class="contact-icon">✉</span>
+                        <span id="candEmail" class="contact-val">---</span>
+                      </div>
+                      <div class="contact-row">
+                        <span class="contact-icon">📞</span>
+                        <span id="candPhone" class="contact-val">---</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- CV Preview & Carta -->
+            <div class="secondary-grid">
+              
+              <section class="dash-card">
+                <h3 class="card-title-sm">Currículum Vitae</h3>
+                <div class="cv-preview-box" id="cvThumb" onclick="openModal()">
+                   <div class="cv-overlay">
+                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                     <span>Ver pantalla completa</span>
+                   </div>
+                   <div class="cv-static-placeholder">
+                     <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                     </svg>
+                     <p>PDF Document</p>
+                   </div>
+                </div>
+              </section>
+
+              <section class="dash-card">
+                <h3 class="card-title-sm">Carta de Motivación</h3>
+                <div class="motiv-box">
+                  <p id="motivLetter" class="motiv-text">Cargando...</p>
+                </div>
+              </section>
+
+            </div>
+
+          </div>
+
+          <!-- RIGHT: IA Analysis -->
+          <aside class="detail-sidebar">
+            
+            <!-- Relocated Status Dropdown -->
+            <section class="dash-card">
+              <h3 class="card-title-sm" style="margin-bottom: 12px; text-align: center;">Estado de la Postulación</h3>
+              <div class="status-dropdown" id="sd-detail" data-id="detail" data-estado="PENDIENTE" style="width: 100%;">
+                <button class="status-dropdown-btn sd-pendiente" id="sdBtn-detail" onclick="toggleStatusDropdown('detail', event)" style="width: 100%; justify-content: space-between; padding: 10px 14px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="sd-dot" id="sdDot-detail" style="background:#9e9e9e"></span>
+                    <span class="sd-label" id="sdLabel-detail">Pendiente</span>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="status-dropdown-menu" id="sdm-detail" style="width: 100%;">
+                  <button class="sd-option" onclick="handleStatusChange('PENDIENTE')">
+                    <span class="sd-dot" style="background:#9e9e9e"></span> Pendiente
+                  </button>
+                  <button class="sd-option" onclick="handleStatusChange('REVISADA')">
+                    <span class="sd-dot" style="background:#2196f3"></span> Revisada
+                  </button>
+                  <button class="sd-option" onclick="handleStatusChange('ENTREVISTA')">
+                    <span class="sd-dot" style="background:#7c4dff"></span> Entrevista
+                  </button>
+                  <button class="sd-option" onclick="handleStatusChange('RECHAZADA')">
+                    <span class="sd-dot" style="background:#f44336"></span> Rechazada
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section class="dash-card ia-card">
+              <div class="ia-header">
+                <span class="ai-pill-sm">✦ LaburAI Score</span>
+                <div class="score-ring-wrap">
+                   <svg class="score-svg" viewBox="0 0 80 80">
+                     <circle cx="40" cy="40" r="35" class="ss-bg"/>
+                     <circle cx="40" cy="40" r="35" id="iaScoreRing" class="ss-fill"/>
+                   </svg>
+                   <div id="iaScoreValue" class="ss-num">0%</div>
+                </div>
+              </div>
+              
+              <div class="ia-body">
+                <h4 class="ia-title">Análisis de Compatibilidad</h4>
+                <p id="iaAnalysisText" class="ia-desc">Analizando perfil contra la oferta...</p>
+                
+                <div class="ia-points">
+                  <div class="ia-point-group">
+                    <h5>✓ Fortalezas</h5>
+                    <ul id="iaStrengths" class="ia-list ia-list--ok"></ul>
+                  </div>
+                  <div class="ia-point-group">
+                    <h5>⚠ Brechas</h5>
+                    <ul id="iaGaps" class="ia-list ia-list--warn"></ul>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Internal Notes Section -->
+            <section class="dash-card notes-card">
+              <div class="notes-header">
+                <h3 class="card-title-sm">Notas Internas</h3>
+                <span class="notes-pill">Solo visibles para la empresa</span>
+              </div>
+              <textarea id="internalNotes" class="form-input notes-textarea" placeholder="Escribe aquí anotaciones privadas sobre el candidato..."></textarea>
+              <div class="notes-footer">
+                <button class="btn-primary btn-sm" id="saveNotesBtn" onclick="saveInternalNotes()">Guardar notas</button>
+                <span id="notesStatus" class="notes-status-text"></span>
+              </div>
+            </section>
+
+            <!-- Actions -->
+            <div class="sidebar-footer">
+              <button class="btn-primary w-100" onclick="window.print()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                Imprimir reporte
+              </button>
+            </div>
+
+          </aside>
+
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modal CV -->
+  <div id="cvModal" class="modal-cv-overlay">
+    <div class="modal-cv-content">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div class="modal-cv-header">
+        <h3>Currículum de <span id="modalName">...</span></h3>
+        <button class="btn-ghost btn-sm" onclick="window.open(CURRENT_APP.candidato.cvUrl, '_blank')">Abrir en nueva pestaña</button>
+      </div>
+      <div class="modal-cv-body">
+        <div class="cv-fullscreen-placeholder">
+           <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8">
+             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+           </svg>
+           <p>Este es un visor interactivo de currículum.</p>
+           <small>Aquí se visualizaría el archivo PDF cargado por el candidato.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-overlay" id="dashOverlay"></div>
+  
+  <script src="js/utils.js"></script>
+  <script src="js/candidato-postulacion.js"></script>
+</body>
+</html>

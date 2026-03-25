@@ -87,7 +87,7 @@ function initReveal() {
 ───────────────────────────────── */
 function initAvatarDropdown() {
   const menu = document.getElementById('avatarMenu');
-  const dd   = document.getElementById('avatarDropdown');
+  const dd = document.getElementById('avatarDropdown');
   if (!menu || !dd) return;
 
   menu.addEventListener('click', (e) => {
@@ -107,8 +107,8 @@ function showToast(msg, type = 'info') {
 
   const colors = {
     success: { bg: '#E8F5E9', border: '#A5D6A7', color: '#2E7D32' },
-    error:   { bg: '#FFEBEE', border: '#EF9A9A', color: '#C62828' },
-    info:    { bg: '#EEF0FB', border: '#C5CCF0', color: '#3949AB' },
+    error: { bg: '#FFEBEE', border: '#EF9A9A', color: '#C62828' },
+    info: { bg: '#EEF0FB', border: '#C5CCF0', color: '#3949AB' },
   };
   const c = colors[type] || colors.info;
 
@@ -116,32 +116,32 @@ function showToast(msg, type = 'info') {
   toast.id = 'labuai-toast';
   toast.textContent = msg;
   Object.assign(toast.style, {
-    position:    'fixed',
-    bottom:      '28px',
-    left:        '50%',
-    transform:   'translateX(-50%) translateY(10px)',
-    background:  c.bg,
-    border:      `1.5px solid ${c.border}`,
-    color:       c.color,
-    padding:     '12px 24px',
-    borderRadius:'12px',
-    fontSize:    '14px',
-    fontWeight:  '600',
-    fontFamily:  "'DM Sans', sans-serif",
-    boxShadow:   '0 8px 24px rgba(0,0,0,0.1)',
-    zIndex:      '9999',
-    opacity:     '0',
-    transition:  'all .3s ease',
-    whiteSpace:  'nowrap',
+    position: 'fixed',
+    bottom: '28px',
+    left: '50%',
+    transform: 'translateX(-50%) translateY(10px)',
+    background: c.bg,
+    border: `1.5px solid ${c.border}`,
+    color: c.color,
+    padding: '12px 24px',
+    borderRadius: '12px',
+    fontSize: '14px',
+    fontWeight: '600',
+    fontFamily: "'DM Sans', sans-serif",
+    boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+    zIndex: '9999',
+    opacity: '0',
+    transition: 'all .3s ease',
+    whiteSpace: 'nowrap',
   });
 
   document.body.appendChild(toast);
   requestAnimationFrame(() => {
-    toast.style.opacity   = '1';
+    toast.style.opacity = '1';
     toast.style.transform = 'translateX(-50%) translateY(0)';
   });
   setTimeout(() => {
-    toast.style.opacity   = '0';
+    toast.style.opacity = '0';
     toast.style.transform = 'translateX(-50%) translateY(10px)';
     setTimeout(() => toast.remove(), 300);
   }, 3000);
@@ -158,9 +158,9 @@ function animateCounter(el, target, duration = 1800, suffix = '') {
   const startTime = performance.now();
 
   function tick(now) {
-    const elapsed  = now - startTime;
+    const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    const ease     = 1 - Math.pow(2, -10 * progress); // easeOutExpo
+    const ease = 1 - Math.pow(2, -10 * progress); // easeOutExpo
     el.textContent = Math.floor(ease * target).toLocaleString('es-AR') + suffix;
     if (progress < 1) requestAnimationFrame(tick);
   }
@@ -173,7 +173,7 @@ function animateCounterId(id, from, to, duration = 1800, suffix = '') {
   const startTime = performance.now();
 
   function tick(now) {
-    const p    = Math.min((now - startTime) / duration, 1);
+    const p = Math.min((now - startTime) / duration, 1);
     const ease = 1 - Math.pow(2, -10 * p);
     el.textContent = Math.floor(from + ease * (to - from)).toLocaleString('es-AR') + suffix;
     if (p < 1) requestAnimationFrame(tick);
@@ -250,14 +250,14 @@ function initNavSession() {
 
     // 2. Menú Lateral (Mobile)
     if (mobileMenu) {
-      const linksHtml = isEmpresa 
+      const linksHtml = isEmpresa
         ? `<a href="ofertas.html">Ver ofertas</a>
            <a href="dashboard-empresa.html#ofertas">Mis ofertas</a>
            <a href="dashboard-empresa.html">Herramientas para empresas</a>`
         : `<a href="ofertas.html">Buscar empleo</a>
            <a href="dashboard-candidato.html#postulaciones">Mis postulaciones</a>`;
 
-      
+
       mobileMenu.innerHTML = `
         ${linksHtml}
         <hr/>
@@ -327,3 +327,87 @@ function requireSession() {
     return null;
   }
 }
+
+/* ─────────────────────────────────
+   ESTADO DE POSTULACIÓN (Dropdown UI)
+───────────────────────────────── */
+function getStatusColor(estado) {
+  switch (estado) {
+    case 'PENDIENTE': return '#9e9e9e';
+    case 'REVISADA': return '#2196f3';
+    case 'ENTREVISTA': return '#7c4dff';
+    case 'RECHAZADA': return '#f44336';
+    default: return '#9e9e9e';
+  }
+}
+
+function getStatusLabel(estado) {
+  const labels = { PENDIENTE: 'Pendiente', REVISADA: 'Revisada', ENTREVISTA: 'Entrevista', RECHAZADA: 'Rechazada' };
+  return labels[estado] || estado;
+}
+
+/* Abrir / cerrar dropdown de estado */
+window.toggleStatusDropdown = function (id, e) {
+  e.stopPropagation();
+  // Cerrar todos los otros abiertos
+  document.querySelectorAll('.status-dropdown-menu.open').forEach(m => {
+    if (m.id !== `sdm-${id}`) m.classList.remove('open');
+  });
+  document.getElementById(`sdm-${id}`)?.classList.toggle('open');
+};
+
+// Cerrar al clickear fuera
+document.addEventListener('click', () => {
+  document.querySelectorAll('.status-dropdown-menu.open').forEach(m => m.classList.remove('open'));
+});
+
+/* ─────────────────────────────────
+   SIDEBAR NAV CENTRALIZADO
+   Evita duplicar HTML del aside nav en distintas páginas.
+───────────────────────────────── */
+const SIDEBAR_CONFIG = {
+  empresa: [
+    { id: 'overview', label: 'Resumen', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>' },
+    { id: 'ofertas', label: 'Mis ofertas', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>' },
+    { id: 'candidatos', label: 'Candidatos', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' },
+    { id: 'publicar', label: 'Publicar oferta', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>' },
+    { id: 'empresa', label: 'Perfil de empresa', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' }
+  ],
+  candidato: [
+    { id: 'overview', label: 'Resumen', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>' },
+    { id: 'cv', label: 'Mi CV e IA', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' },
+    { id: 'postulaciones', label: 'Postulaciones', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>' },
+    { id: 'recomendadas', label: 'Recomendadas', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' },
+    { id: 'perfil', label: 'Mi perfil', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' }
+  ]
+};
+
+window.renderSidebarNav = function (type, activeSection = 'overview') {
+  const container = document.querySelector('.sidebar-nav');
+  if (!container) return;
+
+  const items = SIDEBAR_CONFIG[type];
+  if (!items) return;
+
+  // Si estamos en un "Dashboard SPA" usamos data-section, 
+  // si estamos en otra pagina (ej candidato-postulacion) usamos href para navegar al dashboard
+  const isDashboardSPA = window.location.pathname.includes(`dashboard-${type}.html`);
+
+  const html = items.map(item => {
+    const isActive = item.id === activeSection ? 'active' : '';
+
+    // Configuración condicional de href vs data-section
+    const linkAttr = isDashboardSPA
+      ? `data-section="${item.id}" href="#" onclick="event.preventDefault()"`
+      : `href="dashboard-${type}.html#${item.id}"`;
+
+    return `
+      <a class="snav-item ${isActive}" ${linkAttr}>
+        ${item.icon}
+        ${item.label}
+      </a>
+    `;
+  }).join('');
+
+  container.innerHTML = html;
+};

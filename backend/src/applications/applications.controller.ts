@@ -34,13 +34,19 @@ export class ApplicationsController {
     return [];
   }
 
-  // PATCH /api/applications/:id/estado — solo empresas autenticadas
-  @Patch(':id/estado')
+  // GET /api/applications/:id
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.applicationsService.findOne(id);
+  }
+
+  // PATCH /api/applications/:id — solo empresas autenticadas
+  @Patch(':id')
   @UseGuards(JwtGuard)
-  updateEstado(
+  update(
     @Param('id') id: string,
-    @Body() body: { estado: 'PENDIENTE' | 'REVISADA' | 'ENTREVISTA' | 'RECHAZADA' },
+    @Body() body: { estado?: 'PENDIENTE' | 'REVISADA' | 'ENTREVISTA' | 'RECHAZADA', notes?: string },
   ) {
-    return this.applicationsService.updateEstado(id, body.estado);
+    return this.applicationsService.update(id, body);
   }
 }

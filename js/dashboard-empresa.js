@@ -3,40 +3,11 @@
 ══════════════════════════════════════════ */
 
 /* ─────────────────────────────────
-   DATOS
+   DATOS — Reactive state (populated from API)
 ───────────────────────────────── */
-const EMPRESA = {
-  nombre: 'Grupo Arcor',
-  iniciales: 'GA',
-};
-
-const OFERTAS_DATA = [
-  { id: 1, title: 'Vendedor/a Senior', area: 'Ventas y Comercial', modalidad: 'Presencial', ubicacion: 'Córdoba', status: 'activa', postulaciones: 34, vistas: 620, dias: 5 },
-  { id: 2, title: 'Administrativo/a Contable', area: 'Administración y RRHH', modalidad: 'Remoto', ubicacion: 'Remoto', status: 'activa', postulaciones: 8, vistas: 310, dias: 3 },
-  { id: 3, title: 'Analista de Marketing', area: 'Diseño y Creatividad', modalidad: 'Híbrido', ubicacion: 'Buenos Aires', status: 'activa', postulaciones: 5, vistas: 190, dias: 1 },
-  { id: 4, title: 'Supervisor/a de Producción', area: 'Construcción e Ing.', modalidad: 'Presencial', ubicacion: 'Villa del Rosario', status: 'cerrada', postulaciones: 22, vistas: 480, dias: 30 },
-  { id: 5, title: 'Promotor/a de Ventas', area: 'Ventas y Comercial', modalidad: 'Presencial', ubicacion: 'Córdoba', status: 'cerrada', postulaciones: 41, vistas: 850, dias: 45 },
-];
-
-const CANDIDATOS_DATA = [
-  { id: 1, rank: 1, nombre: 'Valentina González', iniciales: 'VG', color: 'linear-gradient(135deg,#5C6BC0,#7C4DFF)', ofertaId: 1, oferta: 'Vendedor/a Senior', exp: '5 años · Ventas B2B', match: 97, skills: ['Ventas B2B', 'CRM', 'Negociación'], missing: 0 },
-  { id: 2, rank: 2, nombre: 'Martín Fernández', iniciales: 'MF', color: 'linear-gradient(135deg,#11998E,#38EF7D)', ofertaId: 1, oferta: 'Vendedor/a Senior', exp: '4 años · FMCG', match: 91, skills: ['Canal moderno', 'Retail', 'SAP'], missing: 1 },
-  { id: 3, rank: 3, nombre: 'Carolina Ramos', iniciales: 'CR', color: 'linear-gradient(135deg,#F7971E,#FFD200)', ofertaId: 1, oferta: 'Vendedor/a Senior', exp: '3 años · Consumo masivo', match: 88, skills: ['Negociación', 'Excel', 'B2B'], missing: 2 },
-  { id: 4, rank: 4, nombre: 'Diego Salinas', iniciales: 'DS', color: 'linear-gradient(135deg,#667EEA,#764BA2)', ofertaId: 1, oferta: 'Vendedor/a Senior', exp: '3 años · Retail', match: 84, skills: ['CRM', 'Ventas', 'Canal trad.'], missing: 1 },
-  { id: 5, rank: 5, nombre: 'Lucia Herrera', iniciales: 'LH', color: 'linear-gradient(135deg,#F953C6,#B91D73)', ofertaId: 1, oferta: 'Vendedor/a Senior', exp: '2 años · Ventas', match: 79, skills: ['Ventas', 'Comunicación'], missing: 3 },
-  { id: 6, rank: 1, nombre: 'Tomás Burgos', iniciales: 'TB', color: 'linear-gradient(135deg,#5C6BC0,#7C4DFF)', ofertaId: 2, oferta: 'Administrativo/a Contable', exp: '5 años · SAP FI', match: 94, skills: ['SAP', 'Excel', 'Contabilidad'], missing: 0 },
-  { id: 7, rank: 2, nombre: 'Florencia Ríos', iniciales: 'FR', color: 'linear-gradient(135deg,#11998E,#38EF7D)', ofertaId: 2, oferta: 'Administrativo/a Contable', exp: '3 años · Contable', match: 87, skills: ['Excel', 'AFIP', 'Conciliaciones'], missing: 1 },
-  { id: 8, rank: 1, nombre: 'Ignacio Vega', iniciales: 'IV', color: 'linear-gradient(135deg,#F7971E,#FFD200)', ofertaId: 3, oferta: 'Analista de Marketing', exp: '4 años · Mktg digital', match: 92, skills: ['Meta Ads', 'Canva', 'Analytics'], missing: 0 },
-];
-
-const ACTIVIDAD = [
-  { icon: '👤', type: 'postul', text: '<strong>Valentina González</strong> se postuló a Vendedor/a Senior', time: 'hace 12 min' },
-  { icon: '👤', type: 'postul', text: '<strong>Diego Salinas</strong> se postuló a Vendedor/a Senior', time: 'hace 1h' },
-  { icon: '✓', type: 'ok', text: 'La IA analizó <strong>5 nuevos CVs</strong> de la oferta Vendedor/a Senior', time: 'hace 2h' },
-  { icon: '👤', type: 'postul', text: '<strong>Tomás Burgos</strong> se postuló a Administrativo/a Contable', time: 'hace 3h' },
-  { icon: '⭐', type: 'revisar', text: '<strong>Martín Fernández</strong> actualizó su CV — match subió de 85% a 91%', time: 'hace 5h' },
-  { icon: '✓', type: 'ok', text: 'LaburAI sugirió <strong>3 candidatos destacados</strong> para Analista de Marketing', time: 'ayer' },
-];
+let EMPRESA = { nombre: '', iniciales: '' };
+let OFERTAS_DATA = [];
+let CANDIDATOS_DATA = [];
 
 /* ─────────────────────────────────
    NAVEGACIÓN
@@ -63,9 +34,17 @@ function switchSection(id) {
 }
 
 function initNav() {
-  // Sidebar nav
-  document.querySelectorAll('.snav-item[data-section]').forEach((item) => {
-    item.addEventListener('click', (e) => { e.preventDefault(); switchSection(item.dataset.section); });
+  renderSidebarNav('empresa', 'overview');
+
+  // Sidebar nav (Event Delegation)
+  document.addEventListener('click', (e) => {
+    const item = e.target.closest('.snav-item');
+    if (!item) return;
+    
+    if (item.dataset.section) {
+      e.preventDefault();
+      switchSection(item.dataset.section);
+    }
   });
 
   // Interceptar clics en links del navbar para navegación interna (SPA)
@@ -259,12 +238,18 @@ function renderCandidatos(ofertaId = 'todas') {
   const el = document.getElementById('candidatosList');
   if (!el) return;
 
-  const list = ofertaId === 'todas'
+  const statusFilter = document.getElementById('filterStatus')?.value || 'todos';
+
+  let list = ofertaId === 'todas'
     ? CANDIDATOS_DATA
     : CANDIDATOS_DATA.filter((c) => String(c.ofertaId) === String(ofertaId));
 
+  if (statusFilter !== 'todos') {
+    list = list.filter((c) => c.estado === statusFilter);
+  }
+
   if (!list.length) {
-    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-size:14px">No hay candidatos para esta oferta.</div>';
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text3);font-size:14px">No hay candidatos ${statusFilter !== 'todos' ? 'con estado ' + statusFilter.toLowerCase() : ''} para esta oferta.</div>`;
     return;
   }
 
@@ -277,14 +262,19 @@ function renderCandidatos(ofertaId = 'todas') {
     const missing = c.missing > 0 ? `<div class="cand-missing">Faltan ${c.missing} habilidad${c.missing > 1 ? 'es' : ''}</div>` : '';
     const circ = 2 * Math.PI * 24;
     const offset = circ * (1 - c.match / 100);
+    const statusColors = { PENDIENTE: '#9e9e9e', REVISADA: 'var(--indigo)', ENTREVISTA: 'var(--violet)', RECHAZADA: '#E53935' };
+    const borderColor = statusColors[c.estado] || '#e4e8f0';
 
     return `
-      <div class="cand-card" data-id="${c.id}">
+      <div class="cand-card" data-id="${c.id}" style="border-left-color: ${borderColor}">
         ${missing}
         <div class="cand-rank ${rankCls}">#${i + 1}</div>
         <div class="cand-av" style="background:${c.color}">${c.iniciales}</div>
         <div class="cand-info">
-          <div class="cand-name">${c.nombre}</div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <div class="cand-name" style="margin-bottom:0">${c.nombre}</div>
+            <span class="cand-status-pill cand-status-pill--${c.estado.toLowerCase()}">${c.estado}</span>
+          </div>
           <div class="cand-meta">${c.exp} · ${c.oferta}</div>
           <div class="cand-skills">${skills}</div>
         </div>
@@ -300,9 +290,22 @@ function renderCandidatos(ofertaId = 'todas') {
           </div>
           <div class="cand-score-label">compatibilidad</div>
         </div>
-        <div class="cand-actions">
-          <button class="cand-btn cand-btn--primary" onclick="agendarEntrevista(${c.id})">Agendar entrevista</button>
-          <button class="cand-btn" onclick="verPerfil(${c.id})">Ver perfil</button>
+        <div class="cand-actions" style="flex-direction: row; gap: 8px; align-items: center;">
+          <div class="status-dropdown" id="sd-${c.id}" data-id="${c.id}" data-estado="${c.estado}">
+            <button class="status-dropdown-btn sd-${c.estado.toLowerCase()}" onclick="toggleStatusDropdown('${c.id}', event)">
+              <span class="sd-dot" style="background:${getStatusColor(c.estado)}"></span>
+              <span class="sd-label">${getStatusLabel(c.estado)}</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="status-dropdown-menu" id="sdm-${c.id}">
+              ${['PENDIENTE','REVISADA','ENTREVISTA','RECHAZADA'].map(s => `
+                <button class="sd-option ${s === c.estado ? 'sd-option--active' : ''}" onclick="cambiarEstadoPostulacion('${c.id}', '${s}')">
+                  <span class="sd-dot" style="background:${getStatusColor(s)}"></span>
+                  ${getStatusLabel(s)}
+                </button>`).join('')}
+            </div>
+          </div>
+          <a href="candidato-postulacion.html?id=${c.id}" class="cand-btn" style="padding: 7px 12px; font-size: 11px;">Ver detalle</a>
         </div>
       </div>`;
   }).join('');
@@ -330,65 +333,87 @@ function initSelectOferta() {
   });
 }
 
+function initFilterStatus() {
+  document.getElementById('filterStatus')?.addEventListener('change', () => {
+    renderCandidatos(document.getElementById('selectOferta')?.value || 'todas');
+  });
+}
+
+/* Lógica de colores y dropdown de estado movida a utils.js */
+
 /* ─────────────────────────────────
    ACCIONES
 ───────────────────────────────── */
-window.agendarEntrevista = async function(id) {
-  const c = CANDIDATOS_DATA.find((x) => x.id === id);
-  if (!c) return;
+window.cambiarEstadoPostulacion = async function (id, nuevoEstado) {
+  const c = CANDIDATOS_DATA.find((x) => String(x.id) === String(id));
+  if (!c || c.estado === nuevoEstado) return;
 
-  const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+  document.getElementById(`sdm-${id}`)?.classList.remove('open');
+
+  if (nuevoEstado === 'ENTREVISTA' || nuevoEstado === 'RECHAZADA') {
+    const msg = nuevoEstado === 'ENTREVISTA'
+      ? `¿Agendar entrevista con ${c.nombre}?`
+      : `¿Rechazar la postulación de ${c.nombre}?`;
+    if (!confirm(msg)) return;
+  }
+
+  const btn = document.querySelector(`#sd-${id} .status-dropdown-btn`);
+  if (btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'not-allowed';
+    btn.querySelector('.sd-label').textContent = 'Guardando...';
+  }
 
   try {
-    // c.id ES el id de la postulación (lo guardamos así en el DOMContentLoaded)
-    const res = await fetch(`http://localhost:3000/api/applications/${c.id}/estado`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.token}`,
-      },
-      body: JSON.stringify({ estado: 'ENTREVISTA' }),
-    });
-
-    if (res.ok) {
-      showToast(`✓ Entrevista agendada con ${c.nombre}`, 'success');
-      const card = document.querySelector(`.cand-card[data-id="${id}"]`);
-      if (card) {
-        const btn = card.querySelector('.cand-btn--primary');
-        if (btn) { btn.textContent = '✓ Entrevista agendada'; btn.disabled = true; }
-      }
-    } else {
-      showToast('Error al agendar entrevista', 'error');
+    await API.patchPostulacion(id, { estado: nuevoEstado });
+    c.estado = nuevoEstado;
+    showToast(`✓ ${c.nombre} → ${getStatusLabel(nuevoEstado)}`, 'success');
+    updateStatusDropdownUI(id, nuevoEstado);
+    const filtro = document.getElementById('filterStatus')?.value || 'todos';
+    if (filtro !== 'todos') {
+      renderCandidatos(document.getElementById('selectOferta')?.value || 'todas');
     }
   } catch (err) {
-    showToast('No se pudo conectar con el servidor', 'error');
+    console.error('[Dashboard] Error cambiando estado:', err.message);
+    showToast(err.message || 'Error al actualizar el estado', 'error');
+    updateStatusDropdownUI(id, c.estado);
   }
 };
-window.verPerfil = function(id) {
-  const c = CANDIDATOS_DATA.find((x) => x.id === id);
-  if (!c) return;
-  showToast(`${c.nombre} · ${c.oferta} · ${c.exp}`, 'info');
-};
 
-window.cerrarOferta = async function(ofertaId, btn) {
-  const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
-  if (!confirm('¿Seguro que querés cerrar esta oferta?')) return;
+
+/* Actualiza la UI del dropdown SIN re-renderizar la lista completa */
+function updateStatusDropdownUI(id, estado) {
+  const wrapper = document.getElementById(`sd-${id}`);
+  if (!wrapper) return;
+  const btn = wrapper.querySelector('.status-dropdown-btn');
+  if (btn) {
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.cursor = '';
+    // Reemplazar clases de color
+    btn.className = `status-dropdown-btn sd-${estado.toLowerCase()}`;
+    btn.querySelector('.sd-dot').style.background = getStatusColor(estado);
+    btn.querySelector('.sd-label').textContent = getStatusLabel(estado);
+  }
+  // Marcar opción activa
+  wrapper.querySelectorAll('.sd-option').forEach(opt => {
+    opt.classList.toggle('sd-option--active', opt.textContent.trim() === getStatusLabel(estado));
+  });
+  wrapper.dataset.estado = estado;
+}
+
+window.cerrarOferta = async function (ofertaId, btn) {
+  if (!confirm('¿Segúros que querés cerrar esta oferta?')) return;
   try {
-    const res = await fetch(`http://localhost:3000/api/jobs/${ofertaId}/cerrar`, {
-      method: 'PATCH',
-      headers: { 'Authorization': `Bearer ${session.token}` },
-    });
-    if (res.ok) {
-      showToast('Oferta cerrada correctamente', 'success');
-      // Actualizar en el array local
-      const oferta = OFERTAS_DATA.find((o) => o.id === ofertaId);
-      if (oferta) oferta.status = 'cerrada';
-      renderOfertas(document.querySelector('.otab.active')?.dataset.of || 'todas');
-    } else {
-      showToast('Error al cerrar la oferta', 'error');
-    }
+    await API.cerrarOferta(ofertaId);
+    showToast('Oferta cerrada correctamente', 'success');
+    const oferta = OFERTAS_DATA.find((o) => o.id === ofertaId);
+    if (oferta) oferta.status = 'cerrada';
+    renderOfertas(document.querySelector('.otab.active')?.dataset.of || 'todas');
   } catch (err) {
-    showToast('No se pudo conectar con el servidor', 'error');
+    console.error('[Dashboard] Error cerrando oferta:', err.message);
+    showToast('Error al cerrar la oferta', 'error');
   }
 };
 
@@ -564,6 +589,12 @@ function animateCounterId(id, from, to, dur) {
   requestAnimationFrame(t);
 }
 
+function animateCounterEl(el, from, to, dur) {
+  if (!el) return;
+  const s = performance.now();
+  function t(n) { const p = Math.min((n - s) / dur, 1); el.textContent = Math.floor(from + (1 - Math.pow(2, -10 * p)) * (to - from)).toLocaleString('es-AR'); if (p < 1) requestAnimationFrame(t); }
+  requestAnimationFrame(t);
+}
 function pubResetForm() {
   Object.assign(pubState, { titulo: '', rubro: '', modalidad: 'Presencial', ubicacion: '', jornada: 'Full time', desc: '', skills: [], resp: [], benef: [], salMin: '', salMax: '', salNeg: false, salConf: false });
   ['pub-titulo', 'pub-ubicacion', 'pub-desc', 'pub-sal-min', 'pub-sal-max'].forEach((id) => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -577,110 +608,102 @@ function pubResetForm() {
    INIT
 ───────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
-  // 0. Manejar sección desde la URL (ej: ?section=perfil o #perfil) inmediatamente para evitar saltos
+  // 0. Manejar sección inicial desde URL/hash
   const params = new URLSearchParams(window.location.search);
   const hash = window.location.hash.substring(1);
   const initialSection = params.get('section') || hash || 'overview';
-  if (SECTIONS.includes(initialSection)) {
-    switchSection(initialSection);
-  }
+  if (SECTIONS.includes(initialSection)) switchSection(initialSection);
 
   // 1. Validar sesión
   const session = requireSession();
   if (!session) return;
 
-  // Actualizar nombre en sidebar y topbar
+  // 2. Actualizar UI con datos de sesión
   if (session.nombre) {
-    const empresaNombre = session.nombre;
-    document.querySelectorAll('.sp-name, .avatar-name').forEach((el) => {
-      el.textContent = empresaNombre;
-    });
-    document.querySelectorAll('.sp-avatar, .avatar-circle').forEach((el) => {
-      el.textContent = empresaNombre.charAt(0).toUpperCase();
-    });
+    EMPRESA.nombre = session.nombre;
+    EMPRESA.iniciales = session.nombre.charAt(0).toUpperCase();
+    document.querySelectorAll('.sp-name, .avatar-name').forEach((el) => el.textContent = session.nombre);
+    document.querySelectorAll('.sp-avatar, .avatar-circle').forEach((el) => el.textContent = EMPRESA.iniciales);
     const greetEl = document.querySelector('.greeting-title');
-    if (greetEl) greetEl.textContent = `Bienvenido, ${empresaNombre} 🏢`;
+    if (greetEl) greetEl.textContent = `Bienvenido, ${session.nombre} 🏢`;
   }
 
-  // Cargar ofertas reales de la empresa
+  // 3. Cargar datos desde la API
   if (session.empresaId) {
     try {
-      const res      = await fetch(`http://localhost:3000/api/jobs?empresaId=${session.empresaId}`);
-      const misOfertas = await res.json();
+      const misOfertas = await API.getOfertas({ empresaId: session.empresaId });
 
-      if (misOfertas.length) {
-        OFERTAS_DATA.length = 0;
-        misOfertas.forEach((j) => {
-          OFERTAS_DATA.push({
-            id:           j.id,
-            title:        j.titulo,
-            area:         j.rubro,
-            modalidad:    j.modalidad,
-            ubicacion:    j.ubicacion,
-            status:       j.activa ? 'activa' : 'cerrada',
-            postulaciones: j.postulaciones?.length || 0,
-            vistas:       0,
-            dias:         Math.floor((Date.now() - new Date(j.creadoEn)) / 86400000),
-          });
-        });
+      OFERTAS_DATA.length = 0;
+      misOfertas.forEach((j) => OFERTAS_DATA.push({
+        id: j.id,
+        title: j.titulo,
+        area: j.rubro,
+        modalidad: j.modalidad,
+        ubicacion: j.ubicacion,
+        status: j.activa ? 'activa' : 'cerrada',
+        postulaciones: j.postulaciones?.length || 0,
+        vistas: 0,
+        dias: Math.floor((Date.now() - new Date(j.creadoEn)) / 86400000),
+      }));
 
-        // Badge ofertas en sidebar
-        const badge = document.querySelector('.snav-item[data-section="ofertas"] .snav-badge');
-        if (badge) badge.textContent = OFERTAS_DATA.filter((o) => o.status === 'activa').length;
+      const badgeOfertas = document.querySelector('.snav-item[data-section="ofertas"] .snav-badge');
+      if (badgeOfertas) badgeOfertas.textContent = OFERTAS_DATA.filter((o) => o.status === 'activa').length;
 
-        // Actualizar stats del resumen con datos reales
-        const totalPostulaciones = OFERTAS_DATA.reduce((acc, o) => acc + o.postulaciones, 0);
-        const totalActivas       = OFERTAS_DATA.filter((o) => o.status === 'activa').length;
-        const greetSub = document.querySelector('.greeting-sub');
-        if (greetSub) greetSub.innerHTML = `Tenés <strong>${totalPostulaciones} postulaciones nuevas</strong> y <strong>${totalActivas} ofertas activas</strong> publicadas.`;
+      // Cargar candidatos de todas las ofertas en paralelo
+      CANDIDATOS_DATA.length = 0;
+      const resultados = await Promise.all(
+        misOfertas.map((o) =>
+          API.getPostulaciones({ ofertaId: o.id })
+            .then((p) => ({ oferta: o, postulaciones: p }))
+            .catch((err) => {
+              console.error(`[Dashboard] Error cargando candidatos oferta ${o.id}:`, err.message);
+              return { oferta: o, postulaciones: [] };
+            })
+        )
+      );
 
-        // Cargar candidatos de TODAS las ofertas
-        CANDIDATOS_DATA.length = 0;
-        for (const oferta of misOfertas) {
-          try {
-            const candRes  = await fetch(`http://localhost:3000/api/applications?ofertaId=${oferta.id}`);
-            const candData = await candRes.json();
-            if (candRes.ok && Array.isArray(candData)) {
-              candData.forEach((p) => {
-                CANDIDATOS_DATA.push({
-                  id:        p.id,
-                  rank:      CANDIDATOS_DATA.length + 1,
-                  nombre:    `${p.candidato?.nombre || 'Candidato'} ${p.candidato?.apellido || ''}`.trim(),
-                  iniciales: (p.candidato?.nombre?.charAt(0) || 'C') + (p.candidato?.apellido?.charAt(0) || ''),
-                  color:     'linear-gradient(135deg,#5C6BC0,#7C4DFF)',
-                  ofertaId:  p.ofertaId,
-                  oferta:    oferta.titulo,
-                  exp:       p.candidato?.habilidades?.join(', ') || 'Sin datos',
-                  match:     p.matchIA || 0,
-                  skills:    p.candidato?.habilidades?.slice(0, 3) || [],
-                  missing:   0,
-                });
-              });
-            }
-          } catch (err) {
-            console.error('Error cargando candidatos:', err);
-          }
-        }
+      resultados.forEach(({ oferta, postulaciones }) => {
+        postulaciones.forEach((p) => CANDIDATOS_DATA.push({
+          id: p.id,
+          nombre: `${p.candidato?.nombre || 'Candidato'} ${p.candidato?.apellido || ''}`.trim(),
+          iniciales: (p.candidato?.nombre?.charAt(0) || 'C') + (p.candidato?.apellido?.charAt(0) || ''),
+          color: 'linear-gradient(135deg,#5C6BC0,#7C4DFF)',
+          ofertaId: p.ofertaId,
+          oferta: oferta.titulo,
+          exp: p.candidato?.habilidades?.join(', ') || 'Sin datos',
+          match: p.matchIA || 0,
+          skills: p.candidato?.habilidades?.slice(0, 3) || [],
+          missing: 0,
+          estado: p.estado,
+        }));
+      });
 
-        // Badge candidatos en sidebar
-        const candBadge = document.querySelector('.snav-item[data-section="candidatos"] .snav-badge');
-        if (candBadge) candBadge.textContent = CANDIDATOS_DATA.length;
+      const badgeCand = document.querySelector('.snav-item[data-section="candidatos"] .snav-badge');
+      if (badgeCand) badgeCand.textContent = CANDIDATOS_DATA.length;
 
-        // Actualizar selector de ofertas con datos reales
-        const selectOferta = document.getElementById('selectOferta');
-        if (selectOferta) {
-          selectOferta.innerHTML =
-            `<option value="todas">Todas las ofertas (${CANDIDATOS_DATA.length})</option>` +
-            misOfertas.map((o) => {
-              const cant = CANDIDATOS_DATA.filter((c) => c.ofertaId === o.id).length;
-              return `<option value="${o.id}">${o.titulo} (${cant})</option>`;
-            }).join('');
-        }
+      const selectOferta = document.getElementById('selectOferta');
+      if (selectOferta) {
+        selectOferta.innerHTML =
+          `<option value="todas">Todas las ofertas (${CANDIDATOS_DATA.length})</option>` +
+          misOfertas.map((o) => {
+            const cant = CANDIDATOS_DATA.filter((c) => c.ofertaId === o.id).length;
+            return `<option value="${o.id}">${o.titulo} (${cant})</option>`;
+          }).join('');
       }
-
     } catch (err) {
-      console.error('Error cargando datos de empresa:', err);
+      console.error('[Dashboard] Error cargando datos de empresa:', err.message);
     }
+
+    // Stats en paralelo — no bloquean el render principal
+    API.getStatsEmpresa(session.empresaId)
+      .then((stats) => {
+        const greetSub = document.querySelector('.greeting-sub');
+        if (greetSub) greetSub.innerHTML = `Tenés <strong>${stats.totalPostulaciones} postulaciones nuevas</strong> y <strong>${stats.ofertasActivas} ofertas activas</strong> publicadas.`;
+        const statEls = document.querySelectorAll('.dstat-num');
+        const vals = [stats.ofertasActivas, stats.totalPostulaciones, stats.entrevistas ?? 0, 1240];
+        statEls.forEach((el, i) => { if (vals[i] !== undefined) animateCounterEl(el, 0, vals[i], 900); });
+      })
+      .catch((err) => console.error('[Dashboard] Error cargando stats empresa:', err.message));
   }
 
   injectGradient();
@@ -694,8 +717,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initNav();
   initOfertasTabs();
   initSelectOferta();
-  initPublicarForm();
-
-  // Remove redundant section handling at the end
+  initFilterStatus();
   initPublicarForm();
 });

@@ -44,30 +44,7 @@
         </div>
       </div>
 
-      <nav class="sidebar-nav">
-        <a href="#" class="snav-item active" data-section="overview">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Resumen
-        </a>
-        <a href="#" class="snav-item" data-section="cv">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Mi CV e IA
-        </a>
-        <a href="#" class="snav-item" data-section="postulaciones">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
-          Postulaciones
-          <span class="snav-badge">3</span>
-        </a>
-        <a href="#" class="snav-item" data-section="recomendadas">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          Recomendadas
-          <span class="snav-badge snav-badge--new">12</span>
-        </a>
-        <a href="#" class="snav-item" data-section="perfil">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Mi perfil
-        </a>
-      </nav>
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
 
       <div class="sidebar-cv-status">
         <div class="cvs-label">Completud del perfil</div>
@@ -371,6 +348,7 @@
   <div class="dash-overlay" id="dashOverlay"></div>
 
   <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/dashboard-candidato.js"></script>
 </body>
 </html>

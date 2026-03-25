@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class ApplicationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // Postularse a una oferta
   async create(data: {
@@ -32,8 +32,9 @@ export class ApplicationsService {
     return this.prisma.postulacion.create({
       data: {
         candidatoId: data.candidatoId,
-        ofertaId:    data.ofertaId,
+        ofertaId: data.ofertaId,
         cartaMotivacion: data.cartaMotivacion,
+        estado: 'PENDIENTE', // siempre forzado al crear
       },
       include: {
         oferta: {
@@ -78,11 +79,32 @@ export class ApplicationsService {
     });
   }
 
-  // Cambiar estado de una postulación (para empresas)
-  async updateEstado(id: string, estado: 'PENDIENTE' | 'REVISADA' | 'ENTREVISTA' | 'RECHAZADA') {
+  // Actualizar una postulación (estado o notes)
+  async update(id: string, data: { estado?: 'PENDIENTE' | 'REVISADA' | 'ENTREVISTA' | 'RECHAZADA', notes?: string }) {
     return this.prisma.postulacion.update({
       where: { id },
-      data: { estado },
+      data,
     });
+  }
+
+  // Ver una postulación específica
+  async findOne(id: string) {
+    const postulacion = await this.prisma.postulacion.findUnique({
+      where: { id },
+      include: {
+        candidato: {
+          include: {
+            usuario: { select: { email: true } }
+          }
+        },
+        oferta: {
+          include: {
+            empresa: { select: { nombre: true, id: true } }
+          }
+        }
+      }
+    });
+    if (!postulacion) throw new NotFoundException('Postulación no encontrada');
+    return postulacion;
   }
 }

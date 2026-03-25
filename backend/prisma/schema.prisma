@@ -89,6 +89,7 @@ model Postulacion {
   cartaMotivacion String?
   matchIA         Int?
   creadoEn        DateTime @default(now())
+  notes           String?
 
   candidatoId     String
   candidato       Candidato @relation(fields: [candidatoId], references: [id])
