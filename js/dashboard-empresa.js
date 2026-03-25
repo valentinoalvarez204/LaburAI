@@ -259,12 +259,18 @@ function renderCandidatos(ofertaId = 'todas') {
   const el = document.getElementById('candidatosList');
   if (!el) return;
 
-  const list = ofertaId === 'todas'
+  const statusFilter = document.getElementById('filterStatus')?.value || 'todos';
+
+  let list = ofertaId === 'todas'
     ? CANDIDATOS_DATA
     : CANDIDATOS_DATA.filter((c) => String(c.ofertaId) === String(ofertaId));
 
+  if (statusFilter !== 'todos') {
+    list = list.filter((c) => c.estado === statusFilter);
+  }
+
   if (!list.length) {
-    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-size:14px">No hay candidatos para esta oferta.</div>';
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text3);font-size:14px">No hay candidatos ${statusFilter !== 'todos' ? 'con estado ' + statusFilter.toLowerCase() : ''} para esta oferta.</div>`;
     return;
   }
 
@@ -300,9 +306,15 @@ function renderCandidatos(ofertaId = 'todas') {
           </div>
           <div class="cand-score-label">compatibilidad</div>
         </div>
-        <div class="cand-actions">
-          <button class="cand-btn cand-btn--primary" onclick="agendarEntrevista(${c.id})">Agendar entrevista</button>
-          <button class="cand-btn" onclick="verPerfil(${c.id})">Ver perfil</button>
+        <div class="cand-actions" style="flex-direction: row; gap: 8px; align-items: center;">
+          <div class="status-indicator" style="width: 8px; height: 8px; border-radius: 50%; background: ${getStatusColor(c.estado)}"></div>
+          <select class="form-select" style="font-size: 11px; padding: 4px 8px; width: auto; height: auto; min-width: 110px; border-color: ${getStatusColor(c.estado)}22; background-color: ${getStatusColor(c.estado)}08;" onchange="cambiarEstadoPostulacion('${c.id}', this)">
+            <option value="PENDIENTE" ${c.estado === 'PENDIENTE' ? 'selected' : ''}>Pendiente</option>
+            <option value="REVISADA" ${c.estado === 'REVISADA' ? 'selected' : ''}>Revisada</option>
+            <option value="ENTREVISTA" ${c.estado === 'ENTREVISTA' ? 'selected' : ''}>Entrevista</option>
+            <option value="RECHAZADA" ${c.estado === 'RECHAZADA' ? 'selected' : ''}>Rechazada</option>
+          </select>
+          <a href="candidato-postulacion.html?id=${c.id}" class="cand-btn" style="padding: 7px 12px; font-size: 11px;">Ver detalle</a>
         </div>
       </div>`;
   }).join('');
@@ -330,47 +342,73 @@ function initSelectOferta() {
   });
 }
 
+function initFilterStatus() {
+  document.getElementById('filterStatus')?.addEventListener('change', () => {
+    renderCandidatos(document.getElementById('selectOferta')?.value || 'todas');
+  });
+}
+
+function getStatusColor(estado) {
+  switch (estado) {
+    case 'PENDIENTE': return '#9e9e9e'; // Gris
+    case 'REVISADA': return '#2196f3';  // Azul
+    case 'ENTREVISTA': return '#7c4dff'; // Violeta
+    case 'RECHAZADA': return '#f44336'; // Rojo
+    default: return '#9e9e9e';
+  }
+}
+
 /* ─────────────────────────────────
    ACCIONES
 ───────────────────────────────── */
-window.agendarEntrevista = async function(id) {
-  const c = CANDIDATOS_DATA.find((x) => x.id === id);
+window.cambiarEstadoPostulacion = async function (id, el) {
+  const nuevoEstado = el.value;
+  const c = CANDIDATOS_DATA.find((x) => String(x.id) === String(id));
   if (!c) return;
 
+  // Confirmación para estados críticos
+  if (nuevoEstado === 'ENTREVISTA' || nuevoEstado === 'RECHAZADA') {
+    const confirmMsg = nuevoEstado === 'ENTREVISTA'
+      ? `¿Estás seguro de que deseas agendar una entrevista con ${c.nombre}?`
+      : `¿Estás seguro de que deseas rechazar la postulación de ${c.nombre}?`;
+
+    if (!confirm(confirmMsg)) {
+      el.value = c.estado;
+      return;
+    }
+  }
+
   const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+  el.disabled = true;
 
   try {
-    // c.id ES el id de la postulación (lo guardamos así en el DOMContentLoaded)
-    const res = await fetch(`http://localhost:3000/api/applications/${c.id}/estado`, {
+    const res = await fetch(`http://localhost:3000/api/applications/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${session.token}`,
       },
-      body: JSON.stringify({ estado: 'ENTREVISTA' }),
+      body: JSON.stringify({ estado: nuevoEstado }),
     });
 
     if (res.ok) {
-      showToast(`✓ Entrevista agendada con ${c.nombre}`, 'success');
-      const card = document.querySelector(`.cand-card[data-id="${id}"]`);
-      if (card) {
-        const btn = card.querySelector('.cand-btn--primary');
-        if (btn) { btn.textContent = '✓ Entrevista agendada'; btn.disabled = true; }
-      }
+      showToast(`Postulación de ${c.nombre} marcada como ${nuevoEstado}`, 'success');
+      c.estado = nuevoEstado;
+      renderCandidatos(document.getElementById('selectOferta')?.value || 'todas');
     } else {
-      showToast('Error al agendar entrevista', 'error');
+      showToast('Error al actualizar el estado', 'error');
+      el.value = c.estado;
     }
   } catch (err) {
+    console.error('Error:', err);
     showToast('No se pudo conectar con el servidor', 'error');
+    el.value = c.estado;
+  } finally {
+    el.disabled = false;
   }
 };
-window.verPerfil = function(id) {
-  const c = CANDIDATOS_DATA.find((x) => x.id === id);
-  if (!c) return;
-  showToast(`${c.nombre} · ${c.oferta} · ${c.exp}`, 'info');
-};
 
-window.cerrarOferta = async function(ofertaId, btn) {
+window.cerrarOferta = async function (ofertaId, btn) {
   const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
   if (!confirm('¿Seguro que querés cerrar esta oferta?')) return;
   try {
@@ -605,22 +643,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Cargar ofertas reales de la empresa
   if (session.empresaId) {
     try {
-      const res      = await fetch(`http://localhost:3000/api/jobs?empresaId=${session.empresaId}`);
+      const res = await fetch(`http://localhost:3000/api/jobs?empresaId=${session.empresaId}`);
       const misOfertas = await res.json();
 
       if (misOfertas.length) {
         OFERTAS_DATA.length = 0;
         misOfertas.forEach((j) => {
           OFERTAS_DATA.push({
-            id:           j.id,
-            title:        j.titulo,
-            area:         j.rubro,
-            modalidad:    j.modalidad,
-            ubicacion:    j.ubicacion,
-            status:       j.activa ? 'activa' : 'cerrada',
+            id: j.id,
+            title: j.titulo,
+            area: j.rubro,
+            modalidad: j.modalidad,
+            ubicacion: j.ubicacion,
+            status: j.activa ? 'activa' : 'cerrada',
             postulaciones: j.postulaciones?.length || 0,
-            vistas:       0,
-            dias:         Math.floor((Date.now() - new Date(j.creadoEn)) / 86400000),
+            vistas: 0,
+            dias: Math.floor((Date.now() - new Date(j.creadoEn)) / 86400000),
           });
         });
 
@@ -630,7 +668,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Actualizar stats del resumen con datos reales
         const totalPostulaciones = OFERTAS_DATA.reduce((acc, o) => acc + o.postulaciones, 0);
-        const totalActivas       = OFERTAS_DATA.filter((o) => o.status === 'activa').length;
+        const totalActivas = OFERTAS_DATA.filter((o) => o.status === 'activa').length;
         const greetSub = document.querySelector('.greeting-sub');
         if (greetSub) greetSub.innerHTML = `Tenés <strong>${totalPostulaciones} postulaciones nuevas</strong> y <strong>${totalActivas} ofertas activas</strong> publicadas.`;
 
@@ -638,22 +676,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         CANDIDATOS_DATA.length = 0;
         for (const oferta of misOfertas) {
           try {
-            const candRes  = await fetch(`http://localhost:3000/api/applications?ofertaId=${oferta.id}`);
+            const candRes = await fetch(`http://localhost:3000/api/applications?ofertaId=${oferta.id}`);
             const candData = await candRes.json();
             if (candRes.ok && Array.isArray(candData)) {
               candData.forEach((p) => {
                 CANDIDATOS_DATA.push({
-                  id:        p.id,
-                  rank:      CANDIDATOS_DATA.length + 1,
-                  nombre:    `${p.candidato?.nombre || 'Candidato'} ${p.candidato?.apellido || ''}`.trim(),
+                  id: p.id,
+                  rank: CANDIDATOS_DATA.length + 1,
+                  nombre: `${p.candidato?.nombre || 'Candidato'} ${p.candidato?.apellido || ''}`.trim(),
                   iniciales: (p.candidato?.nombre?.charAt(0) || 'C') + (p.candidato?.apellido?.charAt(0) || ''),
-                  color:     'linear-gradient(135deg,#5C6BC0,#7C4DFF)',
-                  ofertaId:  p.ofertaId,
-                  oferta:    oferta.titulo,
-                  exp:       p.candidato?.habilidades?.join(', ') || 'Sin datos',
-                  match:     p.matchIA || 0,
-                  skills:    p.candidato?.habilidades?.slice(0, 3) || [],
-                  missing:   0,
+                  color: 'linear-gradient(135deg,#5C6BC0,#7C4DFF)',
+                  ofertaId: p.ofertaId,
+                  oferta: oferta.titulo,
+                  exp: p.candidato?.habilidades?.join(', ') || 'Sin datos',
+                  match: p.matchIA || 0,
+                  skills: p.candidato?.habilidades?.slice(0, 3) || [],
+                  missing: 0,
+                  estado: p.estado,
                 });
               });
             }
@@ -694,8 +733,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initNav();
   initOfertasTabs();
   initSelectOferta();
-  initPublicarForm();
-
-  // Remove redundant section handling at the end
+  initFilterStatus();
   initPublicarForm();
 });

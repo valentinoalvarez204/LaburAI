@@ -181,15 +181,24 @@
           </div>
         </div>
 
-        <!-- Filtro por oferta -->
-        <div class="candidatos-filter">
-          <label class="form-label">Filtrar por oferta</label>
-          <select class="form-select cand-select" id="selectOferta" style="max-width:320px">
-            <option value="todas">Todas las ofertas (47)</option>
-            <option value="1">Vendedor/a Senior · Córdoba (34)</option>
-            <option value="2">Administrativo/a Contable · Remoto (8)</option>
-            <option value="3">Analista de Marketing · Buenos Aires (5)</option>
-          </select>
+        <!-- Filtros -->
+        <div class="candidatos-filter" style="display:flex; gap:16px; align-items:flex-end;">
+          <div class="form-field" style="margin:0; flex:1; max-width:320px">
+            <label class="form-label">Filtrar por oferta</label>
+            <select class="form-select cand-select" id="selectOferta">
+              <option value="todas">Todas las ofertas (Cargando...)</option>
+            </select>
+          </div>
+          <div class="form-field" style="margin:0; width:180px">
+            <label class="form-label">Estado</label>
+            <select class="form-select" id="filterStatus">
+              <option value="todos">Todos</option>
+              <option value="PENDIENTE">Pendientes</option>
+              <option value="REVISADA">Revisados</option>
+              <option value="ENTREVISTA">Entrevista</option>
+              <option value="RECHAZADA">Rechazados</option>
+            </select>
+          </div>
         </div>
 
         <div class="candidatos-list" id="candidatosList"></div>
