@@ -17,6 +17,7 @@ export class AuthService {
     nombre: string;
     apellido?: string;
     nombreEmpresa?: string;
+    industria?: string;
   }) {
     // Verificar si el email ya existe
     const existe = await this.prisma.usuario.findUnique({
@@ -48,7 +49,8 @@ export class AuthService {
     } else {
       await this.prisma.empresa.create({
         data: {
-          nombre: data.nombreEmpresa || data.nombre,
+          nombre: data.nombre,
+          industria: data.industria || null,
           usuarioId: usuario.id,
         },
       });
