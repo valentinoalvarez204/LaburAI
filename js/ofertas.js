@@ -213,11 +213,26 @@ function applyFilters() {
    CHIPS DE FILTROS ACTIVOS
 ───────────────────────────────── */
 const FILTER_LABELS = {
-  rubro: { administracion: 'Administración y RRHH', ventas: 'Ventas', tecnologia: 'Tecnología', salud: 'Salud', educacion: 'Educación', construccion: 'Construcción', gastronomia: 'Gastronomía', logistica: 'Logística', finanzas: 'Finanzas', diseno: 'Diseño' },
+  // Para rubro, las etiquetas se resuelven dinámicamente en renderActiveFilters
+  rubro: {},
   modalidad: { remoto: 'Remoto', presencial: 'Presencial', hibrido: 'Híbrido' },
   jornada: { fulltime: 'Full time', parttime: 'Part time', freelance: 'Freelance' },
   experiencia: { 'sin-exp': 'Sin experiencia', '1-2': '1–2 años', '3-5': '3–5 años', '5+': 'Más de 5 años' },
 };
+
+// Rubros predefinidos (usados tanto en el filtro como en los chips activos)
+const RUBROS_PREDEFINIDOS = [
+  { id: 'Administración y RRHH',     label: 'Administración y RRHH' },
+  { id: 'Ventas y Comercial',          label: 'Ventas y Comercial' },
+  { id: 'Tecnología e IT',            label: 'Tecnología e IT' },
+  { id: 'Salud y Medicina',            label: 'Salud y Medicina' },
+  { id: 'Educación y Docencia',       label: 'Educación y Docencia' },
+  { id: 'Construcción e Ingeniería',  label: 'Construcción e Ingeniería' },
+  { id: 'Gastronomía y Turismo',      label: 'Gastronomía y Turismo' },
+  { id: 'Logística y Transporte',     label: 'Logística y Transporte' },
+  { id: 'Finanzas y Contabilidad',     label: 'Finanzas y Contabilidad' },
+  { id: 'Diseño y Creatividad',       label: 'Diseño y Creatividad' },
+];
 
 function renderActiveFilters() {
   const bar = document.getElementById('activeFiltersBar');
@@ -226,7 +241,7 @@ function renderActiveFilters() {
 
   const f = state.filters;
   const all = [
-    ...f.rubro.map((v) => ({ name: 'rubro', value: v, label: FILTER_LABELS.rubro[v] })),
+    ...f.rubro.map((v) => ({ name: 'rubro', value: v, label: FILTER_LABELS.rubro[v] || v })),
     ...f.modalidad.map((v) => ({ name: 'modalidad', value: v, label: FILTER_LABELS.modalidad[v] })),
     ...f.jornada.map((v) => ({ name: 'jornada', value: v, label: FILTER_LABELS.jornada[v] })),
     ...f.experiencia.map((v) => ({ name: 'experiencia', value: v, label: FILTER_LABELS.experiencia[v] })),
@@ -424,8 +439,8 @@ function initReveal() {
 /* ─────────────────────────────────
    RENDER FILTROS DINÁMICOS
 ───────────────────────────────── */
-function renderAllFilters() {
-  renderRubroFilters();
+function renderAllFilters(industriasCustom = []) {
+  renderRubroFilters(industriasCustom);
   renderGenericFilters('modalidad', [
     { id: 'remoto', label: 'Remoto' },
     { id: 'presencial', label: 'Presencial' },
@@ -444,27 +459,22 @@ function renderAllFilters() {
   ], 'exp'); // 'exp' es la clave en el objeto OFERTAS
 }
 
-function renderRubroFilters() {
+function renderRubroFilters(industriasCustom = []) {
   const container = document.getElementById('rubro');
   if (!container) return;
 
-  const RUBROS_CONFIG = [
-    { id: 'administracion', label: 'Administración y RRHH' },
-    { id: 'ventas', label: 'Ventas y Comercial' },
-    { id: 'tecnologia', label: 'Tecnología e IT' },
-    { id: 'salud', label: 'Salud y Medicina' },
-    { id: 'educacion', label: 'Educación y Docencia' },
-    { id: 'construccion', label: 'Construcción e Ing.' },
-    { id: 'gastronomia', label: 'Gastronomía y Turismo' },
-    { id: 'logistica', label: 'Logística y Transporte' },
-    { id: 'finanzas', label: 'Finanzas y Contabilidad' },
-    { id: 'diseno', label: 'Diseño y Creatividad' }
-  ];
+  // Unir predefinidas con custom, evitando duplicados (case-insensitive)
+  const predefinidosIds = new Set(RUBROS_PREDEFINIDOS.map((r) => r.id.toLowerCase()));
+  const custom = industriasCustom
+    .filter((ind) => !predefinidosIds.has(ind.toLowerCase()))
+    .map((ind) => ({ id: ind, label: ind }));
+
+  const RUBROS_CONFIG = [...RUBROS_PREDEFINIDOS, ...custom];
 
   const counts = {};
-  OFERTAS.forEach(o => counts[o.rubro] = (counts[o.rubro] || 0) + 1);
+  OFERTAS.forEach((o) => counts[o.rubro] = (counts[o.rubro] || 0) + 1);
 
-  container.innerHTML = RUBROS_CONFIG.map(r => {
+  container.innerHTML = RUBROS_CONFIG.map((r) => {
     const count = counts[r.id] || 0;
     const checked = state.filters.rubro.includes(r.id) ? 'checked' : '';
     return `
@@ -563,6 +573,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   initReveal();
 
   // Renderizar todos los filtros dinámicos
-  renderAllFilters();
+  // Cargar industrias de la BD para el filtro Rubro
+  let industriasCustom = [];
+  try {
+    const resInd = await fetch('http://localhost:3000/api/profile/industrias');
+    if (resInd.ok) industriasCustom = await resInd.json();
+  } catch (_) { /* silencioso */ }
+
+  renderAllFilters(industriasCustom);
   applyAndRender();
 });
