@@ -433,61 +433,72 @@
           <div class="dash-card">
             <h3 class="pf-card-title">Datos de la empresa</h3>
             <div class="empresa-logo-upload">
-              <div class="elu-avatar">GA</div>
+              <div class="elu-avatar" id="empAvatar">--</div>
               <div>
-                <div class="elu-name">Grupo Arcor S.A.</div>
+                <div class="elu-name" id="empTopName">-</div>
                 <button class="btn-ghost btn-sm" style="margin-top:6px">Cambiar logo</button>
               </div>
             </div>
             <div class="form-field">
               <label class="form-label">Nombre de la empresa *</label>
-              <input type="text" class="form-input" value="Grupo Arcor S.A."/>
+              <input type="text" class="form-input" id="empNombre" value=""/>
             </div>
             <div class="form-row">
               <div class="form-field">
                 <label class="form-label">Industria</label>
-                <select class="form-select">
-                  <option selected>Alimentación y bebidas</option>
-                  <option>Tecnología</option>
-                  <option>Salud</option>
-                  <option>Educación</option>
-                  <option>Construcción</option>
-                  <option>Finanzas</option>
+                <select class="form-select" id="empIndustria">
+                  <option value="">Seleccioná una industria…</option>
+                  <option value="Administración y RRHH">Administración y RRHH</option>
+                  <option value="Ventas y Comercial">Ventas y Comercial</option>
+                  <option value="Tecnología e IT">Tecnología e IT</option>
+                  <option value="Salud y Medicina">Salud y Medicina</option>
+                  <option value="Educación y Docencia">Educación y Docencia</option>
+                  <option value="Construcción e Ingeniería">Construcción e Ingeniería</option>
+                  <option value="Gastronomía y Turismo">Gastronomía y Turismo</option>
+                  <option value="Logística y Transporte">Logística y Transporte</option>
+                  <option value="Finanzas y Contabilidad">Finanzas y Contabilidad</option>
+                  <option value="Diseño y Creatividad">Diseño y Creatividad</option>
+                  <option value="Otro">Otro</option>
                 </select>
+                <div id="empOtraIndustriaWrap" style="margin-top: 10px;" hidden>
+                  <input type="text" id="empOtraIndustria" class="form-input" placeholder="Escribí tu industria">
+                </div>
               </div>
               <div class="form-field">
                 <label class="form-label">Tamaño</label>
-                <select class="form-select">
-                  <option>1 – 10 empleados</option>
-                  <option>11 – 50</option>
-                  <option>51 – 200</option>
-                  <option>201 – 1.000</option>
-                  <option selected>Más de 1.000</option>
+                <select class="form-select" id="empTamano">
+                  <option value="">Seleccioná el tamaño</option>
+                  <option value="1-10 empleados">1-10 empleados</option>
+                  <option value="11-50 empleados">11-50 empleados</option>
+                  <option value="51-200 empleados">51-200 empleados</option>
+                  <option value="201-500 empleados">201-500 empleados</option>
+                  <option value="501-1000 empleados">501-1000 empleados</option>
+                  <option value="Más de 1000 empleados">Más de 1000 empleados</option>
                 </select>
               </div>
             </div>
             <div class="form-field">
               <label class="form-label">Sitio web</label>
-              <input type="url" class="form-input" value="https://www.arcor.com"/>
+              <input type="url" class="form-input" id="empSitioWeb" value="" placeholder="https://..."/>
             </div>
           </div>
           <div class="dash-card">
             <h3 class="pf-card-title">Descripción pública</h3>
             <div class="form-field">
               <label class="form-label">Descripción de la empresa</label>
-              <textarea class="form-textarea" rows="5">Arcor es la empresa argentina líder en el mercado mundial de caramelos y uno de los principales fabricantes de galletas, chocolates y alimentos. Presente en más de 120 países.</textarea>
+              <textarea class="form-textarea" id="empDescripcion" rows="5"></textarea>
             </div>
             <div class="form-field">
               <label class="form-label">Sede principal</label>
-              <input type="text" class="form-input" value="Córdoba, Argentina"/>
+              <input type="text" class="form-input" id="empUbicacion" value=""/>
             </div>
             <div class="form-field">
               <label class="form-label">Año de fundación</label>
-              <input type="text" class="form-input" value="1951"/>
+              <input type="number" class="form-input" id="empAnoFundacion" value="" min="1800" max="2100" step="1" placeholder="Ej: 1998"/>
             </div>
             <div class="form-field">
               <label class="form-label">LinkedIn de la empresa</label>
-              <input type="url" class="form-input" placeholder="https://linkedin.com/company/..."/>
+              <input type="url" class="form-input" id="empLinkedin" placeholder="https://linkedin.com/company/..."/>
             </div>
           </div>
         </div>

@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -73,6 +74,31 @@ export class ProfileController {
     return this.profileService.updateCvUrl(id, cvUrl);
   }
 
+  // GET /api/profile/empresa
+  @Get('empresa')
+  @UseGuards(JwtGuard)
+  getCurrentEmpresa(@Req() req: any) {
+    return this.profileService.getEmpresaProfile(req.user.sub);
+  }
+
+  // PATCH /api/profile/empresa (usa el token)
+  @Patch('empresa')
+  @UseGuards(JwtGuard)
+  updateCurrentEmpresa(
+    @Req() req: any,
+    @Body() body: {
+      nombre?:      string;
+      industria?:   string;
+      descripcion?: string;
+      ubicacion?:   string;
+      sitioWeb?:    string;
+      anoFundacion?: number;
+      tamanoEmpresa?: string;
+    },
+  ) {
+    return this.profileService.updateEmpresaByUserId(req.user.sub, body);
+  }
+
   // GET /api/profile/empresa/:id
   @Get('empresa/:id')
   @UseGuards(JwtGuard)
@@ -91,8 +117,16 @@ export class ProfileController {
       descripcion?: string;
       ubicacion?:   string;
       sitioWeb?:    string;
+      anoFundacion?: number;
+      tamanoEmpresa?: string;
     },
   ) {
     return this.profileService.updateEmpresa(id, body);
+  }
+
+  // GET /api/profile/industrias  — público, sin autenticación
+  @Get('industrias')
+  getIndustrias() {
+    return this.profileService.getIndustrias();
   }
 }

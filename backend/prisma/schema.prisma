@@ -45,13 +45,15 @@ model Candidato {
 
 // ── EMPRESA ──
 model Empresa {
-  id          String   @id @default(uuid())
-  nombre      String
-  industria   String?
-  descripcion String?
-  ubicacion   String?
-  sitioWeb    String?
-  creadoEn    DateTime @default(now())
+  id            String   @id @default(uuid())
+  nombre        String
+  industria     String?
+  descripcion   String?
+  ubicacion     String?
+  sitioWeb      String?
+  anoFundacion  Int?
+  tamanoEmpresa String?
+  creadoEn      DateTime @default(now())
 
   usuarioId   String   @unique
   usuario     Usuario  @relation(fields: [usuarioId], references: [id])

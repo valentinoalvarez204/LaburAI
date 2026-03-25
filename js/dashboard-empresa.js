@@ -433,10 +433,48 @@ function initPublicar() {
 function initGuardarEmpresa() {
   document.getElementById('btnSaveEmpresa')?.addEventListener('click', async () => {
     const btn = document.getElementById('btnSaveEmpresa');
-    btn.disabled = true; btn.textContent = 'Guardando…';
-    await delay(1200);
-    btn.disabled = false; btn.textContent = 'Guardar cambios';
-    showToast('Perfil de empresa actualizado', 'success');
+    const prevText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Guardando…';
+
+    try {
+      const session = requireSession();
+      if (!session || !session.empresaId) throw new Error('No hay sesión activa');
+
+      const data = {
+        nombre: document.getElementById('empNombre')?.value || undefined,
+        industria: document.getElementById('empIndustria')?.value === 'Otro'
+          ? (document.getElementById('empOtraIndustria')?.value || undefined)
+          : (document.getElementById('empIndustria')?.value || undefined),
+        tamanoEmpresa: document.getElementById('empTamano')?.value || undefined,
+        ubicacion: document.getElementById('empUbicacion')?.value || undefined,
+        descripcion: document.getElementById('empDescripcion')?.value || undefined,
+        sitioWeb: document.getElementById('empSitioWeb')?.value || undefined,
+        anoFundacion: document.getElementById('empAnoFundacion')?.value 
+          ? Number(document.getElementById('empAnoFundacion').value) 
+          : null,
+      };
+
+      await API.patchPerfilEmpresa(data);
+
+      showToast('Perfil de empresa actualizado', 'success');
+
+      // Update local storage name if it strictly changed
+      if (data.nombre && session.nombre !== data.nombre) {
+        session.nombre = data.nombre;
+        localStorage.setItem('labuai_session', JSON.stringify(session));
+        document.querySelectorAll('.sp-name, .avatar-name, .elu-name').forEach((el) => {
+          if (el) el.textContent = data.nombre;
+        });
+      }
+
+    } catch (error) {
+      console.error('[Dashboard] Error guardando perfil:', error.message);
+      showToast('Error al actualizar el perfil', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = prevText;
+    }
   });
 }
 
@@ -604,6 +642,13 @@ function pubResetForm() {
   pubUpdatePreview(); pubUpdateChecklist();
 }
 
+function initEmpresaForms() {
+  document.getElementById('empIndustria')?.addEventListener('change', (e) => {
+    const wrap = document.getElementById('empOtraIndustriaWrap');
+    if (wrap) wrap.hidden = e.target.value !== 'Otro';
+  });
+}
+
 /* ─────────────────────────────────
    INIT
 ───────────────────────────────── */
@@ -631,6 +676,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 3. Cargar datos desde la API
   if (session.empresaId) {
     try {
+      // Cargar Perfil Empresa
+      const perf = await API.getPerfilEmpresa();
+      if (perf) {
+        const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+        setVal('empNombre', perf.nombre);
+        setVal('empTamano', perf.tamanoEmpresa);
+        setVal('empSitioWeb', perf.sitioWeb);
+        setVal('empDescripcion', perf.descripcion);
+        setVal('empUbicacion', perf.ubicacion);
+        setVal('empAnoFundacion', perf.anoFundacion);
+
+        const selInd = document.getElementById('empIndustria');
+        const wrapInd = document.getElementById('empOtraIndustriaWrap');
+        const inputInd = document.getElementById('empOtraIndustria');
+        
+        if (selInd && perf.industria) {
+          const options = Array.from(selInd.options).map(o => o.value);
+          if (!options.includes(perf.industria)) {
+            selInd.value = 'Otro';
+            if (wrapInd) wrapInd.hidden = false;
+            if (inputInd) inputInd.value = perf.industria;
+          } else {
+            selInd.value = perf.industria;
+          }
+        }
+
+        const topName = document.getElementById('empTopName');
+        const topAvatar = document.getElementById('empAvatar');
+        if (topName) topName.textContent = perf.nombre || 'Empresa';
+        if (topAvatar) topAvatar.textContent = (perf.nombre || 'E').charAt(0).toUpperCase();
+      }
+
       const misOfertas = await API.getOfertas({ empresaId: session.empresaId });
 
       OFERTAS_DATA.length = 0;
@@ -719,4 +796,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initSelectOferta();
   initFilterStatus();
   initPublicarForm();
+  initEmpresaForms();
+  initGuardarEmpresa();
 });

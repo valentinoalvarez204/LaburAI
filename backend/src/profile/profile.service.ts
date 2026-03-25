@@ -68,17 +68,62 @@ export class ProfileService {
     return empresa;
   }
 
-  // Actualizar perfil de la empresa
+  // Obtener perfil de empresa autenticada
+  async getEmpresaProfile(usuarioId: string) {
+    const empresa = await this.prisma.empresa.findUnique({
+      where: { usuarioId },
+      include: {
+        usuario: { select: { email: true } },
+      },
+    });
+    if (!empresa) throw new NotFoundException('Empresa no encontrada');
+    return empresa;
+  }
+
+  // Actualizar perfil de la empresa por ID explícito
   async updateEmpresa(empresaId: string, data: {
     nombre?:      string;
     industria?:   string;
     descripcion?: string;
     ubicacion?:   string;
     sitioWeb?:    string;
+    anoFundacion?: number;
+    tamanoEmpresa?: string;
   }) {
     return this.prisma.empresa.update({
       where: { id: empresaId },
       data,
     });
+  }
+
+  // Actualizar perfil de la empresa por Usuario Autenticado
+  async updateEmpresaByUserId(usuarioId: string, data: {
+    nombre?:      string;
+    industria?:   string;
+    descripcion?: string;
+    ubicacion?:   string;
+    sitioWeb?:    string;
+    anoFundacion?: number;
+    tamanoEmpresa?: string;
+  }) {
+    return this.prisma.empresa.update({
+      where: { usuarioId },
+      data,
+    });
+  }
+
+  // Obtener todas las industrias distintas de la tabla Empresa
+  async getIndustrias(): Promise<string[]> {
+    const rows = await this.prisma.empresa.findMany({
+      where: {
+        industria: { not: null },
+      },
+      select: { industria: true },
+      distinct: ['industria'],
+      orderBy: { industria: 'asc' },
+    });
+    return rows
+      .map((r) => r.industria as string)
+      .filter((v) => v && v.trim() !== '');
   }
 }

@@ -205,7 +205,30 @@ async function patchPerfilCandidato(id, data) {
     throw err;
   }
 }
+/* ─────────────────────────────────
+   PERFIL EMPRESA
+───────────────────────────────── */
+async function getPerfilEmpresa() {
+  try {
+    const data = await apiFetch(`/profile/empresa`);
+    return data;
+  } catch (err) {
+    console.error(`[API] Error obteniendo perfil empresa:`, err.message);
+    throw err;
+  }
+}
 
+async function patchPerfilEmpresa(data) {
+  try {
+    return await apiFetch(`/profile/empresa`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  } catch (err) {
+    console.error(`[API] Error actualizando perfil empresa:`, err.message);
+    throw err;
+  }
+}
 /* ─────────────────────────────────
    EXPORT GLOBAL
 ───────────────────────────────── */
@@ -230,4 +253,6 @@ window.API = {
   // Perfil
   getPerfilCandidato,
   patchPerfilCandidato,
+  getPerfilEmpresa,
+  patchPerfilEmpresa,
 };
