@@ -34,6 +34,7 @@ export class ApplicationsService {
         candidatoId: data.candidatoId,
         ofertaId: data.ofertaId,
         cartaMotivacion: data.cartaMotivacion,
+        estado: 'PENDIENTE', // siempre forzado al crear
       },
       include: {
         oferta: {

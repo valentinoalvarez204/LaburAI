@@ -110,57 +110,6 @@ body { background: var(--bg); }
   align-items: start;
 }
 
-/* ─────────────────────────────────
-   SIDEBAR (Como en Ofertas)
-───────────────────────────────── */
-.dash-sidebar {
-  background: var(--white);
-  border: 1.5px solid var(--border);
-  border-radius: var(--r2);
-  position: sticky; top: 80px;
-  overflow-y: auto;
-  display: flex; flex-direction: column;
-  padding: 20px 12px;
-  gap: 6px;
-  box-shadow: var(--shadow-sm);
-}
-
-.sidebar-profile {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px;
-  background: var(--bg2);
-  border-radius: var(--r);
-  margin-bottom: 8px;
-}
-.sp-avatar {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: var(--grad); color: #fff;
-  font-family: var(--font-head); font-size: 14px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.sp-name { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--text); }
-.sp-role { font-size: 11px; color: var(--text3); margin-top: 2px; }
-
-.sidebar-nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
-.snav-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  font-size: 13px; font-weight: 500; color: var(--text2);
-  cursor: pointer; transition: all .2s; position: relative;
-}
-.snav-item:hover { background: var(--bg2); color: var(--text); }
-.snav-item.active { background: var(--grad-soft); color: var(--indigo); font-weight: 600; }
-.snav-item.active svg { stroke: var(--indigo); }
-.snav-badge {
-  margin-left: auto;
-  background: var(--indigo); color: #fff;
-  font-size: 10px; font-weight: 700;
-  padding: 1px 7px; border-radius: 100px; min-width: 18px; text-align: center;
-}
-.snav-badge--new { background: var(--success); }
-
 /* Completud del perfil */
 .sidebar-cv-status {
   margin-top: auto;
@@ -277,23 +226,23 @@ body { background: var(--bg); }
 }
 .score-ring-wrap {
   position: relative;
-  width: 110px; height: 110px;
+  width: 120px; height: 120px;
   flex-shrink: 0;
 }
-.score-ring-svg { width: 110px; height: 110px; transform: rotate(-90deg); }
+.score-ring-svg { width: 120px; height: 120px; transform: rotate(-90deg); }
 .score-ring-bg   { fill: none; stroke: var(--bg2); stroke-width: 10; }
 .score-ring-fill {
   fill: none; stroke: url(#scoreGrad); stroke-width: 10;
   stroke-linecap: round;
-  stroke-dasharray: 314.16;
-  stroke-dashoffset: 314.16;
+  stroke-dasharray: 376.99;
+  stroke-dashoffset: 376.99;
   transition: stroke-dashoffset 1.4s ease;
 }
 .score-ring-inner {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.score-num { font-family: var(--font-head); font-size: 32px; font-weight: 800; color: var(--text); letter-spacing: -2px; line-height: 1; }
+.score-num { font-family: var(--font-head); font-size: 36px; font-weight: 800; color: var(--text); letter-spacing: -2px; line-height: 1; }
 .score-max { font-size: 12px; color: var(--text3); margin-top: 1px; }
 
 /* Explicación del score */
@@ -376,11 +325,12 @@ body { background: var(--bg); }
 .skills-detected { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
 .skill-detected {
   font-size: 12px; font-weight: 600;
-  padding: 5px 13px; border-radius: 100px;
+  padding: 6px 14px; border-radius: 100px;
   background: var(--bg2); border: 1.5px solid var(--border); color: var(--text2);
   transition: all .2s;
+  cursor: default;
 }
-.skill-detected:hover { border-color: var(--indigo); color: var(--indigo); background: var(--grad-soft); }
+.skill-detected:hover { border-color: var(--indigo); color: var(--indigo); background: var(--grad-soft); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(92,107,192,.12); }
 .skill-detected.main { background: #EEF1FF; border-color: #C5CCF0; color: var(--indigo); }
 .skill-detected.tech { background: #F0EAFF; border-color: #C9B8FF; color: var(--violet); }
 .skill-detected.soft { background: #E8F5E9; border-color: #A5D6A7; color: #2E7D32; }

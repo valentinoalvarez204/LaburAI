@@ -20,21 +20,13 @@ async function initPage() {
   const session = requireSession();
   if (!session) return;
 
-  // C. Inyectar datos de empresa en UI
+  // C. Inyectar datos de empresa y nav en UI
   updateSidebarInfo(session);
+  renderSidebarNav('empresa', 'candidatos');
 
   // D. Cargar datos desde la API
   try {
-    const res = await fetch(`http://localhost:3000/api/applications/${appId}`, {
-      headers: { 'Authorization': `Bearer ${session.token}` }
-    });
-
-    if (!res.ok) {
-      if (res.status === 404) throw new Error('La postulación no existe.');
-      throw new Error('No se pudo conectar con el servidor.');
-    }
-
-    const data = await res.json();
+    const data = await API.getPostulacion(appId);
     CURRENT_APP = data;
 
     // E. Renderizar
@@ -76,10 +68,9 @@ function renderDetailPage(app) {
   document.getElementById('modalName').textContent = nombreCandidato;
 
   // --- Estado ---
-  const statusSelect = document.getElementById('statusSelect');
-  if (statusSelect) {
-    statusSelect.value = app.estado;
-    updateStatusClass(statusSelect, app.estado);
+  const wrapper = document.getElementById('sd-detail');
+  if (wrapper) {
+    updateLocalStatusDropdownUI(app.estado);
   }
 
   // --- Notas Internas ---
@@ -184,10 +175,11 @@ function renderIA(app) {
 /**
  * 5. Gestión del Cambio de Estado
  */
-window.handleStatusChange = async function() {
-  const select = document.getElementById('statusSelect');
-  const nuevoEstado = select.value;
-  const spinner = document.getElementById('statusSpinner');
+window.handleStatusChange = async function(nuevoEstado) {
+  if (CURRENT_APP.estado === nuevoEstado) return;
+
+  // Cerrar el dropdown
+  document.getElementById('sdm-detail')?.classList.remove('open');
   
   // A. Confirmación para cambios importantes
   if (nuevoEstado === 'RECHAZADA' || nuevoEstado === 'ENTREVISTA') {
@@ -195,47 +187,46 @@ window.handleStatusChange = async function() {
       ? '¿Estás seguro de descartar a este candidato? No podrá ser contactado para este proceso.'
       : 'Vas a pasar al candidato a etapa de entrevista. ¿Deseas continuar?';
     
-    if (!confirm(msg)) {
-      select.value = CURRENT_APP.estado;
-      return;
-    }
+    if (!confirm(msg)) return;
   }
 
   // B. Enviar a API
   const session = getSession();
-  select.disabled = true;
-  spinner.classList.remove('hidden');
+  const btn = document.getElementById('sdBtn-detail');
+  if (btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'not-allowed';
+    document.getElementById('sdLabel-detail').textContent = 'Guardando...';
+  }
 
   try {
-    const res = await fetch(`http://localhost:3000/api/applications/${CURRENT_APP.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.token}`
-      },
-      body: JSON.stringify({ estado: nuevoEstado })
-    });
-
-    if (res.ok) {
-      showToast('Estado de postulación actualizado', 'success');
-      CURRENT_APP.estado = nuevoEstado;
-      updateStatusClass(select, nuevoEstado);
-    } else {
-      throw new Error('Error al actualizar estado');
-    }
+    await API.patchPostulacion(CURRENT_APP.id, { estado: nuevoEstado });
+    showToast('Estado de postulación actualizado', 'success');
+    CURRENT_APP.estado = nuevoEstado;
+    updateLocalStatusDropdownUI(nuevoEstado);
   } catch (err) {
     showToast(err.message, 'error');
-    select.value = CURRENT_APP.estado;
-    updateStatusClass(select, CURRENT_APP.estado);
-  } finally {
-    select.disabled = false;
-    spinner.classList.add('hidden');
+    updateLocalStatusDropdownUI(CURRENT_APP.estado);
   }
 }
 
-function updateStatusClass(el, status) {
-  el.classList.remove('st-pendiente', 'st-revisada', 'st-entrevista', 'st-rechazada');
-  el.classList.add('st-' + status.toLowerCase());
+function updateLocalStatusDropdownUI(estado) {
+  const wrapper = document.getElementById('sd-detail');
+  if (!wrapper) return;
+  const btn = document.getElementById('sdBtn-detail');
+  if (btn) {
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.cursor = '';
+    btn.className = `status-dropdown-btn sd-${estado.toLowerCase()}`;
+    document.getElementById('sdDot-detail').style.background = getStatusColor(estado);
+    document.getElementById('sdLabel-detail').textContent = getStatusLabel(estado);
+  }
+  wrapper.querySelectorAll('.sd-option').forEach(opt => {
+    opt.classList.toggle('sd-option--active', opt.textContent.trim() === getStatusLabel(estado));
+  });
+  wrapper.dataset.estado = estado;
 }
 
 /**
@@ -252,22 +243,10 @@ window.saveInternalNotes = async function() {
   status.textContent = 'Guardando...';
 
   try {
-    const res = await fetch(`http://localhost:3000/api/applications/${CURRENT_APP.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.token}`
-      },
-      body: JSON.stringify({ notes: nuevoTexto })
-    });
-
-    if (res.ok) {
-      status.textContent = '✓ Guardado correctamente';
-      setTimeout(() => status.textContent = '', 2000);
-      CURRENT_APP.notes = nuevoTexto;
-    } else {
-      throw new Error('Error al guardar');
-    }
+    await API.patchPostulacion(CURRENT_APP.id, { notes: nuevoTexto });
+    status.textContent = '✓ Guardado correctamente';
+    setTimeout(() => status.textContent = '', 2000);
+    CURRENT_APP.notes = nuevoTexto;
   } catch (err) {
     showToast(err.message, 'error');
     status.textContent = 'Error al guardar';

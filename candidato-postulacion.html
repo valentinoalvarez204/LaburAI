@@ -45,20 +45,7 @@
         </div>
       </div>
 
-      <nav class="sidebar-nav">
-        <a href="dashboard-empresa.html#overview" class="snav-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Resumen
-        </a>
-        <a href="dashboard-empresa.html#ofertas" class="snav-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-          Mis ofertas
-        </a>
-        <a href="dashboard-empresa.html#candidatos" class="snav-item active">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Candidatos
-        </a>
-      </nav>
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
     </aside>
 
     <!-- ── MAIN ── -->
@@ -80,18 +67,6 @@
               Volver al listado
             </a>
             <h1 class="page-title">Detalle de Postulación</h1>
-          </div>
-          <div class="header-status">
-            <span class="status-label">Cambiar estado:</span>
-            <div class="status-select-wrap">
-              <select id="statusSelect" class="form-select" onchange="handleStatusChange()">
-                <option value="PENDIENTE">PENDIENTE</option>
-                <option value="REVISADA">REVISADA</option>
-                <option value="ENTREVISTA">ENTREVISTA</option>
-                <option value="RECHAZADA">RECHAZADA</option>
-              </select>
-              <div id="statusSpinner" class="status-spinner hidden"></div>
-            </div>
           </div>
         </header>
 
@@ -179,6 +154,34 @@
           <!-- RIGHT: IA Analysis -->
           <aside class="detail-sidebar">
             
+            <!-- Relocated Status Dropdown -->
+            <section class="dash-card">
+              <h3 class="card-title-sm" style="margin-bottom: 12px; text-align: center;">Estado de la Postulación</h3>
+              <div class="status-dropdown" id="sd-detail" data-id="detail" data-estado="PENDIENTE" style="width: 100%;">
+                <button class="status-dropdown-btn sd-pendiente" id="sdBtn-detail" onclick="toggleStatusDropdown('detail', event)" style="width: 100%; justify-content: space-between; padding: 10px 14px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="sd-dot" id="sdDot-detail" style="background:#9e9e9e"></span>
+                    <span class="sd-label" id="sdLabel-detail">Pendiente</span>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="status-dropdown-menu" id="sdm-detail" style="width: 100%;">
+                  <button class="sd-option" onclick="handleStatusChange('PENDIENTE')">
+                    <span class="sd-dot" style="background:#9e9e9e"></span> Pendiente
+                  </button>
+                  <button class="sd-option" onclick="handleStatusChange('REVISADA')">
+                    <span class="sd-dot" style="background:#2196f3"></span> Revisada
+                  </button>
+                  <button class="sd-option" onclick="handleStatusChange('ENTREVISTA')">
+                    <span class="sd-dot" style="background:#7c4dff"></span> Entrevista
+                  </button>
+                  <button class="sd-option" onclick="handleStatusChange('RECHAZADA')">
+                    <span class="sd-dot" style="background:#f44336"></span> Rechazada
+                  </button>
+                </div>
+              </div>
+            </section>
+
             <section class="dash-card ia-card">
               <div class="ia-header">
                 <span class="ai-pill-sm">✦ LaburAI Score</span>

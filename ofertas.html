@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LaburAI — Buscar empleo</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/base.css"/>
-  <link rel="stylesheet" href="css/ofertas.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/ofertas.css" />
 </head>
+
 <body>
 
   <!-- ══ NAVBAR ══ -->
@@ -35,10 +39,11 @@
       <a href="#">Para empresas</a>
       <a href="#">Salarios</a>
       <a href="#">Recursos</a>
-      <hr/>
+      <hr />
       <div id="mobileNavActions">
         <a href="login.html" class="btn-ghost" style="text-align:center;display:block">Ingresar</a>
-        <a href="login.html" class="btn-primary" style="text-align:center;display:block;margin-top:8px">Publicar oferta</a>
+        <a href="login.html" class="btn-primary" style="text-align:center;display:block;margin-top:8px">Publicar
+          oferta</a>
       </div>
     </div>
   </nav>
@@ -54,16 +59,25 @@
       <div class="ph-search">
         <div class="search-box-sm">
           <div class="search-field-sm">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" id="searchQuery" placeholder="Puesto, empresa o rubro…" autocomplete="off"/>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" id="searchQuery" placeholder="Puesto, empresa o rubro…" autocomplete="off" />
           </div>
           <div class="search-sep-sm"></div>
           <div class="search-field-sm search-field-sm--loc">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <input type="text" id="searchLocation" placeholder="Ciudad o provincia"/>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <input type="text" id="searchLocation" placeholder="Ciudad o provincia" />
           </div>
           <button class="search-btn-sm" id="searchBtn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
             Buscar
           </button>
         </div>
@@ -94,7 +108,10 @@
       <div class="filter-group">
         <div class="filter-group-header" data-toggle="rubro">
           <span>Rubro</span>
-          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
         </div>
         <div class="filter-group-body" id="rubro">
           <!-- Se carga dinámicamente desde la API -->
@@ -105,7 +122,10 @@
       <div class="filter-group">
         <div class="filter-group-header" data-toggle="modalidad">
           <span>Modalidad</span>
-          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
         </div>
         <div class="filter-group-body" id="modalidad">
           <!-- Dinámico -->
@@ -116,7 +136,10 @@
       <div class="filter-group">
         <div class="filter-group-header" data-toggle="jornada">
           <span>Jornada</span>
-          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
         </div>
         <div class="filter-group-body" id="jornada">
           <!-- Dinámico -->
@@ -127,7 +150,10 @@
       <div class="filter-group">
         <div class="filter-group-header" data-toggle="experiencia">
           <span>Experiencia</span>
-          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
         </div>
         <div class="filter-group-body" id="experiencia">
           <!-- Dinámico -->
@@ -138,11 +164,14 @@
       <div class="filter-group">
         <div class="filter-group-header" data-toggle="salario">
           <span>Salario mínimo</span>
-          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
         </div>
         <div class="filter-group-body" id="salario">
           <div class="salary-slider-wrap">
-            <input type="range" id="salaryRange" min="0" max="1500000" step="50000" value="0" class="salary-slider"/>
+            <input type="range" id="salaryRange" min="0" max="1500000" step="50000" value="0" class="salary-slider" />
             <div class="salary-display">
               <span class="salary-min-label">Sin mínimo</span>
               <span class="salary-cur" id="salaryDisplay">$0</span>
@@ -182,7 +211,11 @@
           </div>
           <!-- Botón filtros mobile -->
           <button class="btn-ghost filters-toggle-btn" id="filtersToggleBtn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <line x1="8" y1="12" x2="16" y2="12" />
+              <line x1="11" y1="18" x2="13" y2="18" />
+            </svg>
             Filtros
           </button>
         </div>
@@ -205,7 +238,8 @@
     <div class="footer-grid">
       <div class="footer-brand">
         <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
-        <p>La plataforma de empleo impulsada por IA. Conectamos talento con las mejores oportunidades de Argentina en todos los rubros.</p>
+        <p>La plataforma de empleo impulsada por IA. Conectamos talento con las mejores oportunidades de Argentina en
+          todos los rubros.</p>
       </div>
       <div class="footer-col">
         <h4>Candidatos</h4>
@@ -239,4 +273,5 @@
   <script src="js/main.js"></script>
   <script src="js/ofertas.js"></script>
 </body>
+
 </html>

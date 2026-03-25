@@ -248,11 +248,15 @@ function switchSection(id) {
 }
 
 function initSidebarNav() {
-  document.querySelectorAll('.snav-item').forEach((item) => {
-    item.addEventListener('click', (e) => {
+  document.addEventListener('click', (e) => {
+    const item = e.target.closest('.snav-item');
+    if (!item) return;
+
+    // Solo prevenir el default si tiene data-section
+    if (item.dataset.section) {
       e.preventDefault();
       switchSection(item.dataset.section);
-    });
+    }
   });
 
   // Interceptar clics en links del navbar para navegación interna (SPA)
@@ -387,16 +391,11 @@ function initSaveProfile() {
 ───────────────────────────────── */
 async function fetchProfile(candidatoId) {
   try {
-    const res = await fetch(`http://localhost:3000/api/profile/candidato/${candidatoId}`);
-    const data = await res.json();
-    if (!res.ok) return;
+    const data = await API.getPerfilCandidato(candidatoId);
 
-    // Mapear datos de la API al objeto CANDIDATO
-    CANDIDATO.nombre = `${data.usuario?.nombre || ''} ${data.usuario?.apellido || ''}`.trim();
+    CANDIDATO.nombre = `${data.nombre || ''} ${data.apellido || ''}`.trim();
     CANDIDATO.score = data.scoreCV || 0;
     CANDIDATO.resumen = data.resumenIA || 'Subí tu CV para que la IA genere un resumen de tu perfil profesional.';
-
-    // Score data (parcial, a mejorar cuando integremos la IA real)
     CANDIDATO.scoreData = {
       total: data.scoreCV || 0,
       nivel: (data.scoreCV >= 75) ? 'bueno' : (data.scoreCV >= 50 ? 'regular' : 'bajo'),
@@ -407,36 +406,28 @@ async function fetchProfile(candidatoId) {
       ]
     };
 
-    // Habilidades
-    if (data.habilidades) {
-      CANDIDATO.habilidades = data.habilidades.split(',').map(s => ({ name: s.trim(), type: 'main' }));
+    if (Array.isArray(data.habilidades) && data.habilidades.length) {
+      CANDIDATO.habilidades = data.habilidades.map(s => ({ name: s.trim(), type: 'main' }));
     }
 
     renderScore();
     renderSkills();
     renderIAAnalysis();
 
-    // Actualizar UI
     const firstName = CANDIDATO.nombre.split(' ')[0];
     const greetEl = document.querySelector('.greeting-title');
     if (greetEl) greetEl.textContent = `¡Hola, ${firstName}! 👋`;
-
-    document.querySelectorAll('.sp-avatar, .avatar-circle').forEach(el => {
-      el.textContent = firstName.charAt(0).toUpperCase();
-    });
-    document.querySelectorAll('.sp-name, .avatar-name').forEach(el => {
-      el.textContent = CANDIDATO.nombre;
-    });
+    document.querySelectorAll('.sp-avatar, .avatar-circle').forEach(el => el.textContent = firstName.charAt(0).toUpperCase());
+    document.querySelectorAll('.sp-name, .avatar-name').forEach(el => el.textContent = CANDIDATO.nombre);
 
   } catch (err) {
-    console.error('Error fetching profile:', err);
+    console.error('[Dashboard] Error cargando perfil:', err.message);
   }
 }
 
 async function fetchRecommendations() {
   try {
-    const res = await fetch('http://localhost:3000/api/jobs');
-    const data = await res.json();
+    const data = await API.getOfertas();
     if (!Array.isArray(data)) return;
 
     RECOMENDADAS = data.slice(0, 6).map(job => ({
@@ -450,12 +441,12 @@ async function fetchRecommendations() {
       tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', ''],
       salary: job.salarioMin ? `$${job.salarioMin.toLocaleString('es-AR')}` : 'A convenir',
       time: 'Reciente',
-      match: 85 // Mock match
+      match: null, // Sin mock: se mostrara solo si el backend lo provee
     }));
 
     renderRecomendadas();
   } catch (err) {
-    console.error('Error fetching recommendations:', err);
+    console.error('[Dashboard] Error cargando recomendaciones:', err.message);
   }
 }
 
@@ -464,27 +455,28 @@ async function fetchRecommendations() {
    INIT
 ───────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
-  // 0. Manejar sección desde la URL (ej: ?section=perfil o #perfil) inmediatamente para evitar saltos
+  // 0. Render sidebar first
+  renderSidebarNav('candidato', 'overview');
+
+  // 1. Sección inicial desde URL/hash
   const params = new URLSearchParams(window.location.search);
   const hash = window.location.hash.substring(1);
   const initialSection = params.get('section') || hash || 'overview';
-  if (SECTIONS.includes(initialSection)) {
-    switchSection(initialSection);
-  }
+  if (SECTIONS.includes(initialSection)) switchSection(initialSection);
 
-  // 1. Validar sesión
+  // 2. Validar sesión
   const session = requireSession();
   if (!session) return;
 
-  // 2. Cargar perfil si es candidato
+  // 3. Cargar perfil y postulaciones en paralelo
   if (session.candidatoId) {
+    // Perfil (no bloqueante)
     fetchProfile(session.candidatoId);
 
-    // Cargar postulaciones reales
+    // Postulaciones
     try {
-      const res = await fetch(`http://localhost:3000/api/applications?candidatoId=${session.candidatoId}`);
-      const data = await res.json();
-      if (res.ok && Array.isArray(data)) {
+      const data = await API.getPostulaciones({ candidatoId: session.candidatoId });
+      if (Array.isArray(data)) {
         POSTULACIONES = data.map(p => ({
           id: p.ofertaId,
           title: p.oferta?.titulo || 'Oferta',
@@ -493,34 +485,37 @@ document.addEventListener('DOMContentLoaded', async () => {
           logoColor: '#5C6BC0',
           fecha: new Date(p.creadoEn).toLocaleDateString('es-AR'),
           status: p.estado.toLowerCase(),
-          match: p.matchIA || 0,
+          match: p.matchIA || null,
         }));
 
         const badge = document.querySelector('.snav-item[data-section="postulaciones"] .snav-badge');
         if (badge) badge.textContent = POSTULACIONES.length;
 
-        const statEl = document.querySelector('.dstat-num');
-        if (statEl) statEl.textContent = POSTULACIONES.length;
-
         renderPostulaciones();
       }
     } catch (err) {
-      console.error('Error cargando postulaciones:', err);
+      console.error('[Dashboard] Error cargando postulaciones:', err.message);
     }
+
+    // Stats candidato (en paralelo, no bloquean)
+    API.getStatsCandidato(session.candidatoId)
+      .then((stats) => {
+        const statEls = document.querySelectorAll('.dstat-num');
+        const vals = [stats.totalPostulaciones, stats.entrevistas ?? 0, stats.pendientes ?? 0, stats.rechazadas ?? 0];
+        statEls.forEach((el, i) => { if (vals[i] !== undefined) el.textContent = vals[i]; });
+      })
+      .catch((err) => console.error('[Dashboard] Error cargando stats candidato:', err.message));
   }
 
-  // 3. Cargar recomendaciones
+  // 4. Recomendaciones
   fetchRecommendations();
 
-  // 4. Interacciones
+  // 5. Interacciones
   initNavbar();
   initNavSession();
   initSidebarNav();
   initPostulacionesFiltros();
   initReanalyze();
   initCopySummary();
-  initSaveProfile();
-
-  // Remove redundant section handling at the end
   initSaveProfile();
 });
