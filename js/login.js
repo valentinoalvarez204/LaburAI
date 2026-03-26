@@ -57,14 +57,35 @@ function initTabs() {
 function initRoleSelector() {
   const btns = document.querySelectorAll('.role-btn');
   const hiddenInput = document.getElementById('selectedRole');
+  const empresaFields = document.getElementById('empresaFields');
+  const candFields = document.getElementById('candFields');
+
+  function setRole(role) {
+    if (hiddenInput) hiddenInput.value = role;
+    if (empresaFields) empresaFields.hidden = (role !== 'empresa');
+    if (candFields) candFields.hidden = (role === 'empresa');
+  }
 
   btns.forEach((btn) => {
     btn.addEventListener('click', () => {
       btns.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
-      if (hiddenInput) hiddenInput.value = btn.dataset.role;
+      setRole(btn.dataset.role);
     });
   });
+
+  // Listener para mostrar/ocultar campo "Otro"
+  const selectIndustria = document.getElementById('regIndustria');
+  const otraWrap = document.getElementById('otraIndustriaWrap');
+  if (selectIndustria && otraWrap) {
+    selectIndustria.addEventListener('change', () => {
+      otraWrap.hidden = selectIndustria.value !== 'Otro';
+      if (otraWrap.hidden) {
+        const otraInput = document.getElementById('regOtraIndustria');
+        if (otraInput) otraInput.value = '';
+      }
+    });
+  }
 }
 
 /* ─────────────────────────────────
@@ -221,16 +242,23 @@ function validateRegister() {
   const pass = document.getElementById('regPassword')?.value;
   const confirm = document.getElementById('regConfirm')?.value;
   const terms = document.getElementById('acceptTerms')?.checked;
+  const rol = document.getElementById('selectedRole')?.value || 'candidato';
 
-  if (!nombre) {
-    setError('regNombre', 'regNombreErr', 'Ingresá tu nombre.');
-    valid = false;
-  } else { setSuccess('regNombre'); }
+  if (rol === 'candidato') {
+    if (!nombre) {
+      setError('regNombre', 'regNombreErr', 'Ingresá tu nombre.');
+      valid = false;
+    } else { setSuccess('regNombre'); }
 
-  if (!apellido) {
-    setError('regApellido', 'regApellidoErr', 'Ingresá tu apellido.');
-    valid = false;
-  } else { setSuccess('regApellido'); }
+    if (!apellido) {
+      setError('regApellido', 'regApellidoErr', 'Ingresá tu apellido.');
+      valid = false;
+    } else { setSuccess('regApellido'); }
+  } else {
+    // Si es empresa limpiamos errores de candidato que pudieran haber quedado
+    clearError('regNombre', 'regNombreErr');
+    clearError('regApellido', 'regApellidoErr');
+  }
 
   if (!email) {
     setError('regEmail', 'regEmailErr', 'El email es obligatorio.');
@@ -263,6 +291,17 @@ function validateRegister() {
   }
 
   return valid;
+}
+
+/* Validar campos de empresa (solo cuando rol = empresa) */
+function validateEmpresaFields() {
+  const nombreEmpresa = document.getElementById('regNombreEmpresa')?.value.trim();
+  if (!nombreEmpresa) {
+    setError('regNombreEmpresa', 'regNombreEmpresaErr', 'Ingresá el nombre de la empresa.');
+    return false;
+  }
+  setSuccess('regNombreEmpresa');
+  return true;
 }
 
 /* ─────────────────────────────────
@@ -343,10 +382,32 @@ function initForms() {
 
       try {
         const rol = document.getElementById('selectedRole')?.value || 'candidato';
+
+        // Validación extra para empresa
+        if (rol === 'empresa' && !validateEmpresaFields()) {
+          setLoading('btnRegister', false);
+          return;
+        }
+
         const nombre = document.getElementById('regNombre')?.value || '';
         const apellido = document.getElementById('regApellido')?.value || '';
         const email = document.getElementById('regEmail')?.value || '';
         const password = document.getElementById('regPassword')?.value || '';
+
+        // Calcular industria final (predefinida o custom)
+        const selectIndustria = document.getElementById('regIndustria');
+        const otraIndustria = document.getElementById('regOtraIndustria')?.value.trim() || '';
+        let industria = '';
+        if (rol === 'empresa' && selectIndustria) {
+          industria = selectIndustria.value === 'Otro'
+            ? otraIndustria
+            : selectIndustria.value;
+        }
+
+        // Nombre de empresa: usar campo dedicado si existe, si no caer en regNombre
+        const nombreEmpresa = (rol === 'empresa'
+          ? document.getElementById('regNombreEmpresa')?.value.trim()
+          : null) || nombre;
 
         const res = await fetch('http://localhost:3000/api/auth/register', {
           method: 'POST',
@@ -355,9 +416,9 @@ function initForms() {
             email,
             password,
             rol: rol.toUpperCase(),
-            nombre,
-            apellido,
-            nombreEmpresa: nombre,
+            nombre: rol === 'empresa' ? nombreEmpresa : nombre,
+            apellido: rol === 'empresa' ? '' : apellido,
+            ...(industria ? { industria } : {}),
           }),
         });
 
@@ -430,8 +491,24 @@ function initLiveValidation() {
   const rules = [
     { id: 'loginEmail', errId: 'loginEmailErr', check: (v) => !v ? 'El email es obligatorio.' : !isValidEmail(v) ? 'Email inválido.' : '' },
     { id: 'loginPassword', errId: 'loginPassErr', check: (v) => !v ? 'La contraseña es obligatoria.' : v.length < 6 ? 'Mínimo 6 caracteres.' : '' },
-    { id: 'regNombre', errId: 'regNombreErr', check: (v) => !v ? 'Ingresá tu nombre.' : '' },
-    { id: 'regApellido', errId: 'regApellidoErr', check: (v) => !v ? 'Ingresá tu apellido.' : '' },
+    { id: 'regNombre', errId: 'regNombreErr', check: (v) => {
+        const rol = document.getElementById('selectedRole')?.value;
+        if (rol === 'empresa') return '';
+        return !v ? 'Ingresá tu nombre.' : '';
+      }
+    },
+    { id: 'regApellido', errId: 'regApellidoErr', check: (v) => {
+        const rol = document.getElementById('selectedRole')?.value;
+        if (rol === 'empresa') return '';
+        return !v ? 'Ingresá tu apellido.' : '';
+      }
+    },
+    { id: 'regNombreEmpresa', errId: 'regNombreEmpresaErr', check: (v) => {
+        const rol = document.getElementById('selectedRole')?.value;
+        if (rol !== 'empresa') return '';
+        return !v ? 'Ingresá el nombre de la empresa.' : '';
+      }
+    },
     { id: 'regEmail', errId: 'regEmailErr', check: (v) => !v ? 'El email es obligatorio.' : !isValidEmail(v) ? 'Email inválido.' : '' },
     { id: 'regPassword', errId: 'regPassErr', check: (v) => !v ? 'La contraseña es obligatoria.' : v.length < 8 ? 'Mínimo 8 caracteres.' : '' },
     {

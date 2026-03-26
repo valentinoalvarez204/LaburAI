@@ -27,4 +27,8 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   nombreEmpresa?: string;
+
+  @IsOptional()
+  @IsString()
+  industria?: string;
 }
