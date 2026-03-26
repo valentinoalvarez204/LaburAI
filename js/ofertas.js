@@ -514,8 +514,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cargar ofertas reales desde la API
   try {
-    const res = await fetch('http://localhost:3000/api/jobs');
-    const data = await res.json();
+    const data = await API.getOfertas();
 
     // Llenar con datos reales
     OFERTAS.length = 0;
@@ -576,8 +575,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Cargar industrias de la BD para el filtro Rubro
   let industriasCustom = [];
   try {
-    const resInd = await fetch('http://localhost:3000/api/profile/industrias');
-    if (resInd.ok) industriasCustom = await resInd.json();
+    industriasCustom = await API.getIndustrias();
   } catch (_) { /* silencioso */ }
 
   renderAllFilters(industriasCustom);
