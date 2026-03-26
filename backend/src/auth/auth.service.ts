@@ -69,7 +69,7 @@ export class AuthService {
         id: usuario.id,
         email: usuario.email,
         rol: usuario.rol,
-        nombre: data.rol === 'CANDIDATO' ? data.nombre : data.nombreEmpresa,
+        nombre: data.nombre,
         candidatoId: candidato?.id || null,
         empresaId: empresa?.id || null,
       },

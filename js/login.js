@@ -431,7 +431,7 @@ function initForms() {
         }
 
         localStorage.setItem('labuai_session', JSON.stringify({
-          nombre: `${nombre} ${apellido}`.trim(),
+          nombre: data.usuario.nombre,
           rol: rol,
           email: email,
           token: data.token,

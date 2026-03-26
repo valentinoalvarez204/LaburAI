@@ -39,7 +39,7 @@
       <div class="sidebar-profile">
         <div class="sp-avatar sp-avatar--empresa">GA</div>
         <div class="sp-info">
-          <div class="sp-name">Grupo Arcor</div>
+          <div class="sp-name">Mi Empresa</div>
           <div class="sp-role">Cuenta empresa · Activa</div>
         </div>
       </div>
@@ -53,8 +53,8 @@
       <!-- Saludo -->
       <div class="dash-greeting">
         <div>
-          <h1 class="greeting-title">Bienvenido, Grupo Arcor 🏢</h1>
-          <p class="greeting-sub">Tenés <strong>47 postulaciones nuevas</strong> y <strong>3 ofertas activas</strong> publicadas.</p>
+          <h1 class="greeting-title">Bienvenido 🏢</h1>
+          <p class="greeting-sub">Cargando estadísticas...</p>
         </div>
         <button class="btn-primary" id="btnNuevaOfertaHero">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
@@ -71,33 +71,22 @@
             <div class="dstat-icon dstat-icon--blue">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
             </div>
-            <div class="dstat-num">3</div>
+            <div class="dstat-num" id="statOfertasActivas">0</div>
             <div class="dstat-label">Ofertas activas</div>
-            <div class="dstat-trend dstat-trend--up">↑ 1 esta semana</div>
           </div>
           <div class="dstat">
             <div class="dstat-icon dstat-icon--indigo">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
             </div>
-            <div class="dstat-num">47</div>
+            <div class="dstat-num" id="statPostulaciones">0</div>
             <div class="dstat-label">Postulaciones totales</div>
-            <div class="dstat-trend dstat-trend--up">↑ 12 esta semana</div>
           </div>
           <div class="dstat">
             <div class="dstat-icon dstat-icon--green">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             </div>
-            <div class="dstat-num">8</div>
+            <div class="dstat-num" id="statEntrevistas">0</div>
             <div class="dstat-label">Entrevistas agendadas</div>
-            <div class="dstat-trend dstat-trend--up">↑ 3 esta semana</div>
-          </div>
-          <div class="dstat">
-            <div class="dstat-icon dstat-icon--amber">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </div>
-            <div class="dstat-num">1.240</div>
-            <div class="dstat-label">Vistas a tus ofertas</div>
-            <div class="dstat-trend dstat-trend--up">↑ 18% vs mes anterior</div>
           </div>
         </div>
 
@@ -142,9 +131,9 @@
           <h2 class="dash-section-title">Mis ofertas publicadas</h2>
         </div>
         <div class="ofertas-tabs">
-          <button class="otab active" data-of="todas">Todas (5)</button>
-          <button class="otab" data-of="activa">Activas (3)</button>
-          <button class="otab" data-of="cerrada">Cerradas (2)</button>
+          <button class="otab active" data-of="todas">Todas</button>
+          <button class="otab" data-of="activa">Activas</button>
+          <button class="otab" data-of="cerrada">Cerradas</button>
         </div>
         <div class="ofertas-list" id="ofertasList"></div>
       </section>
@@ -389,7 +378,7 @@
               </div>
               <div class="prev-logo-emp">GA</div>
               <div class="prev-t" id="prev-titulo">Tu oferta aparecerá así</div>
-              <div class="prev-co">Grupo Arcor · <span id="prev-ubicacion">Ubicación</span></div>
+              <div class="prev-co"><span id="prev-empresa">Empresa</span> · <span id="prev-ubicacion">Ubicación</span></div>
               <div class="prev-tags-row">
                 <span class="job-tag" id="prev-modalidad">Presencial</span>
                 <span class="job-tag" id="prev-jornada">Full time</span>
