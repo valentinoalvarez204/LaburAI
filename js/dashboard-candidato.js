@@ -380,6 +380,31 @@ function initSaveProfile() {
 }
 
 /* ─────────────────────────────────
+   INIT CUENTA OPTIONS
+───────────────────────────────── */
+function initCuentaOptions() {
+  const btnVerificar = document.getElementById('btnVerificarEmail');
+  const btnBorrar = document.getElementById('btnBorrarCuenta');
+
+  if (btnVerificar) {
+    btnVerificar.addEventListener('click', () => {
+      alert('Funcionalidad de verificación de email próximamente disponible.');
+      const statusEl = document.getElementById('emailStatus');
+      if (statusEl) {
+        statusEl.className = 'status-verified';
+        statusEl.textContent = '- VERIFICADO';
+      }
+    });
+  }
+
+  if (btnBorrar) {
+    btnBorrar.addEventListener('click', () => {
+      alert('Funcionalidad de verificación de email próximamente disponible.');
+    });
+  }
+}
+
+/* ─────────────────────────────────
    TOAST
 ───────────────────────────────── */
 
@@ -518,4 +543,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   initReanalyze();
   initCopySummary();
   initSaveProfile();
+  initCuentaOptions();
 });

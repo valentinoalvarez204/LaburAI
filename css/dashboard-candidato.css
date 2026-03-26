@@ -462,6 +462,10 @@ body { background: var(--bg); }
 .profile-form-grid {
   display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
 }
+.cuenta-card {
+  grid-column: span 2;
+  min-height: 200px;
+}
 .pf-card-title {
   font-family: var(--font-head); font-size: 15px; font-weight: 700;
   color: var(--text); margin-bottom: 18px;
@@ -539,4 +543,23 @@ body { background: var(--bg); }
   .dash-stats { grid-template-columns: repeat(2,1fr); gap: 10px; }
   .postul-item { flex-wrap: wrap; }
   .pi-match, .pi-status { align-self: flex-start; }
+}
+
+/* ─────────────────────────────────
+   CUENTA OPTIONS
+───────────────────────────────── */
+.cuenta-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status-pending {
+  color: #E53935; /* rojo */
+  font-weight: 600;
+}
+
+.status-verified {
+  color: white; /* blanco */
+  font-weight: 600;
 }
