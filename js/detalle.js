@@ -393,8 +393,8 @@ function initModal() {
     btnConfirm.innerHTML = '<div style="width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div> Enviando…';
 
     try {
-      // Obtener sesión del usuario
-      const session = JSON.parse(localStorage.getItem('laburai_session') || '{}');
+      // Obtener sesión del usuario (corregido typo labuai_session)
+      const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
 
       if (!session.token) {
         showToast('Necesitás iniciar sesión para postularte', 'error');
@@ -406,28 +406,11 @@ function initModal() {
       const ofertaId = getParam('id');
       const carta    = document.getElementById('coverLetter')?.value || '';
 
-      // Postular directamente usando el id guardado en sesión
-      const res = await fetch('http://localhost:3000/api/applications', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.token}`,
-        },
-        body: JSON.stringify({
-          candidatoId:     session.candidatoId,
-          ofertaId:        ofertaId,
-          cartaMotivacion: carta,
-        }),
+      // Usar la función centralizada de la API
+      await API.crearPostulacion({
+        ofertaId:        ofertaId,
+        cartaMotivacion: carta,
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        showToast(data.message || 'Error al postularse', 'error');
-        btnConfirm.disabled = false;
-        btnConfirm.innerHTML = 'Confirmar postulación';
-        return;
-      }
 
       // Mostrar éxito
       overlay?.classList.add('hidden');
@@ -549,7 +532,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!id) { window.location.href = 'ofertas.html'; return; }
 
   try {
-    const session = JSON.parse(localStorage.getItem('laburai_session'));
+    const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
     const candidatoId = (session && session.rol === 'CANDIDATO') ? session.candidatoId : '';
     const url = candidatoId 
       ? `http://localhost:3000/api/jobs/${id}?candidatoId=${candidatoId}`

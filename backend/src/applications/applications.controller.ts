@@ -12,7 +12,6 @@ export class ApplicationsController {
   create(
     @Req() req: any,
     @Body() body: {
-      candidatoId: string;
       ofertaId: string;
       cartaMotivacion?: string;
     }
@@ -20,7 +19,7 @@ export class ApplicationsController {
     if (req.user?.rol === 'EMPRESA') {
       throw new ForbiddenException('Las empresas no pueden postularse a ofertas.');
     }
-    return this.applicationsService.create(body);
+    return this.applicationsService.create(req.user.sub, body);
   }
 
   // GET /api/applications?candidatoId=XXX
