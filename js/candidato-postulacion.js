@@ -271,10 +271,10 @@ window.closeModal = function() {
 }
 
 // Cerrar modal al hacer click fuera del contenido
-window.onclick = function(event) {
+window.addEventListener('click', function(event) {
   const modal = document.getElementById('cvModal');
   if (event.target === modal) closeModal();
-}
+});
 
 /**
  * INIT

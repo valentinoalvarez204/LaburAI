@@ -434,18 +434,7 @@ window.cerrarOferta = async function (ofertaId, btn) {
   }
 };
 
-function initPublicar() {
-  document.getElementById('btnPublicar')?.addEventListener('click', async () => {
-    const btn = document.getElementById('btnPublicar');
-    btn.disabled = true;
-    btn.innerHTML = '<div style="width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div> Publicando…';
-    await delay(1600);
-    btn.disabled = false;
-    btn.innerHTML = 'Publicar oferta';
-    showToast('¡Oferta publicada! LaburAI ya está analizando candidatos.', 'success');
-    switchSection('ofertas');
-  });
-}
+
 
 function initGuardarEmpresa() {
   document.getElementById('btnSaveEmpresa')?.addEventListener('click', async () => {
