@@ -11,8 +11,7 @@ let JOBS = [];
 
 async function fetchHomeJobs() {
   try {
-    const res = await fetch('http://localhost:3000/api/jobs');
-    const data = await res.json();
+    const data = await API.getOfertas();
     if (!Array.isArray(data)) return;
 
     JOBS = data.map(job => ({
@@ -109,8 +108,7 @@ function initReveal() {
 
 async function fetchStats() {
   try {
-    const res = await fetch('http://localhost:3000/api/stats');
-    const data = await res.json();
+    const data = await API.getGlobalStats();
 
     // Mapear etiquetas de index.html a claves de la API
     const mapping = {
