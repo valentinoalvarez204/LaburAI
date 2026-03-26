@@ -6,6 +6,8 @@ import { JobsModule } from './jobs/jobs.module';
 import { ApplicationsModule } from './applications/applications.module';
 import { ProfileModule } from './profile/profile.module';
 import { StatsModule } from './stats/stats.module';
+import { EntrevistasModule } from './entrevistas/entrevistas.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { StatsModule } from './stats/stats.module';
     ApplicationsModule,
     ProfileModule,
     StatsModule,
+    EntrevistasModule,
+    DashboardModule,
   ],
   providers: [PrismaService],
   exports: [PrismaService],

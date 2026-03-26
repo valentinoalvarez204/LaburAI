@@ -332,19 +332,8 @@ function initForms() {
         const email = document.getElementById('loginEmail')?.value || '';
         const password = document.getElementById('loginPassword')?.value || '';
 
-        const res = await fetch('http://localhost:3000/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        });
-
-        const data = await res.json();
+        const data = await API.login(email, password);
         setLoading('btnLogin', false);
-
-        if (!res.ok) {
-          showToast(data.message || 'Email o contraseña incorrectos', 'error');
-          return;
-        }
 
         localStorage.setItem('labuai_session', JSON.stringify({
           nombre: data.usuario.nombre,
@@ -366,7 +355,7 @@ function initForms() {
 
       } catch (err) {
         setLoading('btnLogin', false);
-        showToast('No se pudo conectar con el servidor', 'error');
+        showToast(err.message || 'No se pudo conectar con el servidor', 'error');
       }
     });
   }
@@ -405,33 +394,19 @@ function initForms() {
         }
 
         // Nombre de empresa: usar campo dedicado si existe, si no caer en regNombre
-        const nombreEmpresa = (rol === 'empresa'
-          ? document.getElementById('regNombreEmpresa')?.value.trim()
-          : null) || nombre;
-
-        const res = await fetch('http://localhost:3000/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email,
-            password,
-            rol: rol.toUpperCase(),
-            nombre: rol === 'empresa' ? nombreEmpresa : nombre,
-            apellido: rol === 'empresa' ? '' : apellido,
-            ...(industria ? { industria } : {}),
-          }),
+        const data = await API.register({
+          email,
+          password,
+          rol: rol.toUpperCase(),
+          nombre: rol === 'empresa' ? nombreEmpresa : nombre,
+          apellido: rol === 'empresa' ? '' : apellido,
+          ...(industria ? { industria } : {}),
         });
 
-        const data = await res.json();
         setLoading('btnRegister', false);
 
-        if (!res.ok) {
-          showToast(data.message || 'Error al registrarse', 'error');
-          return;
-        }
-
         localStorage.setItem('labuai_session', JSON.stringify({
-          nombre: `${nombre} ${apellido}`.trim(),
+          nombre: data.usuario.nombre,
           rol: rol,
           email: email,
           token: data.token,
@@ -466,7 +441,7 @@ function initForms() {
 
       } catch (err) {
         setLoading('btnRegister', false);
-        showToast('No se pudo conectar con el servidor', 'error');
+        showToast(err.message || 'No se pudo conectar con el servidor', 'error');
       }
     });
   }

@@ -64,15 +64,33 @@ export class JobsService {
     modalidad: string;
     ubicacion: string;
     jornada: string;
+    vacantes?: number;
+    fechaLimite?: string;
     experiencia?: string;
     estudios?: string;
     salarioMin?: number;
     salarioMax?: number;
     habilidades?: string[];
-    empresaId: string;
-  }) {
+    responsabilidades?: string[];
+    beneficios?: string[];
+  }, usuarioId: string) {
+    
+    const empresa = await this.prisma.empresa.findUnique({
+      where: { usuarioId }
+    });
+
+    if (!empresa) {
+      throw new ForbiddenException('Perfil de empresa no encontrado');
+    }
+
+    const fechaParseada = data.fechaLimite ? new Date(data.fechaLimite) : undefined;
+
     return this.prisma.ofertaLaboral.create({
-      data,
+      data: {
+        ...data,
+        fechaLimite: fechaParseada,
+        empresaId: empresa.id,
+      },
       include: {
         empresa: { select: { nombre: true } },
       },
@@ -87,16 +105,26 @@ export class JobsService {
     modalidad: string;
     ubicacion: string;
     jornada: string;
+    vacantes: number;
+    fechaLimite: string;
     experiencia: string;
     estudios: string;
     salarioMin: number;
     salarioMax: number;
     habilidades: string[];
+    responsabilidades: string[];
+    beneficios: string[];
   }>, usuarioId: string) {
     await this.assertOwnership(id, usuarioId);
+
+    const updateData: any = { ...data };
+    if (data.fechaLimite) {
+      updateData.fechaLimite = new Date(data.fechaLimite);
+    }
+    
     return this.prisma.ofertaLaboral.update({
       where: { id },
-      data,
+      data: updateData,
     });
   }
 

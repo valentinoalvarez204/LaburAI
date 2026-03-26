@@ -7,9 +7,9 @@ export class StatsService {
 
   async getGlobalStats() {
     const [candidatos, ofertas, empresas, matchAgg] = await Promise.all([
-      this.prisma.usuario.count({ where: { rol: 'CANDIDATO' } }),
+      this.prisma.candidato.count(),
       this.prisma.ofertaLaboral.count({ where: { activa: true } }),
-      this.prisma.usuario.count({ where: { rol: 'EMPRESA' } }),
+      this.prisma.empresa.count(),
       this.prisma.postulacion.aggregate({
         _avg: { matchIA: true },
       }),
@@ -23,7 +23,15 @@ export class StatsService {
     };
   }
 
-  async getEmpresaStats(empresaId: string) {
+  async getEmpresaStats(usuarioId: string) {
+    const empresa = await this.prisma.empresa.findUnique({
+      where: { usuarioId },
+    });
+    if (!empresa) {
+      return { ofertasActivas: 0, totalPostulaciones: 0, entrevistas: 0, rechazadas: 0 };
+    }
+    const empresaId = empresa.id;
+
     const [ofertasActivas, totalPostulaciones, entrevistas, rechazadas] = await Promise.all([
       this.prisma.ofertaLaboral.count({
         where: { empresaId, activa: true },
@@ -47,7 +55,15 @@ export class StatsService {
     };
   }
 
-  async getCandidatoStats(candidatoId: string) {
+  async getCandidatoStats(usuarioId: string) {
+    const candidato = await this.prisma.candidato.findUnique({
+      where: { usuarioId },
+    });
+    if (!candidato) {
+      return { totalPostulaciones: 0, pendientes: 0, entrevistas: 0, rechazadas: 0 };
+    }
+    const candidatoId = candidato.id;
+
     const [totalPostulaciones, pendientes, entrevistas, rechazadas] = await Promise.all([
       this.prisma.postulacion.count({ where: { candidatoId } }),
       this.prisma.postulacion.count({ where: { candidatoId, estado: 'PENDIENTE' } }),

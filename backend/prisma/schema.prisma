@@ -8,14 +8,14 @@ datasource db {
 
 // ── USUARIOS ──
 model Usuario {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  rol       Rol      @default(CANDIDATO)
-  creadoEn  DateTime @default(now())
+  id       String   @id @default(uuid())
+  email    String   @unique
+  password String
+  rol      Rol      @default(CANDIDATO)
+  creadoEn DateTime @default(now())
 
-  candidato  Candidato?
-  empresa    Empresa?
+  candidato Candidato?
+  empresa   Empresa?
 }
 
 enum Rol {
@@ -37,8 +37,8 @@ model Candidato {
   habilidades String[]
   creadoEn    DateTime @default(now())
 
-  usuarioId   String   @unique
-  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId String  @unique
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
 
   postulaciones Postulacion[]
 }
@@ -55,31 +55,35 @@ model Empresa {
   tamanoEmpresa String?
   creadoEn      DateTime @default(now())
 
-  usuarioId   String   @unique
-  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId String  @unique
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
 
-  ofertas     OfertaLaboral[]
+  ofertas OfertaLaboral[]
 }
 
 // ── OFERTA LABORAL ──
 model OfertaLaboral {
-  id          String    @id @default(uuid())
-  titulo      String
-  descripcion String
-  rubro       String
-  modalidad   String
-  ubicacion   String
-  jornada     String
-  experiencia String?
-  estudios    String?
-  salarioMin  Int?
-  salarioMax  Int?
-  habilidades String[]
-  activa      Boolean   @default(true)
-  creadoEn    DateTime  @default(now())
+  id                String    @id @default(uuid())
+  titulo            String
+  descripcion       String
+  rubro             String
+  modalidad         String
+  ubicacion         String
+  jornada           String
+  vacantes          Int?      @default(1)
+  fechaLimite       DateTime?
+  experiencia       String?
+  estudios          String?
+  salarioMin        Int?
+  salarioMax        Int?
+  habilidades       String[]
+  responsabilidades String[]
+  beneficios        String[]
+  activa            Boolean   @default(true)
+  creadoEn          DateTime  @default(now())
 
-  empresaId   String
-  empresa     Empresa   @relation(fields: [empresaId], references: [id])
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id])
 
   postulaciones Postulacion[]
 }
@@ -93,13 +97,26 @@ model Postulacion {
   creadoEn        DateTime @default(now())
   notes           String?
 
-  candidatoId     String
-  candidato       Candidato @relation(fields: [candidatoId], references: [id])
+  candidatoId String
+  candidato   Candidato @relation(fields: [candidatoId], references: [id])
 
-  ofertaId        String
-  oferta          OfertaLaboral @relation(fields: [ofertaId], references: [id])
+  ofertaId String
+  oferta   OfertaLaboral @relation(fields: [ofertaId], references: [id])
+
+  entrevistas Entrevista[]
 
   @@unique([candidatoId, ofertaId])
+}
+
+// ── ENTREVISTA ──
+model Entrevista {
+  id          String   @id @default(uuid())
+  fecha       DateTime
+  linkReunion String?
+  creadaEn    DateTime @default(now())
+
+  postulacionId String
+  postulacion   Postulacion @relation(fields: [postulacionId], references: [id])
 }
 
 enum Estado {

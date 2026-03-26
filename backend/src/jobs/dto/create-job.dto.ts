@@ -54,6 +54,23 @@ export class CreateJobDto {
   @IsString({ each: true })
   habilidades?: string[];
 
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  vacantes?: number;
+
+  @IsOptional()
   @IsString()
-  empresaId: string;
+  fechaLimite?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  responsabilidades?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  beneficios?: string[];
 }

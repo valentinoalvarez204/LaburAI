@@ -210,6 +210,23 @@ function renderOfertas(filter = 'todas') {
         ${o.status === 'activa' ? `<button class="or-btn" onclick="cerrarOferta('${o.id}', this)">Cerrar</button>` : ''}
       </div>
     </div>`).join('');
+
+  updateOfertasTabsCounts();
+}
+
+/** Actualiza los números en los botones de las tabs de ofertas */
+function updateOfertasTabsCounts() {
+  const todas = OFERTAS_DATA.length;
+  const activas = OFERTAS_DATA.filter(o => o.status === 'activa').length;
+  const cerradas = OFERTAS_DATA.filter(o => o.status === 'cerrada').length;
+
+  const btnTodas = document.querySelector('.otab[data-of="todas"]');
+  const btnActivas = document.querySelector('.otab[data-of="activa"]');
+  const btnCerradas = document.querySelector('.otab[data-of="cerrada"]');
+
+  if (btnTodas) btnTodas.textContent = `Todas (${todas})`;
+  if (btnActivas) btnActivas.textContent = `Activas (${activas})`;
+  if (btnCerradas) btnCerradas.textContent = `Cerradas (${cerradas})`;
 }
 
 function initOfertasTabs() {
@@ -417,18 +434,7 @@ window.cerrarOferta = async function (ofertaId, btn) {
   }
 };
 
-function initPublicar() {
-  document.getElementById('btnPublicar')?.addEventListener('click', async () => {
-    const btn = document.getElementById('btnPublicar');
-    btn.disabled = true;
-    btn.innerHTML = '<div style="width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div> Publicando…';
-    await delay(1600);
-    btn.disabled = false;
-    btn.innerHTML = 'Publicar oferta';
-    showToast('¡Oferta publicada! LaburAI ya está analizando candidatos.', 'success');
-    switchSection('ofertas');
-  });
-}
+
 
 function initGuardarEmpresa() {
   document.getElementById('btnSaveEmpresa')?.addEventListener('click', async () => {
@@ -559,6 +565,7 @@ function pubUpdatePreview() {
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set('prev-titulo', pubState.titulo || 'Tu oferta aparecerá así');
   set('prev-ubicacion', pubState.ubicacion || 'Ubicación');
+  set('prev-empresa', EMPRESA.nombre || 'Empresa');
   const mEl = document.getElementById('prev-modalidad');
   if (mEl) { mEl.textContent = pubState.modalidad; mEl.className = `job-tag ${pubState.modalidad === 'Remoto' ? 'remote' : ''}`; }
   set('prev-jornada', pubState.jornada);
@@ -605,32 +612,85 @@ async function pubHandleSubmit() {
   if (btn) btn.disabled = true;
   if (txt) txt.style.display = 'none';
   if (spin) spin.classList.remove('hidden');
-  await delay(2000);
-  if (btn) btn.disabled = false;
-  if (txt) txt.style.display = '';
-  if (spin) spin.classList.add('hidden');
 
-  document.querySelector('.publicar-layout')?.classList.add('hidden');
-  const success = document.getElementById('pubSuccess');
-  if (success) {
-    success.classList.remove('hidden');
-    animateCounterId('pubCandCount', 0, 1247, 1600);
-    animateCounterId('pubMatchCount', 0, 34, 1600);
+  try {
+    const payload = {
+      titulo: pubState.titulo,
+      rubro: pubState.rubro,
+      modalidad: pubState.modalidad,
+      ubicacion: pubState.ubicacion,
+      jornada: pubState.jornada,
+      descripcion: pubState.desc,
+      habilidades: pubState.skills,
+      responsabilidades: pubState.resp,
+      beneficios: pubState.benef,
+    };
+
+    if (pubState.salMin) payload.salarioMin = Number(pubState.salMin);
+    if (pubState.salMax) payload.salarioMax = Number(pubState.salMax);
+    
+    // (Opcionales si la UI los envia en un futuro, ej vacantes o fechaLimite)
+    if (pubState.vacantes) payload.vacantes = Number(pubState.vacantes);
+    if (pubState.fechaLimite) payload.fechaLimite = pubState.fechaLimite;
+
+    await API.crearOferta(payload);
+
+    if (btn) btn.disabled = false;
+    if (txt) txt.style.display = '';
+    if (spin) spin.classList.add('hidden');
+
+    document.querySelector('.publicar-layout')?.classList.add('hidden');
+    const success = document.getElementById('pubSuccess');
+    if (success) {
+      success.classList.remove('hidden');
+      animateCounterId('pubCandCount', 0, 0, 800);
+      animateCounterId('pubMatchCount', 0, 0, 800);
+    }
+    showToast('¡Oferta publicada exitosamente!', 'success');
+
+    // Refrescar lista de ofertas si ya estaban cargadas
+    const session = requireSession();
+    if (session && session.empresaId) {
+      const misOfertas = await API.getOfertas({ empresaId: session.empresaId });
+      OFERTAS_DATA.length = 0;
+      misOfertas.forEach((j) => OFERTAS_DATA.push({
+        id: j.id, title: j.titulo, area: j.rubro, modalidad: j.modalidad, ubicacion: j.ubicacion,
+        status: j.activa ? 'activa' : 'cerrada', postulaciones: j.postulaciones?.length || 0,
+        vistas: 0, dias: Math.floor((Date.now() - new Date(j.creadoEn)) / 86400000),
+      }));
+      renderOfertas(document.querySelector('.otab.active')?.dataset.of || 'todas');
+    }
+
+  } catch (err) {
+    if (btn) btn.disabled = false;
+    if (txt) txt.style.display = '';
+    if (spin) spin.classList.add('hidden');
+    console.error('[Dashboard] Error al publicar:', err.message);
+    showToast(err.message || 'Ocurrió un error al publicar la oferta', 'error');
   }
-  showToast('¡Oferta publicada!', 'success');
 }
 
 function animateCounterId(id, from, to, dur) {
   const el = document.getElementById(id); if (!el) return;
   const s = performance.now();
-  function t(n) { const p = Math.min((n - s) / dur, 1); el.textContent = Math.floor(from + (1 - Math.pow(2, -10 * p)) * (to - from)).toLocaleString('es-AR'); if (p < 1) requestAnimationFrame(t); }
+  function t(n) { 
+    const p = Math.min((n - s) / dur, 1); 
+    const val = p === 1 ? to : Math.round(from + (1 - Math.pow(2, -10 * p)) * (to - from));
+    el.textContent = val.toLocaleString('es-AR'); 
+    if (p < 1) requestAnimationFrame(t); 
+  }
   requestAnimationFrame(t);
 }
 
 function animateCounterEl(el, from, to, dur) {
   if (!el) return;
   const s = performance.now();
-  function t(n) { const p = Math.min((n - s) / dur, 1); el.textContent = Math.floor(from + (1 - Math.pow(2, -10 * p)) * (to - from)).toLocaleString('es-AR'); if (p < 1) requestAnimationFrame(t); }
+  function t(n) { 
+    const p = Math.min((n - s) / dur, 1); 
+    const val = p === 1 ? to : Math.round(from + (1 - Math.pow(2, -10 * p)) * (to - from));
+    el.textContent = val.toLocaleString('es-AR'); 
+    if (p < 1) requestAnimationFrame(t); 
+  }
   requestAnimationFrame(t);
 }
 function pubResetForm() {
@@ -772,15 +832,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Stats en paralelo — no bloquean el render principal
-    API.getStatsEmpresa(session.empresaId)
+    apiFetch('/dashboard/empresa')
       .then((stats) => {
         const greetSub = document.querySelector('.greeting-sub');
-        if (greetSub) greetSub.innerHTML = `Tenés <strong>${stats.totalPostulaciones} postulaciones nuevas</strong> y <strong>${stats.ofertasActivas} ofertas activas</strong> publicadas.`;
-        const statEls = document.querySelectorAll('.dstat-num');
-        const vals = [stats.ofertasActivas, stats.totalPostulaciones, stats.entrevistas ?? 0, 1240];
-        statEls.forEach((el, i) => { if (vals[i] !== undefined) animateCounterEl(el, 0, vals[i], 900); });
+        if (greetSub) {
+          greetSub.innerHTML = `Tenés <strong>${stats.postulaciones} postulaciones nuevas</strong> y <strong>${stats.ofertasActivas} ofertas activas</strong> publicadas.`;
+        }
+
+        const elOfertas = document.getElementById('statOfertasActivas');
+        const elPostulaciones = document.getElementById('statPostulaciones');
+        const elEntrevistas = document.getElementById('statEntrevistas');
+
+        if (elOfertas) animateCounterEl(elOfertas, 0, stats.ofertasActivas, 900);
+        if (elPostulaciones) animateCounterEl(elPostulaciones, 0, stats.postulaciones, 900);
+        if (elEntrevistas) animateCounterEl(elEntrevistas, 0, stats.entrevistas, 900);
       })
-      .catch((err) => console.error('[Dashboard] Error cargando stats empresa:', err.message));
+      .catch((err) => {
+        console.error('[Dashboard] Error cargando stats empresa:', err.message);
+        const greetSub = document.querySelector('.greeting-sub');
+        if (greetSub) greetSub.textContent = 'Error al cargar estadísticas.';
+      });
   }
 
   injectGradient();

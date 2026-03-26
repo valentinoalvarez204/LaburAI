@@ -6,11 +6,16 @@ export class ApplicationsService {
   constructor(private prisma: PrismaService) { }
 
   // Postularse a una oferta
-  async create(data: {
-    candidatoId: string;
+  async create(usuarioId: string, data: {
     ofertaId: string;
     cartaMotivacion?: string;
   }) {
+    // Buscar el perfil de candidato asociado a este usuario
+    const candidato = await this.prisma.candidato.findUnique({
+      where: { usuarioId }
+    });
+    if (!candidato) throw new NotFoundException('Perfil de candidato no encontrado');
+
     // Verificar que la oferta existe
     const oferta = await this.prisma.ofertaLaboral.findUnique({
       where: { id: data.ofertaId },
@@ -22,7 +27,7 @@ export class ApplicationsService {
     const yaPostulado = await this.prisma.postulacion.findUnique({
       where: {
         candidatoId_ofertaId: {
-          candidatoId: data.candidatoId,
+          candidatoId: candidato.id,
           ofertaId: data.ofertaId,
         },
       },
@@ -31,7 +36,7 @@ export class ApplicationsService {
 
     return this.prisma.postulacion.create({
       data: {
-        candidatoId: data.candidatoId,
+        candidatoId: candidato.id,
         ofertaId: data.ofertaId,
         cartaMotivacion: data.cartaMotivacion,
         estado: 'PENDIENTE', // siempre forzado al crear
