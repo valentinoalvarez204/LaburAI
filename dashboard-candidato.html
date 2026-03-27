@@ -282,22 +282,40 @@
         <div class="profile-form-grid">
           <div class="pf-card">
             <h3 class="pf-card-title">Datos personales</h3>
-            <div class="form-field">
-              <label class="form-label">Nombre completo</label>
-              <input type="text" id="profileNombre" class="form-input" value="Valentina González"/>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Nombre</label>
+                <input type="text" id="profileNombre" class="form-input" value=""/>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Apellido</label>
+                <input type="text" id="profileApellido" class="form-input" value=""/>
+              </div>
             </div>
             <div class="form-field">
               <label class="form-label">Email</label>
-              <input type="email" class="form-input" value="valentina.g@email.com"/>
+              <input type="email" id="profileEmail" class="form-input" value="" readonly />
             </div>
             <div class="form-row">
               <div class="form-field">
                 <label class="form-label">Ubicación</label>
-                <input type="text" id="profileUbicacion" class="form-input" value="Córdoba, Argentina"/>
+                <select id="profileUbicacion" class="form-select">
+                  <option value="" selected disabled>Seleccioná tu provincia</option>
+                  <option value="Córdoba">Córdoba</option>
+                  <option value="Buenos Aires">Buenos Aires</option>
+                  <option value="Mendoza">Mendoza</option>
+                  <option value="Salta">Salta</option>
+                  <option value="Santa Fe">Santa Fe</option>
+                  <option value="Tucumán">Tucumán</option>
+                  <option value="Entre Ríos">Entre Ríos</option>
+                  <option value="Neuquén">Neuquén</option>
+                  <option value="Chubut">Chubut</option>
+                  <option value="Río Negro">Río Negro</option>
+                </select>
               </div>
               <div class="form-field">
                 <label class="form-label">Teléfono</label>
-                <input type="text" id="profileTelefono" class="form-input" value="+54 351 456 7890"/>
+                <input type="text" id="profileTelefono" class="form-input" value=""/>
               </div>
             </div>
           </div>
