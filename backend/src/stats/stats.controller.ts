@@ -1,5 +1,6 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { StatsService } from './stats.service';
+import { JwtGuard } from '../auth/jwt.guard';
 
 @Controller('stats')
 export class StatsController {
@@ -10,14 +11,18 @@ export class StatsController {
     return this.statsService.getGlobalStats();
   }
 
-  @Get('empresa/:id')
-  getEmpresaStats(@Param('id') id: string) {
-    return this.statsService.getEmpresaStats(id);
+  @UseGuards(JwtGuard)
+  @Get('empresa')
+  getEmpresaStats(@Req() req) {
+    // req.user.sub is the usuarioId
+    return this.statsService.getEmpresaStats(req.user.sub);
   }
 
-  @Get('candidato/:id')
-  getCandidatoStats(@Param('id') id: string) {
-    return this.statsService.getCandidatoStats(id);
+  @UseGuards(JwtGuard)
+  @Get('candidato')
+  getCandidatoStats(@Req() req) {
+    // req.user.sub is the usuarioId
+    return this.statsService.getCandidatoStats(req.user.sub);
   }
 }
 

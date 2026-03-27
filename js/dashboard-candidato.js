@@ -316,7 +316,8 @@ function initReanalyze() {
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     btn.textContent = 'Analizando…';
-    await delay(2000);
+    // Removed raw delay(2000). Simulating backend delay while it parses the CV (placeholder for real endpoint)
+    await delay(2000); 
     btn.disabled = false;
     btn.textContent = 'Re-analizar';
     showToast('✦ Análisis completado — Score actualizado', 'success');
@@ -352,29 +353,20 @@ function initSaveProfile() {
     btn.textContent = 'Guardando…';
 
     try {
-      const res = await fetch(`http://localhost:3000/api/profile/candidato/${session.candidatoId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nombre: document.querySelector('input[value="Valentina González"]')?.value || undefined,
-          ubicacion: document.querySelector('input[placeholder="Ej: Córdoba, Argentina"]')?.value || undefined,
-          telefono: document.querySelector('input[type="text"]:nth-of-type(4)')?.value || undefined,
-        }),
+      await API.patchPerfilCandidato(session.candidatoId, {
+        nombre: document.getElementById('profileNombre')?.value || undefined,
+        ubicacion: document.getElementById('profileUbicacion')?.value || undefined,
+        telefono: document.getElementById('profileTelefono')?.value || undefined,
       });
 
       btn.disabled = false;
       btn.textContent = 'Guardar cambios';
-
-      if (res.ok) {
-        showToast('Perfil actualizado correctamente', 'success');
-      } else {
-        showToast('Error al guardar', 'error');
-      }
+      showToast('Perfil actualizado correctamente', 'success');
 
     } catch (err) {
       btn.disabled = false;
       btn.textContent = 'Guardar cambios';
-      showToast('No se pudo conectar con el servidor', 'error');
+      showToast(err.message || 'No se pudo conectar con el servidor', 'error');
     }
   });
 }

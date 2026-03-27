@@ -72,10 +72,10 @@ async function getGlobalStats() {
 /* ─────────────────────────────────
    ESTADÍSTICAS EMPRESA
 ───────────────────────────────── */
-async function getStatsEmpresa(empresaId) {
+async function getStatsEmpresa() {
   try {
-    const data = await apiFetch(`/stats/empresa/${empresaId}`);
-    assertFields(data, ['ofertasActivas', 'totalPostulaciones', 'entrevistas', 'rechazadas'], `/stats/empresa/${empresaId}`);
+    const data = await apiFetch(`/stats/empresa`);
+    assertFields(data, ['ofertasActivas', 'totalPostulaciones', 'entrevistas', 'rechazadas'], `/stats/empresa`);
     return data;
   } catch (err) {
     console.error('[API] Error obteniendo stats de empresa:', err.message);
@@ -86,10 +86,10 @@ async function getStatsEmpresa(empresaId) {
 /* ─────────────────────────────────
    ESTADÍSTICAS CANDIDATO
 ───────────────────────────────── */
-async function getStatsCandidato(candidatoId) {
+async function getStatsCandidato() {
   try {
-    const data = await apiFetch(`/stats/candidato/${candidatoId}`);
-    assertFields(data, ['totalPostulaciones', 'pendientes', 'entrevistas', 'rechazadas'], `/stats/candidato/${candidatoId}`);
+    const data = await apiFetch(`/stats/candidato`);
+    assertFields(data, ['totalPostulaciones', 'pendientes', 'entrevistas', 'rechazadas'], `/stats/candidato`);
     return data;
   } catch (err) {
     console.error('[API] Error obteniendo stats de candidato:', err.message);
@@ -229,6 +229,15 @@ async function patchPerfilEmpresa(data) {
     throw err;
   }
 }
+
+async function getIndustrias() {
+  try {
+    return await apiFetch(`/profile/industrias`);
+  } catch (err) {
+    console.error(`[API] Error obteniendo industrias:`, err.message);
+    throw err;
+  }
+}
 /* ─────────────────────────────────
    EXPORT GLOBAL
 ───────────────────────────────── */
@@ -255,4 +264,5 @@ window.API = {
   patchPerfilCandidato,
   getPerfilEmpresa,
   patchPerfilEmpresa,
+  getIndustrias,
 };

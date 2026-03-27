@@ -50,4 +50,24 @@ export class UpdateJobDto {
   @IsArray()
   @IsString({ each: true })
   habilidades?: string[];
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  vacantes?: number;
+
+  @IsOptional()
+  @IsString()
+  fechaLimite?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  responsabilidades?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  beneficios?: string[];
 }

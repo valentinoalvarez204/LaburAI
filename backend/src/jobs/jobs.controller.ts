@@ -41,8 +41,11 @@ export class JobsController {
   // POST /api/jobs — solo empresas autenticadas
   @Post()
   @UseGuards(JwtGuard)
-  create(@Body() body: CreateJobDto) {
-    return this.jobsService.create(body);
+  async create(@Body() body: CreateJobDto, @Req() req: any) {
+    if (req.user.rol !== 'EMPRESA') {
+      throw new ForbiddenException('Solo las empresas pueden publicar ofertas');
+    }
+    return this.jobsService.create(body, req.user.sub);
   }
 
   // PATCH /api/jobs/:id — editar oferta (solo la empresa dueña)
