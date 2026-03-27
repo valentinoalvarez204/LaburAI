@@ -316,8 +316,7 @@ function initReanalyze() {
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     btn.textContent = 'Analizando…';
-    // Removed raw delay(2000). Simulating backend delay while it parses the CV (placeholder for real endpoint)
-    await delay(2000); 
+    await delay(2000);
     btn.disabled = false;
     btn.textContent = 'Re-analizar';
     showToast('✦ Análisis completado — Score actualizado', 'success');
@@ -353,47 +352,31 @@ function initSaveProfile() {
     btn.textContent = 'Guardando…';
 
     try {
-      await API.patchPerfilCandidato(session.candidatoId, {
-        nombre: document.getElementById('profileNombre')?.value || undefined,
-        ubicacion: document.getElementById('profileUbicacion')?.value || undefined,
-        telefono: document.getElementById('profileTelefono')?.value || undefined,
+      const res = await fetch(`http://localhost:3000/api/profile/candidato/${session.candidatoId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: document.querySelector('input[value="Valentina González"]')?.value || undefined,
+          ubicacion: document.querySelector('input[placeholder="Ej: Córdoba, Argentina"]')?.value || undefined,
+          telefono: document.querySelector('input[type="text"]:nth-of-type(4)')?.value || undefined,
+        }),
       });
 
       btn.disabled = false;
       btn.textContent = 'Guardar cambios';
-      showToast('Perfil actualizado correctamente', 'success');
+
+      if (res.ok) {
+        showToast('Perfil actualizado correctamente', 'success');
+      } else {
+        showToast('Error al guardar', 'error');
+      }
 
     } catch (err) {
       btn.disabled = false;
       btn.textContent = 'Guardar cambios';
-      showToast(err.message || 'No se pudo conectar con el servidor', 'error');
+      showToast('No se pudo conectar con el servidor', 'error');
     }
   });
-}
-
-/* ─────────────────────────────────
-   INIT CUENTA OPTIONS
-───────────────────────────────── */
-function initCuentaOptions() {
-  const btnVerificar = document.getElementById('btnVerificarEmail');
-  const btnBorrar = document.getElementById('btnBorrarCuenta');
-
-  if (btnVerificar) {
-    btnVerificar.addEventListener('click', () => {
-      alert('Funcionalidad de verificación de email próximamente disponible.');
-      const statusEl = document.getElementById('emailStatus');
-      if (statusEl) {
-        statusEl.className = 'status-verified';
-        statusEl.textContent = '- VERIFICADO';
-      }
-    });
-  }
-
-  if (btnBorrar) {
-    btnBorrar.addEventListener('click', () => {
-      alert('Funcionalidad de verificación de email próximamente disponible.');
-    });
-  }
 }
 
 /* ─────────────────────────────────
@@ -535,5 +518,4 @@ document.addEventListener('DOMContentLoaded', async () => {
   initReanalyze();
   initCopySummary();
   initSaveProfile();
-  initCuentaOptions();
 });

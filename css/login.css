@@ -53,7 +53,7 @@
   position: relative;
   overflow: hidden;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   padding: 60px 52px;
 }
 
