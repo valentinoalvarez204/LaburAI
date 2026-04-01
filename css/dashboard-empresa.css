@@ -62,6 +62,25 @@ body {
 }
 
 /* ─────────────────────────────────
+   CUENTA OPTIONS
+───────────────────────────────── */
+.cuenta-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status-pending {
+  color: #E53935; /* rojo */
+  font-weight: 600;
+}
+
+.status-verified {
+  color: white; /* blanco */
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────
    OFERTAS MINI (en el resumen)
 ───────────────────────────────── */
 .ofertas-mini {
@@ -717,6 +736,10 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+}
+
+.cuenta-card {
+  grid-column: span 2;
 }
 
 .pf-card-title {

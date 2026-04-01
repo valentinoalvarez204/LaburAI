@@ -55,6 +55,7 @@ function renderScore() {
 
   // Nivel del score
   const nivelEl = document.getElementById('scoreLevel');
+
   if (nivelEl) {
     const nivelMap = {
       bueno: { cls: 'score-level--bueno', icon: '✓', label: 'CV Competitivo' },
@@ -88,6 +89,41 @@ function renderScore() {
     tipEl.innerHTML = `
       <div class="score-tip-icon">✦</div>
       <div><strong>Consejo de LaburAI:</strong> ${tip}</div>`;
+  }
+}
+
+function updateProfileCompleteness(profile) {
+  const fields = [profile.nombre, profile.apellido, profile.email, profile.ubicacion, profile.telefono];
+  const filled = fields.filter((v) => v != null && String(v).trim() !== '').length;
+  const percent = Math.round((filled / 5) * 100);
+
+  const fillEl = document.querySelector('.cvs-fill');
+  const pctEl = document.querySelector('.cvs-pct');
+
+  if (fillEl) {
+    fillEl.style.width = `${percent}%`;
+    fillEl.style.background = percent === 100 ? 'var(--success)' : 'var(--grad)';
+  }
+
+  if (pctEl) {
+    if (percent === 100) {
+      pctEl.classList.add('cvs-pct--complete');
+      pctEl.innerHTML = `100% <span class="cvs-check">✓</span>`;
+    } else {
+      pctEl.classList.remove('cvs-pct--complete');
+      pctEl.textContent = `${percent}%`;
+    }
+  }
+
+  const ctaLink = document.querySelector('.cvs-cta');
+  if (ctaLink) {
+    if (percent === 100) {
+      ctaLink.textContent = 'Ir a perfil →';
+      ctaLink.classList.add('cvs-cta--done');
+    } else {
+      ctaLink.textContent = 'Completar perfil →';
+      ctaLink.classList.remove('cvs-cta--done');
+    }
   }
 }
 
@@ -316,8 +352,7 @@ function initReanalyze() {
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     btn.textContent = 'Analizando…';
-    // Removed raw delay(2000). Simulating backend delay while it parses the CV (placeholder for real endpoint)
-    await delay(2000); 
+    await delay(2000);
     btn.disabled = false;
     btn.textContent = 'Re-analizar';
     showToast('✦ Análisis completado — Score actualizado', 'success');
@@ -353,20 +388,43 @@ function initSaveProfile() {
     btn.textContent = 'Guardando…';
 
     try {
-      await API.patchPerfilCandidato(session.candidatoId, {
-        nombre: document.getElementById('profileNombre')?.value || undefined,
-        ubicacion: document.getElementById('profileUbicacion')?.value || undefined,
-        telefono: document.getElementById('profileTelefono')?.value || undefined,
-      });
+      const telefonoVal = document.getElementById('profileTelefono')?.value?.trim();
+      const payload = {
+        nombre: document.getElementById('profileNombre')?.value?.trim() || undefined,
+        apellido: document.getElementById('profileApellido')?.value?.trim() || undefined,
+        ubicacion: document.getElementById('profileUbicacion')?.value?.trim() || undefined,
+        telefono: telefonoVal ? telefonoVal : null,
+      };
+
+      await API.patchPerfilCandidato(session.candidatoId, payload);
 
       btn.disabled = false;
       btn.textContent = 'Guardar cambios';
       showToast('Perfil actualizado correctamente', 'success');
 
+      // Actualizar el estado local y campos de la UI
+      const profileNombre = document.getElementById('profileNombre');
+      const profileApellido = document.getElementById('profileApellido');
+      const profileUbicacion = document.getElementById('profileUbicacion');
+      const profileTelefono = document.getElementById('profileTelefono');
+      const profileEmail = document.getElementById('profileEmail');
+      if (profileNombre) profileNombre.value = payload.nombre || '';
+      if (profileApellido) profileApellido.value = payload.apellido || '';
+      if (profileUbicacion) profileUbicacion.value = payload.ubicacion || '';
+      if (profileTelefono) profileTelefono.value = payload.telefono || '';
+
+      updateProfileCompleteness({
+        nombre: payload.nombre,
+        apellido: payload.apellido,
+        email: profileEmail?.value,
+        ubicacion: payload.ubicacion,
+        telefono: payload.telefono,
+      });
     } catch (err) {
       btn.disabled = false;
       btn.textContent = 'Guardar cambios';
-      showToast(err.message || 'No se pudo conectar con el servidor', 'error');
+      console.error('[Dashboard] Error guardando perfil', err);
+      showToast('Error al guardar', 'error');
     }
   });
 }
@@ -388,6 +446,26 @@ async function fetchProfile(candidatoId) {
     CANDIDATO.nombre = `${data.nombre || ''} ${data.apellido || ''}`.trim();
     CANDIDATO.score = data.scoreCV || 0;
     CANDIDATO.resumen = data.resumenIA || 'Subí tu CV para que la IA genere un resumen de tu perfil profesional.';
+    // Sincronizar formulario de Mi perfil
+    const profileNombre = document.getElementById('profileNombre');
+    const profileApellido = document.getElementById('profileApellido');
+    const profileEmail = document.getElementById('profileEmail');
+    const profileUbicacion = document.getElementById('profileUbicacion');
+    const profileTelefono = document.getElementById('profileTelefono');
+    if (profileNombre) profileNombre.value = data.nombre || '';
+    if (profileApellido) profileApellido.value = data.apellido || '';
+    if (profileEmail) profileEmail.value = data.usuario?.email || '';
+    if (profileUbicacion) profileUbicacion.value = data.ubicacion || '';
+    if (profileTelefono) profileTelefono.value = data.telefono || '';
+
+    updateProfileCompleteness({
+      nombre: data.nombre,
+      apellido: data.apellido,
+      email: data.usuario?.email,
+      ubicacion: data.ubicacion,
+      telefono: data.telefono,
+    });
+
     CANDIDATO.scoreData = {
       total: data.scoreCV || 0,
       nivel: (data.scoreCV >= 75) ? 'bueno' : (data.scoreCV >= 50 ? 'regular' : 'bajo'),
