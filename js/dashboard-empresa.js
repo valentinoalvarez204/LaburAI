@@ -68,7 +68,10 @@ function initNav() {
 
   // Botones "Nueva oferta" → van a la sección publicar del dashboard
   ['btnNuevaOferta', 'btnNuevaOfertaHero'].forEach((id) => {
-    document.getElementById(id)?.addEventListener('click', () => switchSection('publicar'));
+    document.getElementById(id)?.addEventListener('click', () => {
+      pubResetForm();
+      switchSection('publicar');
+    });
   });
   // Links internos (dash-card headers "Ver todas →")
   document.querySelectorAll('[data-section]').forEach((el) => {
@@ -185,8 +188,8 @@ function renderOfertas(filter = 'todas') {
           <span class="or-badge">${o.area}</span>
           <span class="or-badge">${o.modalidad}</span>
           <span class="or-badge">${o.ubicacion}</span>
-          <span class="or-badge" style="${o.status === 'activa' ? 'background:#E8F5E9;color:#2E7D32;border-color:#A5D6A7' : ''}">
-            ${o.status === 'activa' ? '● Activa' : '○ Cerrada'}
+          <span class="or-badge" style="${o.status === 'activa' ? 'background:#E8F5E9;color:#2E7D32;border-color:#A5D6A7' : (o.status === 'borrador' ? 'background:#F3F4F6;color:#6B7280;border-color:#D1D5DB' : '')}">
+            ${o.status === 'activa' ? '● Activa' : (o.status === 'borrador' ? '○ Borrador' : '○ Cerrada')}
           </span>
         </div>
       </div>
@@ -205,8 +208,8 @@ function renderOfertas(filter = 'todas') {
         </div>
       </div>
       <div class="or-actions">
-        <button class="or-btn or-btn--primary" onclick="switchSection('candidatos')">Ver candidatos</button>
-        <button class="or-btn">Editar</button>
+        <button class="or-btn or-btn--primary" onclick="verCandidatosOferta('${o.id}')">Ver candidatos</button>
+        <button class="or-btn" onclick="editarOferta('${o.id}')">Editar</button>
         ${o.status === 'activa' ? `<button class="or-btn" onclick="cerrarOferta('${o.id}', this)">Cerrar</button>` : ''}
       </div>
     </div>`).join('');
@@ -214,19 +217,21 @@ function renderOfertas(filter = 'todas') {
   updateOfertasTabsCounts();
 }
 
-/** Actualiza los números en los botones de las tabs de ofertas */
 function updateOfertasTabsCounts() {
   const todas = OFERTAS_DATA.length;
   const activas = OFERTAS_DATA.filter(o => o.status === 'activa').length;
   const cerradas = OFERTAS_DATA.filter(o => o.status === 'cerrada').length;
+  const borradores = OFERTAS_DATA.filter(o => o.status === 'borrador').length;
 
   const btnTodas = document.querySelector('.otab[data-of="todas"]');
   const btnActivas = document.querySelector('.otab[data-of="activa"]');
   const btnCerradas = document.querySelector('.otab[data-of="cerrada"]');
+  const btnBorradores = document.querySelector('.otab[data-of="borrador"]');
 
   if (btnTodas) btnTodas.textContent = `Todas (${todas})`;
   if (btnActivas) btnActivas.textContent = `Activas (${activas})`;
   if (btnCerradas) btnCerradas.textContent = `Cerradas (${cerradas})`;
+  if (btnBorradores) btnBorradores.textContent = `Borradores (${borradores})`;
 }
 
 function initOfertasTabs() {
@@ -420,6 +425,15 @@ function updateStatusDropdownUI(id, estado) {
   wrapper.dataset.estado = estado;
 }
 
+window.verCandidatosOferta = function(ofertaId) {
+  switchSection('candidatos');
+  const sel = document.getElementById('selectOferta');
+  if (sel) {
+    sel.value = ofertaId;
+  }
+  renderCandidatos(ofertaId);
+};
+
 window.cerrarOferta = async function (ofertaId, btn) {
   if (!confirm('¿Segúros que querés cerrar esta oferta?')) return;
   try {
@@ -431,6 +445,58 @@ window.cerrarOferta = async function (ofertaId, btn) {
   } catch (err) {
     console.error('[Dashboard] Error cerrando oferta:', err.message);
     showToast('Error al cerrar la oferta', 'error');
+  }
+};
+
+window.editarOferta = async function(id) {
+  try {
+    const data = await API.getOferta(id);
+    pubResetForm(); // limpia el form pero lo necesitamos preparar
+    pubState.ofertaId = id;
+    pubState.titulo = data.titulo || '';
+    pubState.rubro = data.rubro || '';
+    pubState.modalidad = data.modalidad || 'Presencial';
+    pubState.ubicacion = data.ubicacion || '';
+    pubState.jornada = data.jornada || 'Full time';
+    pubState.desc = data.descripcion || '';
+    pubState.skills = data.habilidades || [];
+    pubState.resp = data.responsabilidades || [];
+    pubState.benef = data.beneficios || [];
+    pubState.salMin = data.salarioMin ? String(data.salarioMin) : '';
+    pubState.salMax = data.salarioMax ? String(data.salarioMax) : '';
+    
+    // Updates the DOM elements directly
+    document.getElementById('pub-titulo').value = pubState.titulo;
+    const rubroSel = document.getElementById('pub-rubro');
+    if (rubroSel) rubroSel.value = pubState.rubro;
+    document.querySelectorAll('.pub-radio').forEach((b) => b.classList.toggle('active', b.dataset.val === pubState.modalidad));
+    document.getElementById('pub-ubicacion').value = pubState.ubicacion;
+    const jornadaSel = document.getElementById('pub-jornada');
+    if (jornadaSel) jornadaSel.value = pubState.jornada;
+    document.getElementById('pub-desc').value = pubState.desc;
+    const charEl = document.getElementById('pub-chars');
+    if (charEl) charEl.textContent = pubState.desc.length;
+    document.getElementById('pub-sal-min').value = pubState.salMin;
+    document.getElementById('pub-sal-max').value = pubState.salMax;
+
+    // Call the newly exported _render method for each tag input
+    document.getElementById('pub-skills-list')._render?.();
+    document.getElementById('pub-resp-list')._render?.();
+    document.getElementById('pub-benef-list')._render?.();
+
+    pubUpdatePreview();
+    pubUpdateChecklist();
+
+    // Adapt the UI mode for Edit Mode
+    const pubTitle = document.getElementById('pub-title');
+    if (pubTitle) pubTitle.textContent = 'Editar oferta';
+    const pubBtnText = document.querySelector('#btnPublicar .pub-btn-text');
+    if (pubBtnText) pubBtnText.textContent = 'Guardar cambios';
+
+    switchSection('publicar');
+  } catch (err) {
+    console.error('[Dashboard] Error cargando oferta para edición:', err);
+    showToast('No se pudo cargar la oferta', 'error');
   }
 };
 
@@ -528,9 +594,20 @@ function initPublicarForm() {
   pubInitTags('pub-resp-input', 'pub-resp-list', 'resp', 'pub-tag--resp');
   pubInitTags('pub-benef-input', 'pub-benef-list', 'benef', 'pub-tag--benef');
   const fechaEl = document.getElementById('pub-fecha');
-  if (fechaEl) fechaEl.min = new Date().toISOString().split('T')[0];
-  document.getElementById('btnPublicar')?.addEventListener('click', pubHandleSubmit);
-  document.getElementById('btnBorrador')?.addEventListener('click', () => showToast('Borrador guardado', 'success'));
+  if (fechaEl) {
+    fechaEl.min = new Date().toISOString().split('T')[0];
+    fechaEl.addEventListener('change', (e) => { pubState.fechaLimite = e.target.value; });
+  }
+  document.getElementById('btnPublicar')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    pubState.esBorrador = false;
+    pubHandleSubmit();
+  });
+  document.getElementById('btnBorrador')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    pubState.esBorrador = true;
+    pubHandleSubmit();
+  });
   document.getElementById('btnPublicarOtra')?.addEventListener('click', () => {
     document.getElementById('pubSuccess')?.classList.add('hidden');
     document.querySelector('.publicar-layout')?.classList.remove('hidden');
@@ -549,6 +626,7 @@ function pubInitTags(inputId, listId, stateKey, tagClass) {
       btn.addEventListener('click', (e) => { e.stopPropagation(); pubState[stateKey].splice(+btn.dataset.i, 1); render(); pubUpdateChecklist(); });
     });
   }
+  list._render = render;
   function add(val) {
     const clean = val.trim().replace(/,$/, '');
     if (!clean || pubState[stateKey].includes(clean)) return;
@@ -595,16 +673,21 @@ function pubUpdateChecklist() {
 
 async function pubHandleSubmit() {
   let ok = true;
-  [['pub-titulo', 'pub-err-titulo', () => pubState.titulo.trim().length > 0, 'El título es obligatorio.'],
-  ['pub-rubro', 'pub-err-rubro', () => pubState.rubro !== '', 'Seleccioná un rubro.'],
-  ['pub-ubicacion', 'pub-err-ubicacion', () => pubState.ubicacion.trim().length > 0, 'La ubicación es obligatoria.'],
-  ['pub-desc', 'pub-err-desc', () => pubState.desc.length >= 50, 'La descripción debe tener al menos 50 caracteres.'],
-  ].forEach(([, errId, check, msg]) => {
-    const errEl = document.getElementById(errId);
-    if (errEl) errEl.textContent = check() ? '' : msg;
-    if (!check()) ok = false;
-  });
-  if (!ok) { document.querySelector('.pub-error:not(:empty)')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+  if (!pubState.esBorrador) {
+    [['pub-titulo', 'pub-err-titulo', () => pubState.titulo.trim().length > 0, 'El título es obligatorio.'],
+    ['pub-rubro', 'pub-err-rubro', () => pubState.rubro !== '', 'Seleccioná un rubro.'],
+    ['pub-ubicacion', 'pub-err-ubicacion', () => pubState.ubicacion.trim().length > 0, 'La ubicación es obligatoria.'],
+    ['pub-desc', 'pub-err-desc', () => pubState.desc.length >= 50, 'La descripción debe tener al menos 50 caracteres.'],
+    ].forEach(([, errId, check, msg]) => {
+      const errEl = document.getElementById(errId);
+      if (errEl) errEl.textContent = check() ? '' : msg;
+      if (!check()) ok = false;
+    });
+    if (!ok) { document.querySelector('.pub-error:not(:empty)')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+  } else {
+    // Si es borrador, al menos que haya un título aunque sea un espacio, o algo mínimo.
+    // O le avisamos que puede omitir todo. Por ahora, pasamos 'ok = true'.
+  }
 
   const btn = document.getElementById('btnPublicar');
   const txt = btn?.querySelector('.pub-btn-text');
@@ -624,6 +707,7 @@ async function pubHandleSubmit() {
       habilidades: pubState.skills,
       responsabilidades: pubState.resp,
       beneficios: pubState.benef,
+      esBorrador: pubState.esBorrador || false
     };
 
     if (pubState.salMin) payload.salarioMin = Number(pubState.salMin);
@@ -633,20 +717,44 @@ async function pubHandleSubmit() {
     if (pubState.vacantes) payload.vacantes = Number(pubState.vacantes);
     if (pubState.fechaLimite) payload.fechaLimite = pubState.fechaLimite;
 
-    await API.crearOferta(payload);
+    const isEdit = !!pubState.ofertaId;
+    if (isEdit) {
+      await API.patchOferta(pubState.ofertaId, payload);
+    } else {
+      await API.crearOferta(payload);
+    }
 
     if (btn) btn.disabled = false;
     if (txt) txt.style.display = '';
     if (spin) spin.classList.add('hidden');
 
     document.querySelector('.publicar-layout')?.classList.add('hidden');
-    const success = document.getElementById('pubSuccess');
-    if (success) {
-      success.classList.remove('hidden');
-      animateCounterId('pubCandCount', 0, 0, 800);
-      animateCounterId('pubMatchCount', 0, 0, 800);
+    
+    if (isEdit) {
+      showToast(pubState.esBorrador ? '¡Borrador guardado exitosamente!' : '¡Oferta modificada exitosamente!', 'success');
+      pubResetForm();
+      switchSection('ofertas');
+      if (pubState.esBorrador) {
+        document.querySelector('.otab[data-of="borrador"]')?.click();
+      } else {
+        document.querySelector('.otab[data-of="activa"]')?.click();
+      }
+    } else {
+      if (pubState.esBorrador) {
+        showToast('¡Borrador guardado exitosamente!', 'success');
+        pubResetForm();
+        switchSection('ofertas');
+        document.querySelector('.otab[data-of="borrador"]')?.click();
+      } else {
+        const success = document.getElementById('pubSuccess');
+        if (success) {
+          success.classList.remove('hidden');
+          animateCounterId('pubCandCount', 0, 0, 800);
+          animateCounterId('pubMatchCount', 0, 0, 800);
+        }
+        showToast('¡Oferta publicada exitosamente!', 'success');
+      }
     }
-    showToast('¡Oferta publicada exitosamente!', 'success');
 
     // Refrescar lista de ofertas si ya estaban cargadas
     const session = requireSession();
@@ -655,7 +763,7 @@ async function pubHandleSubmit() {
       OFERTAS_DATA.length = 0;
       misOfertas.forEach((j) => OFERTAS_DATA.push({
         id: j.id, title: j.titulo, area: j.rubro, modalidad: j.modalidad, ubicacion: j.ubicacion,
-        status: j.activa ? 'activa' : 'cerrada', postulaciones: j.postulaciones?.length || 0,
+        status: j.estado ? j.estado.toLowerCase() : 'activa', postulaciones: j.postulaciones?.length || 0,
         vistas: 0, dias: Math.floor((Date.now() - new Date(j.creadoEn)) / 86400000),
       }));
       renderOfertas(document.querySelector('.otab.active')?.dataset.of || 'todas');
@@ -694,11 +802,25 @@ function animateCounterEl(el, from, to, dur) {
   requestAnimationFrame(t);
 }
 function pubResetForm() {
+  delete pubState.ofertaId;
   Object.assign(pubState, { titulo: '', rubro: '', modalidad: 'Presencial', ubicacion: '', jornada: 'Full time', desc: '', skills: [], resp: [], benef: [], salMin: '', salMax: '', salNeg: false, salConf: false });
   ['pub-titulo', 'pub-ubicacion', 'pub-desc', 'pub-sal-min', 'pub-sal-max'].forEach((id) => { const el = document.getElementById(id); if (el) el.value = ''; });
   ['pub-sal-neg', 'pub-sal-conf'].forEach((id) => { const el = document.getElementById(id); if (el) el.checked = false; });
   ['pub-skills-list', 'pub-resp-list', 'pub-benef-list'].forEach((id) => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
   document.querySelectorAll('.pub-radio').forEach((b) => b.classList.toggle('active', b.dataset.val === 'Presencial'));
+  
+  const charEl = document.getElementById('pub-chars');
+  if (charEl) charEl.textContent = '0';
+
+  const titleEl = document.getElementById('pub-title');
+  if (titleEl) titleEl.textContent = 'Publicar nueva oferta';
+
+  const pubBtnText = document.querySelector('#btnPublicar .pub-btn-text');
+  if (pubBtnText) pubBtnText.textContent = 'Publicar oferta';
+
+  document.querySelector('.publicar-layout')?.classList.remove('hidden');
+  document.getElementById('pubSuccess')?.classList.add('hidden');
+
   pubUpdatePreview(); pubUpdateChecklist();
 }
 
@@ -802,7 +924,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         area: j.rubro,
         modalidad: j.modalidad,
         ubicacion: j.ubicacion,
-        status: j.activa ? 'activa' : 'cerrada',
+        status: j.estado ? j.estado.toLowerCase() : 'activa',
         postulaciones: j.postulaciones?.length || 0,
         vistas: 0,
         dias: Math.floor((Date.now() - new Date(j.creadoEn)) / 86400000),

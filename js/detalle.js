@@ -172,22 +172,42 @@ function renderPage(oferta) {
   const btnApply = document.getElementById('btnApply');
   const btnSaveAlt = document.getElementById('btnSaveAlt');
   const mobileApplyBar = document.getElementById('mobileApplyBar');
+  const btnApplyMobile = document.getElementById('btnApplyMobile');
+
+  const btnLoginToApply = document.getElementById('btnLoginToApply');
+  const btnLoginToApplyMobile = document.getElementById('btnLoginToApplyMobile');
+  
+  const isAuthenticated = session && session.token ? true : false;
   
   if (isEmpresa) {
     if (btnApply) btnApply.style.display = 'none';
     if (btnSaveAlt) btnSaveAlt.style.display = 'none';
     if (mobileApplyBar) mobileApplyBar.style.display = 'none';
+    if (btnLoginToApply) btnLoginToApply.style.display = 'none';
+    if (btnLoginToApplyMobile) btnLoginToApplyMobile.style.display = 'none';
+  } else if (!isAuthenticated) {
+    // Para usuarios NO logueados
+    if (btnApply) btnApply.style.display = 'none';
+    if (btnSaveAlt) btnSaveAlt.style.display = 'none';
+    if (btnApplyMobile) btnApplyMobile.style.display = 'none';
+    if (btnLoginToApply) btnLoginToApply.style.display = 'flex';
+    if (btnLoginToApplyMobile) btnLoginToApplyMobile.style.display = 'flex';
   } else {
-    // Para candidatos, preparamos el texto si es remoto o presencial (si aplicara)
+    // Para candidatos LOGUEADOS
+    if (btnLoginToApply) btnLoginToApply.style.display = 'none';
+    if (btnLoginToApplyMobile) btnLoginToApplyMobile.style.display = 'none';
+
     if (btnApply) {
       const btnText = oferta.modalidad === 'Remoto' ? 'Postularme' : 'Postulación Rápida';
-      // Mantenemos el HTML original pero seteando el texto
       btnApply.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg> ${btnText}`;
+      btnApply.style.display = 'flex';
     }
-    const btnApplyMobile = document.getElementById('btnApplyMobile');
+    if (btnSaveAlt) btnSaveAlt.style.display = 'flex';
+    
     if (btnApplyMobile) {
       const btnTextBtn = oferta.modalidad === 'Remoto' ? 'Postularme' : 'Postul. Rápida';
       btnApplyMobile.innerText = btnTextBtn;
+      btnApplyMobile.style.display = 'flex';
     }
   }
 

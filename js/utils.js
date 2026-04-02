@@ -160,9 +160,13 @@ function animateCounter(el, target, duration = 1800, suffix = '') {
   function tick(now) {
     const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    const ease = 1 - Math.pow(2, -10 * progress); // easeOutExpo
-    el.textContent = Math.floor(ease * target).toLocaleString('es-AR') + suffix;
-    if (progress < 1) requestAnimationFrame(tick);
+    if (progress === 1) {
+      el.textContent = target.toLocaleString('es-AR') + suffix;
+    } else {
+      const ease = 1 - Math.pow(2, -10 * progress); // easeOutExpo
+      el.textContent = Math.floor(ease * target).toLocaleString('es-AR') + suffix;
+      requestAnimationFrame(tick);
+    }
   }
   requestAnimationFrame(tick);
 }
@@ -174,9 +178,13 @@ function animateCounterId(id, from, to, duration = 1800, suffix = '') {
 
   function tick(now) {
     const p = Math.min((now - startTime) / duration, 1);
-    const ease = 1 - Math.pow(2, -10 * p);
-    el.textContent = Math.floor(from + ease * (to - from)).toLocaleString('es-AR') + suffix;
-    if (p < 1) requestAnimationFrame(tick);
+    if (p === 1) {
+      el.textContent = to.toLocaleString('es-AR') + suffix;
+    } else {
+      const ease = 1 - Math.pow(2, -10 * p);
+      el.textContent = Math.floor(from + ease * (to - from)).toLocaleString('es-AR') + suffix;
+      requestAnimationFrame(tick);
+    }
   }
   requestAnimationFrame(tick);
 }

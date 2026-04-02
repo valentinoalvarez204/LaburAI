@@ -5,16 +5,15 @@ import {
   Min,
   IsArray,
   MinLength,
+  IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateJobDto {
   @IsString()
-  @MinLength(3)
   titulo: string;
 
   @IsString()
-  @MinLength(10)
   descripcion: string;
 
   @IsString()
@@ -73,4 +72,8 @@ export class CreateJobDto {
   @IsArray()
   @IsString({ each: true })
   beneficios?: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  esBorrador?: boolean;
 }

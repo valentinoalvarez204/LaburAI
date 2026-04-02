@@ -16,12 +16,13 @@ export class ApplicationsService {
     });
     if (!candidato) throw new NotFoundException('Perfil de candidato no encontrado');
 
-    // Verificar que la oferta existe
+    // Verificar que la oferta existe y está vigente
     const oferta = await this.prisma.ofertaLaboral.findUnique({
       where: { id: data.ofertaId },
     });
     if (!oferta) throw new NotFoundException('Oferta no encontrada');
-    if (!oferta.activa) throw new BadRequestException('Esta oferta ya no está activa');
+    const vencida = oferta.fechaLimite && oferta.fechaLimite < new Date();
+    if (oferta.esBorrador || vencida) throw new BadRequestException('Esta oferta no está disponible');
 
     // Verificar que no se haya postulado antes
     const yaPostulado = await this.prisma.postulacion.findUnique({

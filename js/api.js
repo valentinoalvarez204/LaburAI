@@ -128,6 +128,15 @@ async function crearOferta(data) {
   }
 }
 
+async function patchOferta(id, data) {
+  try {
+    return await apiFetch(`/jobs/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+  } catch (err) {
+    console.error(`[API] Error actualizando oferta ${id}:`, err.message);
+    throw err;
+  }
+}
+
 async function cerrarOferta(id) {
   try {
     return await apiFetch(`/jobs/${id}/cerrar`, { method: 'PATCH' });
@@ -253,6 +262,7 @@ window.API = {
   getOfertas,
   getOferta,
   crearOferta,
+  patchOferta,
   cerrarOferta,
   // Postulaciones
   getPostulaciones,
