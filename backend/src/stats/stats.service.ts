@@ -8,7 +8,12 @@ export class StatsService {
   async getGlobalStats() {
     const [candidatos, ofertas, empresas, matchAgg] = await Promise.all([
       this.prisma.candidato.count(),
-      this.prisma.ofertaLaboral.count({ where: { activa: true } }),
+      this.prisma.ofertaLaboral.count({
+        where: {
+          esBorrador: false,
+          OR: [{ fechaLimite: null }, { fechaLimite: { gte: new Date() } }],
+        },
+      }),
       this.prisma.empresa.count(),
       this.prisma.postulacion.aggregate({
         _avg: { matchIA: true },
@@ -34,7 +39,11 @@ export class StatsService {
 
     const [ofertasActivas, totalPostulaciones, entrevistas, rechazadas] = await Promise.all([
       this.prisma.ofertaLaboral.count({
-        where: { empresaId, activa: true },
+        where: {
+          empresaId,
+          esBorrador: false,
+          OR: [{ fechaLimite: null }, { fechaLimite: { gte: new Date() } }],
+        },
       }),
       this.prisma.postulacion.count({
         where: { oferta: { empresaId } },

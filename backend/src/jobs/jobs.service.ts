@@ -13,21 +13,36 @@ export class JobsService {
     ubicacion?: string;
     empresaId?: string;
   }) {
-    const where: any = { activa: true };
+    const where: any = {};
+
+    if (!filtros?.empresaId) {
+      where.esBorrador = false;
+      where.OR = [
+        { fechaLimite: null },
+        { fechaLimite: { gte: new Date() } }
+      ];
+    } else {
+      where.empresaId = filtros.empresaId;
+    }
 
     if (filtros?.rubro) { where.rubro = { contains: filtros.rubro, mode: 'insensitive' }; }
     if (filtros?.modalidad) { where.modalidad = { contains: filtros.modalidad, mode: 'insensitive' }; }
     if (filtros?.ubicacion) { where.ubicacion = { contains: filtros.ubicacion, mode: 'insensitive' }; }
-    if (filtros?.empresaId) { where.empresaId = filtros.empresaId; }
     if (filtros?.q) {
-      where.OR = [
+      const searchOR = [
         { titulo: { contains: filtros.q, mode: 'insensitive' } },
         { descripcion: { contains: filtros.q, mode: 'insensitive' } },
         { rubro: { contains: filtros.q, mode: 'insensitive' } },
       ];
+      if (where.OR) {
+        where.AND = [{ OR: where.OR }, { OR: searchOR }];
+        delete where.OR;
+      } else {
+        where.OR = searchOR;
+      }
     }
 
-    return this.prisma.ofertaLaboral.findMany({
+    const ofertas = await this.prisma.ofertaLaboral.findMany({
       where,
       include: {
         empresa: {
@@ -38,6 +53,13 @@ export class JobsService {
         },
       },
       orderBy: { creadoEn: 'desc' },
+    });
+
+    const ahora = new Date();
+    return ofertas.map(o => {
+      const vencida = o.fechaLimite && o.fechaLimite < ahora;
+      const estado = o.esBorrador ? 'BORRADOR' : (vencida ? 'CERRADA' : 'ACTIVA');
+      return { ...o, estado };
     });
   }
 
@@ -53,7 +75,10 @@ export class JobsService {
       },
     });
     if (!oferta) throw new NotFoundException('Oferta no encontrada');
-    return oferta;
+    const ahora = new Date();
+    const vencida = oferta.fechaLimite && oferta.fechaLimite < ahora;
+    const estado = oferta.esBorrador ? 'BORRADOR' : (vencida ? 'CERRADA' : 'ACTIVA');
+    return { ...oferta, estado };
   }
 
   // Crear una oferta (solo empresas)
@@ -73,6 +98,7 @@ export class JobsService {
     habilidades?: string[];
     responsabilidades?: string[];
     beneficios?: string[];
+    esBorrador?: boolean;
   }, usuarioId: string) {
     
     const empresa = await this.prisma.empresa.findUnique({
@@ -88,6 +114,7 @@ export class JobsService {
     return this.prisma.ofertaLaboral.create({
       data: {
         ...data,
+        esBorrador: data.esBorrador ?? false,
         fechaLimite: fechaParseada,
         empresaId: empresa.id,
       },
@@ -114,6 +141,7 @@ export class JobsService {
     habilidades: string[];
     responsabilidades: string[];
     beneficios: string[];
+    esBorrador: boolean;
   }>, usuarioId: string) {
     await this.assertOwnership(id, usuarioId);
 
@@ -128,12 +156,12 @@ export class JobsService {
     });
   }
 
-  // Cerrar una oferta (verifica que el usuario sea dueño de la empresa)
+  // Cerrar una oferta (estableciendo la fechaLimite como la fecha actual)
   async close(id: string, usuarioId: string) {
     await this.assertOwnership(id, usuarioId);
     return this.prisma.ofertaLaboral.update({
       where: { id },
-      data: { activa: false },
+      data: { fechaLimite: new Date() },
     });
   }
 

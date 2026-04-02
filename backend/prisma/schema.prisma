@@ -79,7 +79,7 @@ model OfertaLaboral {
   habilidades       String[]
   responsabilidades String[]
   beneficios        String[]
-  activa            Boolean   @default(true)
+  esBorrador        Boolean   @default(false)
   creadoEn          DateTime  @default(now())
 
   empresaId String

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsInt, Min, IsArray } from 'class-validator';
+import { IsString, IsOptional, IsInt, Min, IsArray, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateJobDto {
@@ -70,4 +70,8 @@ export class UpdateJobDto {
   @IsArray()
   @IsString({ each: true })
   beneficios?: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  esBorrador?: boolean;
 }

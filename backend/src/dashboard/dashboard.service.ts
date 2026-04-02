@@ -14,7 +14,8 @@ export class DashboardService {
     const ofertasActivas = await this.prisma.ofertaLaboral.count({
       where: {
         empresaId: empresa.id,
-        activa: true,
+        esBorrador: false,
+        OR: [{ fechaLimite: null }, { fechaLimite: { gte: new Date() } }],
       },
     });
 

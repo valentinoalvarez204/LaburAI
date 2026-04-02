@@ -67,6 +67,67 @@ function renderDetailPage(app) {
   document.getElementById('candInitials').textContent = (cand.nombre?.charAt(0) || 'C') + (cand.apellido?.charAt(0) || '');
   document.getElementById('modalName').textContent = nombreCandidato;
 
+  const oferta = app.oferta || {};
+  const briefEl = document.getElementById('ofertaBrief');
+  if (briefEl) {
+    if (oferta.titulo) {
+      const fechaPost = app.creadoEn ? new Date(app.creadoEn).toLocaleDateString('es-AR', {
+        day: 'numeric', month: 'short', year: 'numeric'
+      }) : '';
+      const fechaTexto = fechaPost ? ` · Aplicó el ${fechaPost}` : '';
+      const empresaNombre = oferta.empresa?.nombre ? `${oferta.empresa.nombre} - ` : '';
+      briefEl.innerHTML = `Postulado a: <strong style="color:var(--text1)">${empresaNombre}${oferta.titulo}</strong> <span style="opacity:0.8">· ${oferta.modalidad || ''} · ${oferta.ubicacion || ''}${fechaTexto}</span>`;
+    } else {
+      briefEl.textContent = 'Datos de la oferta no disponibles.';
+    }
+  }
+
+  // --- Currículum Vitae (Modal & PDF Iframe) ---
+  const cvBody = document.getElementById('modalCvBody');
+  const btnTab = document.getElementById('btnOpenCvTab');
+  let finalCvUrl = cand.cvUrl;
+  
+  if (finalCvUrl) {
+    // Resolver posible path relativo
+    if (finalCvUrl.startsWith('/')) {
+      const baseUrl = typeof API_BASE !== 'undefined' ? API_BASE.replace('/api', '') : 'http://localhost:3000';
+      finalCvUrl = baseUrl + finalCvUrl;
+    }
+    
+    if (cvBody) {
+      cvBody.innerHTML = `<iframe src="${finalCvUrl}" width="100%" height="100%" style="border:none; border-radius:12px; min-height:75vh; background:white;"></iframe>`;
+    }
+    if (btnTab) {
+      btnTab.onclick = () => window.open(finalCvUrl, '_blank');
+      btnTab.style.display = 'inline-block';
+    }
+    const cvFilename = document.getElementById('cvFilename');
+    if (cvFilename) {
+      cvFilename.textContent = finalCvUrl.split('/').pop().split('?')[0] || 'Documento CV';
+    }
+    const cvScorePill = document.getElementById('cvScorePill');
+    if (cvScorePill && cand.scoreCV !== undefined && cand.scoreCV !== null) {
+      cvScorePill.textContent = `Score: ${cand.scoreCV}`;
+      cvScorePill.style.display = 'inline-block';
+    } else if (cvScorePill) {
+      cvScorePill.style.display = 'none';
+    }
+  } else {
+    if (cvBody) {
+      cvBody.innerHTML = `
+        <div class="cv-fullscreen-placeholder">
+           <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8">
+             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+           </svg>
+           <p style="margin-top:20px; font-size:16px;">Este candidato no ha subido un Currículum Vitae</p>
+        </div>
+      `;
+    }
+    if (btnTab) btnTab.style.display = 'none';
+    const cvScorePill = document.getElementById('cvScorePill');
+    if (cvScorePill) cvScorePill.style.display = 'none';
+  }
+
   // --- Estado ---
   const wrapper = document.getElementById('sd-detail');
   if (wrapper) {
@@ -98,7 +159,11 @@ function renderDetailPage(app) {
   }
 
   // --- Resumen & Habilidades ---
-  document.getElementById('candSummary').textContent = cand.resumenIA || 'El análisis de IA sobre este perfil aún no se ha generado o el candidato no proporcionó suficiente información.';
+  if (cand.resumenIA) {
+    document.getElementById('candSummary').innerHTML = cand.resumenIA.replace(/\n/g, '<br>');
+  } else {
+    document.getElementById('candSummary').textContent = 'El análisis de IA sobre este perfil aún no se ha generado o el candidato no proporcionó suficiente información.';
+  }
   
   const skillsList = document.getElementById('candSkillsList');
   if (cand.habilidades?.length) {
@@ -114,7 +179,7 @@ function renderDetailPage(app) {
   // --- Motivación ---
   const motiv = document.getElementById('motivLetter');
   if (app.cartaMotivacion) {
-    motiv.textContent = app.cartaMotivacion;
+    motiv.innerHTML = app.cartaMotivacion.replace(/\n/g, '<br>');
     motiv.classList.remove('text-secondary');
   } else {
     motiv.textContent = 'Este candidato no ha incluido una carta de presentación para esta oferta.';
