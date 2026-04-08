@@ -28,6 +28,9 @@ LaburAI/
 │   │   ├── jobs/              ← CRUD ofertas laborales
 │   │   ├── applications/      ← CRUD postulaciones
 │   │   ├── profile/           ← Edición de perfiles
+│   │   ├── stats/             ← Estadísticas globales y por empresa/candidato
+│   │   ├── entrevistas/       ← Gestión de entrevistas para postulaciones
+│   │   ├── dashboard/         ← Módulos agregadores de dashboard
 │   │   ├── app.module.ts      ← Raíz del módulo NestJS
 │   │   ├── prisma.service.ts  ← Cliente Prisma singleton
 │   │   └── main.ts            ← Bootstrap, CORS, prefijo /api
@@ -42,6 +45,7 @@ LaburAI/
 ├── login.html
 ├── ofertas.html
 ├── oferta-detalle.html
+├── candidato-postulacion.html
 ├── dashboard-candidato.html
 └── dashboard-empresa.html
 ```
@@ -104,6 +108,8 @@ Todas las rutas tienen el prefijo global `/api` (configurado en `main.ts`).
 | jobs | `/api/jobs` |
 | applications | `/api/applications` |
 | profile | `/api/profile` |
+| stats | `/api/stats` |
+| entrevistas | `/api/entrevistas` |
 
 ### Modelos de base de datos
 
@@ -123,9 +129,10 @@ npx prisma migrate dev --name descripcion-del-cambio
 |---|---|
 | `Usuario` | Credenciales + rol (`CANDIDATO` \| `EMPRESA`) |
 | `Candidato` | Perfil personal, CV, habilidades, `scoreCV`, `resumenIA` |
-| `Empresa` | Perfil de empresa |
+| `Empresa` | Perfil de empresa (incl. info extendida, industria, tamaño) |
 | `OfertaLaboral` | Oferta publicada por una empresa, con `habilidades` requeridas |
 | `Postulacion` | Relación Candidato ↔ OfertaLaboral, con `matchIA` |
+| `Entrevista` | Citas agendadas para postulaciones (`fecha`, `linkReunion`) |
 
 > Los campos `scoreCV`, `resumenIA` y `matchIA` están reservados para la integración con IA.
 
@@ -188,14 +195,40 @@ Estructura esperada:
 }
 ```
 
-Para llamar a la API desde el frontend:
+### Consumo de API (`api.js`)
 
-```js
-const session = JSON.parse(localStorage.getItem('labuai_session'));
-const res = await fetch('http://localhost:3000/api/<ruta>', {
-  headers: { Authorization: `Bearer ${session.token}` }
-});
+**Todo** el consumo de la API REST está centralizado en el archivo `js/api.js`. Ningún componente debe realizar el llamado nativo `fetch` de manera asilada.
+
+**Características de api.js:**
+- **Inyección de JWT:** Si hay un token en `labuai_session`, se inyecta automáticamente en los headers de cada petición.
+- **Intercepción Global de 401 (Unauthorized):** Si el servidor rechaza el token por estar caducado, se limpia el `localStorage` de inmediato y se devuelve al usuario a `/login.html`. Esto previene fallos UI visuales.
+- **Manejo Estandarizado de Errores:** Convierte cualquier error en una Excepción JavaScript clara (`throw new Error()`) lista para ser atrapada por el componente utilizando el `catch() { showToast(...) }`.
+
+**Métodos HTTP Implementados (Arquitectura RESTful):**
+- **GET (Lectura):** Para consultas a la base de datos sin alterar estados (ej: `getOfertas`, `getPerfilEmpresa`). Parámetros enviados vía Query Parameters.
+- **POST (Creación):** Para inyectar nuevas entidades al servidor por primera vez (ej: `register()`, `crearPostulacion()`). Lleva la carga de datos estructurada en el cuerpo (Body) de la petición usando JSON.
+- **PATCH (Modificación Parcial):** Reemplazando activamente al `PUT`, agiliza las actualizaciones ya que sólo manda a guardar en la DB **aquellos campos modificados** como el estado de una postulación o un cambio de perfil (`patchOferta()`). 
+- **DELETE:** (Opcional) Borrado físico permanente de la Base de Datos. (En muchas entidades de este proyecto se usa el patrón "Soft-Delete", inactivando recursos con PATCH).
+
+**Ejemplo de Patrón Correcto:**
+```javascript
+// ❌ Antiguo Patrón (NO USAR)
+// fetch('...', { headers... })
+
+// ✅ Nuevo Patrón Centralizado
+try {
+  const empresasGlobales = await window.API.getGlobalStats();
+  // ... renderizado UI ...
+} catch (error) {
+  showToast(error.message, 'error');
+}
 ```
+
+### Control de Accesos y Roles en Frontend (RBAC)
+Las vistas del sistema reaccionan al rol de la key `labuai_session.usuario.rol`:
+- **EMPRESA:** Entra al Dashboard Empresa, permitiéndole crear Ofertas, editarlas y ver Candidatos interesados. 
+- **CANDIDATO:** Entra a su propia pantalla de Candidato teniendo historial de CVs.
+- **Invitado Anónimo:** Al detectar falta de sesión, los eventos que requieran permisos (como "Postularme" en el job info), automáticamente llevarán a la vista de credenciales (Login) conservando la integridad del proceso.
 
 ---
 
