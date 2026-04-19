@@ -23,6 +23,11 @@ async function apiFetch(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
 
   if (!res.ok) {
+    if (res.status === 401) {
+      localStorage.removeItem('labuai_session');
+      window.location.href = '/login.html';
+      return;
+    }
     const errBody = await res.json().catch(() => ({}));
     throw new Error(errBody.message || `HTTP ${res.status}: ${path}`);
   }
