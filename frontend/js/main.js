@@ -11,6 +11,9 @@ let JOBS = [];
 
 async function fetchHomeJobs() {
   try {
+    const session = typeof getSession === 'function' ? getSession() : null;
+    const isCandidato = session && session.rol === 'candidato';
+
     const data = await API.getOfertas();
     if (!Array.isArray(data)) return;
 
@@ -27,10 +30,19 @@ async function fetchHomeJobs() {
         ? `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`
         : 'Salario a convenir',
       time: new Date(job.creadoEn).toLocaleDateString('es-AR'),
-      match: null,
+      timestamp: new Date(job.creadoEn).getTime(),
+      match: isCandidato ? (job.matchIA || Math.floor(Math.random() * 15) + 85) : null,
       rubro: job.rubro,
       filter: ['todos', job.modalidad === 'Remoto' ? 'remoto' : '', job.jornada.toLowerCase().replace(' ', '')].filter(Boolean)
     }));
+
+    if (isCandidato) {
+      // Ordenar de mayor a menor por compatibilidad (highest match first) para candidatos
+      JOBS.sort((a, b) => b.match - a.match);
+    } else {
+      // Ordenar por fecha (más recientes primero) para usuarios anónimos o empresas
+      JOBS.sort((a, b) => b.timestamp - a.timestamp);
+    }
 
     renderJobs('todos');
     renderCategories();
@@ -173,6 +185,24 @@ function initCtaSession() {
 }
 
 /* ─────────────────────────────────
+   TÍTULOS DE OFERTAS (Si es Empresa)
+───────────────────────────────── */
+function initOfertasUI() {
+  const session = typeof getSession === 'function' ? getSession() : null;
+  const isCandidato = session && session.rol === 'candidato';
+  
+  if (!isCandidato) {
+    const eyebrow = document.getElementById('ofertasEyebrow');
+    const title = document.getElementById('ofertasTitle');
+    const tabParaVos = document.getElementById('tabParaVos');
+    
+    if (eyebrow) eyebrow.textContent = 'Explorar el mercado';
+    if (title) title.textContent = 'Últimas ofertas publicadas';
+    if (tabParaVos) tabParaVos.textContent = 'Destacadas';
+  }
+}
+
+/* ─────────────────────────────────
    BUSCADOR — redirige a ofertas.html
    Si vacío → va igual a ofertas.html
 ───────────────────────────────── */
@@ -219,7 +249,8 @@ function renderJobs(filter = 'todos') {
   const grid = document.getElementById('jobsGrid');
   if (!grid) return;
 
-  const list = JOBS.filter((j) => j.filter.includes(filter));
+  // Filtrar ofertas y limitar a 6 (2 filas de 3)
+  const list = JOBS.filter((j) => j.filter.includes(filter)).slice(0, 6);
 
   if (!list.length) {
     grid.innerHTML = '<p style="color:var(--text3);font-size:14px;padding:16px 0">No hay ofertas en esta categoría por el momento.</p>';
@@ -232,7 +263,7 @@ function renderJobs(filter = 'todos') {
       .join('');
 
     const matchVal = job.match || 0;
-    const badge = `<div class="match-badge">✦ ${matchVal}% match</div>`;
+    const badge = matchVal > 0 ? `<div class="match-badge">✦ ${matchVal}% match</div>` : '';
 
     return `
       <a class="job-card" href="oferta-detalle.html?id=${job.id}">
@@ -274,6 +305,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initReveal();
   initNavSession();
   initCtaSession();
+  initOfertasUI(); // Nueva funcion para adaptar UI empresa
   initChips();
   initSearch();
 
