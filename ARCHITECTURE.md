@@ -38,16 +38,17 @@ LaburAI/
 │   │   └── schema.prisma      ← Modelos de BD
 │   └── .env                   ← DATABASE_URL (Supabase)
 │
-├── css/                       ← Un archivo CSS por página
-├── js/                        ← Un archivo JS por página
-│   └── utils.js               ← Funciones compartidas (cargar primero)
-├── index.html
-├── login.html
-├── ofertas.html
-├── oferta-detalle.html
-├── candidato-postulacion.html
-├── dashboard-candidato.html
-└── dashboard-empresa.html
+├── frontend/                  ← Cliente UI estático
+│   ├── css/                   ← Un archivo CSS por página
+│   ├── js/                    ← Un archivo JS por página
+│   │   └── utils.js           ← Funciones compartidas (cargar primero)
+│   ├── index.html
+│   ├── login.html
+│   ├── ofertas.html
+│   ├── oferta-detalle.html
+│   ├── candidato-postulacion.html
+│   ├── dashboard-candidato.html
+│   └── dashboard-empresa.html
 ```
 
 ---
@@ -147,9 +148,9 @@ npx prisma migrate dev --name descripcion-del-cambio
 
 ### Cómo agregar una nueva página
 
-1. Crear `<nueva-pagina>.html` en la raíz
-2. Crear `css/<nueva-pagina>.css`
-3. Crear `js/<nueva-pagina>.js`
+1. Crear `<nueva-pagina>.html` en la carpeta `frontend/`
+2. Crear `css/<nueva-pagina>.css` dentro de `frontend/`
+3. Crear `js/<nueva-pagina>.js` dentro de `frontend/`
 4. Incluir los scripts en este orden en el HTML:
    ```html
    <link rel="stylesheet" href="css/base.css">
