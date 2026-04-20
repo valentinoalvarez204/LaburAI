@@ -382,6 +382,7 @@ function initForms() {
         const apellido = document.getElementById('regApellido')?.value || '';
         const email = document.getElementById('regEmail')?.value || '';
         const password = document.getElementById('regPassword')?.value || '';
+        const nombreEmpresa = document.getElementById('regNombreEmpresa')?.value || '';
 
         // Calcular industria final (predefinida o custom)
         const selectIndustria = document.getElementById('regIndustria');
