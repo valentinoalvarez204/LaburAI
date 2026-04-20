@@ -1340,10 +1340,39 @@ body {
 
   .oferta-row {
     flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 18px 16px;
+    gap: 12px;
+  }
+
+  .or-status {
+    margin-top: 6px; /* Alinear puntito con primera línea */
+  }
+
+  .or-info {
+    width: calc(100% - 22px);
+    flex: none;
+  }
+
+  .or-meta {
+    gap: 6px; /* Reducir gap de badges */
   }
 
   .or-stats {
-    display: none;
+    display: none; /* Ocultar estadísticas en mobile */
+  }
+
+  .or-actions {
+    width: calc(100% - 22px);
+    margin-left: 22px; /* Alinear con los textos */
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .or-btn {
+    flex: 1; /* Botones ocupan espacio parejo */
+    text-align: center;
+    padding: 8px 12px;
   }
 
   .cand-rank,
