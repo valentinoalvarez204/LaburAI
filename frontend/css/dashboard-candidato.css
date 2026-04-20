@@ -182,10 +182,16 @@ body { background: var(--bg); }
    OVERVIEW ROW
 ───────────────────────────────── */
 .overview-row {
-  display: grid;
-  grid-template-columns: 320px 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
+}
+
+.overview-content, .cv-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* ─────────────────────────────────
