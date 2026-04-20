@@ -548,6 +548,10 @@ function renderList(id, items) {
    INIT
 ───────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
+  // Iniciar UI compartida sincrónicamente
+  initNavbar();
+  initNavSession();
+
   const id = getParam('id');
   if (!id) { window.location.href = 'ofertas.html'; return; }
 
@@ -597,8 +601,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       company_openings:  1,
     };
 
-    initNavbar();
-    initNavSession();
     renderPage(oferta);
     initTabs();
     initSave();

@@ -510,6 +510,16 @@ function renderGenericFilters(containerId, config, dataKey) {
    INIT
 ────────────────────────────────— */
 document.addEventListener('DOMContentLoaded', async () => {
+  // Inicializaciones síncronas primero para no bloquear la UI
+  initNavbar();
+  initNavSession();
+  initSidebarToggle();
+  initAccordion();
+  initFilters();
+  initSearch();
+  initSort();
+  initReveal();
+
   showSkeleton();
 
   // Cargar ofertas reales desde la API
@@ -561,15 +571,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (qIn) qIn.value = state.query;
   const lIn = document.getElementById('searchLocation');
   if (lIn) lIn.value = state.location;
-
-  initNavbar();
-  initNavSession();
-  initSidebarToggle();
-  initAccordion();
-  initFilters();
-  initSearch();
-  initSort();
-  initReveal();
 
   // Renderizar todos los filtros dinámicos
   // Cargar industrias de la BD para el filtro Rubro

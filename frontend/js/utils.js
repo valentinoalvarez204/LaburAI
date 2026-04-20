@@ -419,3 +419,59 @@ window.renderSidebarNav = function (type, activeSection = 'overview') {
 
   container.innerHTML = html;
 };
+
+/* ─────────────────────────────────
+   GLOBAL FOOTER
+───────────────────────────────── */
+function renderFooter() {
+  const path = window.location.pathname;
+  
+  // Excluir dashboards y páginas de login completamente (buenas prácticas)
+  const isExcluded = path.includes('login') || path.includes('auth') || path.includes('dashboard') || path.includes('postulacion');
+  if (isExcluded) return;
+
+  // Footer global normal para páginas principales
+  const footerHTML = `
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="logo" style="margin-bottom:14px;display:inline-flex"><span class="logo-star">✦</span>LaburAI</a>
+        <p>La plataforma de empleo impulsada por IA. Conectamos talento con las mejores oportunidades de Argentina en todos los rubros.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Candidatos</h4>
+        <a href="ofertas.html">Buscar empleo</a>
+        <a href="login.html">Subir CV</a>
+        <a href="login.html">Análisis de perfil</a>
+        <a href="login.html">Historial de postulaciones</a>
+        <a href="login.html">Perfil público</a>
+      </div>
+      <div class="footer-col">
+        <h4>Empresas</h4>
+        <a href="login.html" class="pub-oferta-cta">Publicar oferta</a>
+        <a href="login.html">Buscar candidatos</a>
+        <a href="login.html">Dashboard</a>
+      </div>
+      <div class="footer-col">
+        <h4>LaburAI</h4>
+        <a href="#">Acerca de</a>
+        <a href="#">Blog</a>
+        <a href="#">Privacidad</a>
+        <a href="#">Términos de uso</a>
+        <a href="#">Contacto</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 LaburAI. Todos los derechos reservados.</p>
+      <p style="color:#667EEA;font-weight:600;font-size:13px">Análisis de CV potenciado por IA ✦</p>
+    </div>
+  </footer>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', footerHTML);
+}
+
+// Inyectar automáticamente el footer global si corresponde
+document.addEventListener('DOMContentLoaded', () => {
+  renderFooter();
+});
