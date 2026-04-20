@@ -78,16 +78,16 @@ El sistema utiliza IA para:
     │   └── prisma
     │       └── schema.prisma
     │
-    ├── css
-    ├── js
-    │   └── utils.js
-    │
-    ├── index.html
-    ├── login.html
-    ├── ofertas.html
-    ├── oferta-detalle.html
-    ├── dashboard-candidato.html
-    └── dashboard-empresa.html
+    └── frontend
+        ├── css
+        ├── js
+        │   └── utils.js
+        ├── index.html
+        ├── login.html
+        ├── ofertas.html
+        ├── oferta-detalle.html
+        ├── dashboard-candidato.html
+        └── dashboard-empresa.html
 
 ------------------------------------------------------------------------
 
