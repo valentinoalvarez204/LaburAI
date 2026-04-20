@@ -72,113 +72,115 @@
       <!-- ── SECCIÓN: RESUMEN ── -->
       <section id="overview" class="dash-section hidden">
 
-        <!-- Stats rápidas -->
-        <div class="dash-stats">
-          <div class="dstat">
-            <div class="dstat-icon dstat-icon--blue">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
-            </div>
-            <div class="dstat-num">8</div>
-            <div class="dstat-label">Postulaciones</div>
-          </div>
-          <div class="dstat">
-            <div class="dstat-icon dstat-icon--green">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </div>
-            <div class="dstat-num">34</div>
-            <div class="dstat-label">Vistas al perfil</div>
-          </div>
-          <div class="dstat">
-            <div class="dstat-icon dstat-icon--amber">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            </div>
-            <div class="dstat-num">12</div>
-            <div class="dstat-label">Ofertas nuevas</div>
-          </div>
-          <div class="dstat">
-            <div class="dstat-icon dstat-icon--indigo">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <div class="dstat-num">3</div>
-            <div class="dstat-label">Entrevistas</div>
-          </div>
-        </div>
-
-        <!-- Fila: Score IA + Análisis CV -->
-        <div class="overview-row">
-
-          <!-- Score del CV -->
-          <div class="score-card">
-            <div class="score-header">
-              <div class="score-title-wrap">
-                <span class="ai-pill-sm">✦ IA</span>
-                <h2 class="card-title">Score de tu CV</h2>
+        <div class="overview-content">
+          <!-- Stats rápidas -->
+          <div class="dash-stats">
+            <div class="dstat">
+              <div class="dstat-icon dstat-icon--blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
               </div>
-              <button class="btn-ghost btn-sm" id="btnReanalyze">Re-analizar</button>
+            <div class="dstat-num">0</div>
+              <div class="dstat-label">Postulaciones</div>
             </div>
+            <div class="dstat">
+              <div class="dstat-icon dstat-icon--green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </div>
+            <div class="dstat-num">0</div>
+              <div class="dstat-label">Vistas al perfil</div>
+            </div>
+            <div class="dstat">
+              <div class="dstat-icon dstat-icon--amber">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+            <div class="dstat-num">0</div>
+              <div class="dstat-label">Ofertas nuevas</div>
+            </div>
+            <div class="dstat">
+              <div class="dstat-icon dstat-icon--indigo">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            <div class="dstat-num">0</div>
+              <div class="dstat-label">Entrevistas</div>
+            </div>
+          </div>
 
-            <!-- Número + explicación -->
-            <div class="score-top">
-              <div class="score-ring-wrap">
-                <svg viewBox="0 0 120 120" class="score-ring-svg">
-                  <defs>
-                    <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stop-color="#5C6BC0"/>
-                      <stop offset="100%" stop-color="#7C4DFF"/>
-                    </linearGradient>
-                  </defs>
-                  <circle cx="60" cy="60" r="50" class="score-ring-bg"/>
-                  <circle cx="60" cy="60" r="50" class="score-ring-fill" id="scoreRingFill"/>
-                </svg>
-                <div class="score-ring-inner">
-                  <div class="score-num" id="scoreNum">82</div>
-                  <div class="score-max">/ 100</div>
+          <!-- Fila: Score IA + Análisis CV -->
+          <div class="overview-row">
+
+            <!-- Score del CV -->
+            <div class="score-card">
+              <div class="score-header">
+                <div class="score-title-wrap">
+                  <span class="ai-pill-sm">✦ IA</span>
+                  <h2 class="card-title">Score de tu CV</h2>
+                </div>
+                <button class="btn-ghost btn-sm" id="btnReanalyze">Re-analizar</button>
+              </div>
+
+              <!-- Número + explicación -->
+              <div class="score-top">
+                <div class="score-ring-wrap">
+                  <svg viewBox="0 0 120 120" class="score-ring-svg">
+                    <defs>
+                      <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#5C6BC0"/>
+                        <stop offset="100%" stop-color="#7C4DFF"/>
+                      </linearGradient>
+                    </defs>
+                    <circle cx="60" cy="60" r="50" class="score-ring-bg"/>
+                    <circle cx="60" cy="60" r="50" class="score-ring-fill" id="scoreRingFill"/>
+                  </svg>
+                  <div class="score-ring-inner">
+                    <div class="score-num" id="scoreNum">82</div>
+                    <div class="score-max">/ 100</div>
+                  </div>
+                </div>
+                <div class="score-explain">
+                  <div class="score-explain-title">¿Qué significa?</div>
+                  <p class="score-explain-text">La IA evaluó qué tan completo, claro y competitivo está tu CV para el mercado laboral. <strong>No mide cuánto sabés</strong>, sino qué tan bien presentado está tu perfil.</p>
+                  <div class="score-level" id="scoreLevel"></div>
                 </div>
               </div>
-              <div class="score-explain">
-                <div class="score-explain-title">¿Qué significa?</div>
-                <p class="score-explain-text">La IA evaluó qué tan completo, claro y competitivo está tu CV para el mercado laboral. <strong>No mide cuánto sabés</strong>, sino qué tan bien presentado está tu perfil.</p>
-                <div class="score-level" id="scoreLevel"></div>
-              </div>
+
+              <!-- Criterios detallados -->
+              <div class="score-criteria" id="scoreCriteria"></div>
+
+              <!-- Tip de la IA -->
+              <div class="score-tip" id="scoreTip"></div>
             </div>
 
-            <!-- Criterios detallados -->
-            <div class="score-criteria" id="scoreCriteria"></div>
-
-            <!-- Tip de la IA -->
-            <div class="score-tip" id="scoreTip"></div>
+            <!-- Resumen IA -->
+            <div class="ai-summary-card">
+              <div class="score-header">
+                <div class="score-title-wrap">
+                  <span class="ai-pill-sm">✦ IA</span>
+                  <h2 class="card-title">Resumen profesional generado</h2>
+                </div>
+                <button class="btn-ghost btn-sm" id="btnCopySummary">Copiar</button>
+              </div>
+              <p class="ai-summary-text" id="aiSummaryText">
+                Profesional con más de 5 años de experiencia en ventas B2B y gestión de cuentas en el sector de consumo masivo. Sólido historial en cumplimiento de objetivos comerciales, negociación y desarrollo de carteras de clientes en canales modernos y tradicionales. Conocimiento avanzado de CRM, análisis de datos comerciales y liderazgo de equipos pequeños. Orientada a resultados, con alta capacidad de adaptación y excelentes habilidades comunicacionales.
+              </p>
+              <div class="ai-summary-tags" id="aiSummaryTags"></div>
+              <div class="ai-regen-note">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Generado automáticamente por LaburAI a partir de tu CV · Última actualización: hace 3 días
+              </div>
+            </div>
           </div>
 
-          <!-- Resumen IA -->
-          <div class="ai-summary-card">
+          <!-- Habilidades detectadas -->
+          <div class="skills-card">
             <div class="score-header">
               <div class="score-title-wrap">
                 <span class="ai-pill-sm">✦ IA</span>
-                <h2 class="card-title">Resumen profesional generado</h2>
+                <h2 class="card-title">Habilidades detectadas en tu CV</h2>
               </div>
-              <button class="btn-ghost btn-sm" id="btnCopySummary">Copiar</button>
+              <a href="#cv" class="btn-ghost btn-sm" onclick="switchSection('cv')">Ver análisis completo</a>
             </div>
-            <p class="ai-summary-text" id="aiSummaryText">
-              Profesional con más de 5 años de experiencia en ventas B2B y gestión de cuentas en el sector de consumo masivo. Sólido historial en cumplimiento de objetivos comerciales, negociación y desarrollo de carteras de clientes en canales modernos y tradicionales. Conocimiento avanzado de CRM, análisis de datos comerciales y liderazgo de equipos pequeños. Orientada a resultados, con alta capacidad de adaptación y excelentes habilidades comunicacionales.
-            </p>
-            <div class="ai-summary-tags" id="aiSummaryTags"></div>
-            <div class="ai-regen-note">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              Generado automáticamente por LaburAI a partir de tu CV · Última actualización: hace 3 días
-            </div>
+            <div class="skills-detected" id="skillsDetected"></div>
           </div>
-        </div>
-
-        <!-- Habilidades detectadas -->
-        <div class="skills-card">
-          <div class="score-header">
-            <div class="score-title-wrap">
-              <span class="ai-pill-sm">✦ IA</span>
-              <h2 class="card-title">Habilidades detectadas en tu CV</h2>
-            </div>
-            <a href="#cv" class="btn-ghost btn-sm" onclick="switchSection('cv')">Ver análisis completo</a>
-          </div>
-          <div class="skills-detected" id="skillsDetected"></div>
         </div>
 
       </section>
@@ -189,62 +191,64 @@
           <h2 class="dash-section-title">Mi CV e Inteligencia Artificial</h2>
         </div>
 
-        <!-- CV actual -->
-        <div class="cv-upload-card">
-          <div class="cvc-left">
-            <div class="cvc-icon">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <div class="cv-content">
+          <!-- CV actual -->
+          <div class="cv-upload-card">
+            <div class="cvc-left">
+              <div class="cvc-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              </div>
+              <div>
+                <div class="cvc-name">valentina-gonzalez-cv.pdf</div>
+                <div class="cvc-meta">Subido el 16 mar 2026 · 2.4 MB · Analizado por IA ✓</div>
+              </div>
             </div>
-            <div>
-              <div class="cvc-name">valentina-gonzalez-cv.pdf</div>
-              <div class="cvc-meta">Subido el 16 mar 2026 · 2.4 MB · Analizado por IA ✓</div>
+            <div class="cvc-actions">
+              <button class="btn-ghost btn-sm">Descargar</button>
+              <button class="btn-primary btn-sm" id="btnUploadNew">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Actualizar CV
+              </button>
             </div>
           </div>
-          <div class="cvc-actions">
-            <button class="btn-ghost btn-sm">Descargar</button>
-            <button class="btn-primary btn-sm" id="btnUploadNew">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Actualizar CV
-            </button>
-          </div>
-        </div>
 
-        <!-- Análisis detallado IA -->
-        <div class="ia-analysis-grid">
-          <div class="ia-block">
-            <div class="ia-block-header">
-              <span class="ia-block-icon">🛠️</span>
-              <h3 class="ia-block-title">Habilidades técnicas</h3>
+          <!-- Análisis detallado IA -->
+          <div class="ia-analysis-grid">
+            <div class="ia-block">
+              <div class="ia-block-header">
+                <span class="ia-block-icon">🛠️</span>
+                <h3 class="ia-block-title">Habilidades técnicas</h3>
+              </div>
+              <div class="ia-tags" id="iaTechSkills"></div>
             </div>
-            <div class="ia-tags" id="iaTechSkills"></div>
-          </div>
-          <div class="ia-block">
-            <div class="ia-block-header">
-              <span class="ia-block-icon">🤝</span>
-              <h3 class="ia-block-title">Habilidades blandas</h3>
+            <div class="ia-block">
+              <div class="ia-block-header">
+                <span class="ia-block-icon">🤝</span>
+                <h3 class="ia-block-title">Habilidades blandas</h3>
+              </div>
+              <div class="ia-tags" id="iaSoftSkills"></div>
             </div>
-            <div class="ia-tags" id="iaSoftSkills"></div>
-          </div>
-          <div class="ia-block">
-            <div class="ia-block-header">
-              <span class="ia-block-icon">💻</span>
-              <h3 class="ia-block-title">Tecnologías detectadas</h3>
+            <div class="ia-block">
+              <div class="ia-block-header">
+                <span class="ia-block-icon">💻</span>
+                <h3 class="ia-block-title">Tecnologías detectadas</h3>
+              </div>
+              <div class="ia-tags" id="iaTechs"></div>
             </div>
-            <div class="ia-tags" id="iaTechs"></div>
-          </div>
-          <div class="ia-block">
-            <div class="ia-block-header">
-              <span class="ia-block-icon">⚠️</span>
-              <h3 class="ia-block-title">Habilidades faltantes sugeridas</h3>
+            <div class="ia-block">
+              <div class="ia-block-header">
+                <span class="ia-block-icon">⚠️</span>
+                <h3 class="ia-block-title">Habilidades faltantes sugeridas</h3>
+              </div>
+              <div class="ia-tags" id="iaMissing"></div>
             </div>
-            <div class="ia-tags" id="iaMissing"></div>
           </div>
-        </div>
 
-        <!-- Experiencia laboral extraída -->
-        <div class="exp-card">
-          <h3 class="card-title" style="margin-bottom:20px">Experiencia laboral detectada por IA</h3>
-          <div class="exp-timeline" id="expTimeline"></div>
+          <!-- Experiencia laboral extraída -->
+          <div class="exp-card">
+            <h3 class="card-title" style="margin-bottom:20px">Experiencia laboral detectada por IA</h3>
+            <div class="exp-timeline" id="expTimeline"></div>
+          </div>
         </div>
 
       </section>
