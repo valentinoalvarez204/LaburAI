@@ -164,7 +164,7 @@ function initPasswordStrength() {
 function setError(inputId, errId, message) {
   const input = document.getElementById(inputId);
   const err = document.getElementById(errId);
-  if (input) input.closest('.field-wrap')?.classList.add('error');
+  if (input) input.closest('.floating-group')?.classList.add('error');
   if (err) err.textContent = message;
   return false;
 }
@@ -173,8 +173,8 @@ function clearError(inputId, errId) {
   const input = document.getElementById(inputId);
   const err = document.getElementById(errId);
   if (input) {
-    input.closest('.field-wrap')?.classList.remove('error');
-    input.closest('.field-wrap')?.classList.remove('success');
+    input.closest('.floating-group')?.classList.remove('error');
+    input.closest('.floating-group')?.classList.remove('success');
   }
   if (err) err.textContent = '';
 }
@@ -182,13 +182,13 @@ function clearError(inputId, errId) {
 function setSuccess(inputId) {
   const input = document.getElementById(inputId);
   if (input) {
-    input.closest('.field-wrap')?.classList.remove('error');
-    input.closest('.field-wrap')?.classList.add('success');
+    input.closest('.floating-group')?.classList.remove('error');
+    input.closest('.floating-group')?.classList.add('success');
   }
 }
 
 function clearErrors() {
-  document.querySelectorAll('.field-wrap').forEach((w) => {
+  document.querySelectorAll('.floating-group').forEach((w) => {
     w.classList.remove('error', 'success');
   });
   document.querySelectorAll('.field-error').forEach((e) => {
