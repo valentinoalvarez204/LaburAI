@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { AI_PROVIDER_TOKEN } from '../ai/ai.module';
+import type { IAPIService } from '../ai/interfaces/ia-service.interface';
 
 @Injectable()
 export class ProfileService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(AI_PROVIDER_TOKEN) private aiService: IAPIService
+  ) {}
 
   // Obtener perfil del candidato
   async getCandidato(candidatoId: string) {
@@ -42,12 +47,45 @@ export class ProfileService {
   }
 
   // Actualizar la URL del CV
-  async updateCvUrl(candidatoId: string, cvUrl: string) {
-    return this.prisma.candidato.update({
-      where: { id: candidatoId },
-      data: { cvUrl },
-      select: { id: true, cvUrl: true },
-    });
+  async updateCvUrl(id: string, cvUrl: string) {
+    try {
+      // Intentamos actualizar por Candidato ID
+      return await this.prisma.candidato.update({
+        where: { id },
+        data: { cvUrl },
+        select: { id: true, cvUrl: true },
+      });
+    } catch (error) {
+      // Si no existe, intentamos por Usuario ID (caso común en pruebas)
+      return this.prisma.candidato.update({
+        where: { usuarioId: id },
+        data: { cvUrl },
+        select: { id: true, cvUrl: true },
+      });
+    }
+  }
+
+  // Procesar el texto del CV con Inteligencia Artificial
+  async procesarCVConIA(id: string, textoCV: string) {
+    const analisis = await this.aiService.analizarCV(textoCV);
+    
+    const data = {
+      resumenIA: analisis.resumen,
+      habilidades: analisis.skills,
+      scoreCV: analisis.experienciaAnios
+    };
+
+    try {
+      return await this.prisma.candidato.update({
+        where: { id },
+        data
+      });
+    } catch (error) {
+      return this.prisma.candidato.update({
+        where: { usuarioId: id },
+        data
+      });
+    }
   }
 
   // Obtener perfil de la empresa

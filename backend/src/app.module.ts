@@ -9,6 +9,8 @@ import { StatsModule } from './stats/stats.module';
 import { EntrevistasModule } from './entrevistas/entrevistas.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 
+import { AiModule } from './ai/ai.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -19,6 +21,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     StatsModule,
     EntrevistasModule,
     DashboardModule,
+    AiModule,
   ],
   providers: [PrismaService],
   exports: [PrismaService],

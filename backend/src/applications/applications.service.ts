@@ -1,9 +1,14 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { AI_PROVIDER_TOKEN } from '../ai/ai.module';
+import type { IAPIService } from '../ai/interfaces/ia-service.interface';
 
 @Injectable()
 export class ApplicationsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(
+    private prisma: PrismaService,
+    @Inject(AI_PROVIDER_TOKEN) private aiService: IAPIService,
+  ) { }
 
   // Postularse a una oferta
   async create(usuarioId: string, data: {
@@ -35,12 +40,20 @@ export class ApplicationsService {
     });
     if (yaPostulado) throw new BadRequestException('Ya te postulaste a esta oferta');
 
+    // Calcular match usando la IA de forma óptima
+    console.log('Calculando match...');
+    const candidatoTexto = `Habilidades: ${candidato.habilidades.join(', ')}. Resumen: ${candidato.resumenIA || 'Sin resumen'}`;
+    const ofertaTexto = `Rol: ${oferta.titulo}. Requisitos: ${oferta.descripcion}. Habilidades deseadas: ${oferta.habilidades.join(', ')}`;
+    const matchScore = await this.aiService.calcularMatch(candidatoTexto, ofertaTexto);
+    console.log('Match calculado:', matchScore);
+
     return this.prisma.postulacion.create({
       data: {
         candidatoId: candidato.id,
         ofertaId: data.ofertaId,
         cartaMotivacion: data.cartaMotivacion,
         estado: 'PENDIENTE', // siempre forzado al crear
+        matchIA: matchScore,
       },
       include: {
         oferta: {

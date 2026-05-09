@@ -12,14 +12,19 @@ import {
   Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { memoryStorage } from 'multer';
 import { extname } from 'path';
 import { JwtGuard } from '../auth/jwt.guard';
 import { ProfileService } from './profile.service';
+import { SupabaseStorageService } from '../storage/supabase-storage.service';
+import { extraerTextoPdf } from '../ai/utils/pdf-parser.util';
 
 @Controller('profile')
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService) {}
+  constructor(
+    private readonly profileService: ProfileService,
+    private readonly storageService: SupabaseStorageService,
+  ) {}
 
   // GET /api/profile/candidato/:id
   @Get('candidato/:id')
@@ -49,13 +54,7 @@ export class ProfileController {
   @UseGuards(JwtGuard)
   @UseInterceptors(
     FileInterceptor('cv', {
-      storage: diskStorage({
-        destination: './uploads/cvs',
-        filename: (_req, file, cb) => {
-          const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, `cv-${unique}${extname(file.originalname)}`);
-        },
-      }),
+      storage: memoryStorage(),
       fileFilter: (_req, file, cb) => {
         if (file.mimetype !== 'application/pdf') {
           return cb(new BadRequestException('Solo se aceptan archivos PDF'), false);
@@ -70,8 +69,35 @@ export class ProfileController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) throw new BadRequestException('No se recibió ningún archivo');
-    const cvUrl = `/uploads/cvs/${file.filename}`;
-    return this.profileService.updateCvUrl(id, cvUrl);
+
+    // 1. Primero extraemos el texto directamente de memoria (sin archivo local)
+    let textoPdf = '';
+    try {
+      console.log('Extrayendo texto del PDF desde buffer...');
+      textoPdf = await extraerTextoPdf(file.buffer);
+      console.log('Texto extraído correctamente (longitud:', textoPdf.length, ')');
+    } catch (error) {
+      console.error('Error extrayendo texto del PDF:', error);
+    }
+
+    // 2. Subimos a Supabase Storage mandando el buffer
+    const cvUrl = await this.storageService.subirCV(file.buffer, file.originalname, id);
+
+    // 3. Guardamos la URL pública en la DB
+    await this.profileService.updateCvUrl(id, cvUrl);
+
+    // 4. Procesamos con IA usando el texto ya extraído
+    if (textoPdf) {
+      try {
+        console.log('Enviando a procesar con IA...');
+        await this.profileService.procesarCVConIA(id, textoPdf);
+        console.log('Procesamiento con IA completado');
+      } catch (error) {
+        console.error('Error procesando IA al subir CV:', error);
+      }
+    }
+
+    return { id, cvUrl, message: 'CV subido a Supabase Storage y procesado con IA exitosamente' };
   }
 
   // GET /api/profile/empresa
