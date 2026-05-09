@@ -414,7 +414,7 @@ function initModal() {
 
     try {
       // Obtener sesión del usuario (corregido typo labuai_session)
-      const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+      const session = JSON.parse(sessionStorage.getItem('labuai_session') || '{}');
 
       if (!session.token) {
         showToast('Necesitás iniciar sesión para postularte', 'error');
@@ -556,7 +556,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!id) { window.location.href = 'ofertas.html'; return; }
 
   try {
-    const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+    const session = JSON.parse(sessionStorage.getItem('labuai_session') || '{}');
     const candidatoId = (session && session.rol === 'CANDIDATO') ? session.candidatoId : '';
     const url = candidatoId 
       ? `http://localhost:3000/api/jobs/${id}?candidatoId=${candidatoId}`

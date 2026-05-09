@@ -377,7 +377,7 @@ function initCopySummary() {
 function initSaveProfile() {
   document.getElementById('btnSaveProfile')?.addEventListener('click', async () => {
     const btn = document.getElementById('btnSaveProfile');
-    const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+    const session = JSON.parse(sessionStorage.getItem('labuai_session') || '{}');
 
     if (!session.candidatoId) {
       showToast('No se encontró tu perfil', 'error');

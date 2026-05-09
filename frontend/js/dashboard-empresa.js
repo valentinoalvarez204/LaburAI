@@ -532,9 +532,11 @@ function initGuardarEmpresa() {
       showToast('Perfil de empresa actualizado', 'success');
 
       // Update local storage name if it strictly changed
-      if (data.nombre && session.nombre !== data.nombre) {
+      if (session && session.nombre) {
         session.nombre = data.nombre;
-        localStorage.setItem('labuai_session', JSON.stringify(session));
+        sessionStorage.setItem('labuai_session', JSON.stringify(session));
+        
+        // Actualizar UI del navbar si cambió
         document.querySelectorAll('.sp-name, .avatar-name, .elu-name').forEach((el) => {
           if (el) el.textContent = data.nombre;
         });

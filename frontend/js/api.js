@@ -13,7 +13,7 @@ const API_BASE = 'http://localhost:3000/api';
  */
 async function apiFetch(path, options = {}) {
   const session = (() => {
-    try { return JSON.parse(localStorage.getItem('labuai_session') || '{}'); }
+    try { return JSON.parse(sessionStorage.getItem('labuai_session') || '{}'); }
     catch { return {}; }
   })();
 
@@ -24,7 +24,7 @@ async function apiFetch(path, options = {}) {
 
   if (!res.ok) {
     if (res.status === 401) {
-      localStorage.removeItem('labuai_session');
+      sessionStorage.removeItem('labuai_session');
       window.location.href = '/login.html';
       return;
     }
