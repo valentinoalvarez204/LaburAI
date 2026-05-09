@@ -25,22 +25,53 @@ enum Rol {
 
 // ── CANDIDATO ──
 model Candidato {
-  id          String   @id @default(uuid())
-  nombre      String
-  apellido    String
-  ubicacion   String?
-  telefono    String?
-  linkedin    String?
-  cvUrl       String?
-  scoreCV     Int?
-  resumenIA   String?
-  habilidades String[]
-  creadoEn    DateTime @default(now())
+  id                   String   @id @default(uuid())
+  nombre               String
+  apellido             String
+  ubicacion            String?
+  telefono             String?
+  linkedin             String?
+  cvUrl                String?
+  scoreCV              Int?
+  resumenIA            String?
+  habilidades          String[]  // array plano usado por el match IA low-token
+  habilidadesFaltantes String[]  // sugerencias de la IA
+  formacion            String[]  // títulos y estudios detectados por la IA
+  creadoEn             DateTime @default(now())
 
   usuarioId String  @unique
   usuario   Usuario @relation(fields: [usuarioId], references: [id])
 
-  postulaciones Postulacion[]
+  postulaciones   Postulacion[]
+  habilidadesTech HabilidadCandidato[]
+  experiencias    ExperienciaCandidato[]
+}
+
+// ── HABILIDADES DEL CANDIDATO (extraídas por IA) ──
+model HabilidadCandidato {
+  id          String        @id @default(uuid())
+  nombre      String
+  tipo        TipoHabilidad
+  candidatoId String
+  candidato   Candidato     @relation(fields: [candidatoId], references: [id], onDelete: Cascade)
+}
+
+enum TipoHabilidad {
+  TECNICA
+  BLANDA
+  TECNOLOGIA
+}
+
+// ── EXPERIENCIA LABORAL DEL CANDIDATO (extraída por IA) ──
+model ExperienciaCandidato {
+  id          String    @id @default(uuid())
+  rol         String
+  empresa     String
+  desde       String
+  hasta       String
+  descripcion String?
+  candidatoId String
+  candidato   Candidato @relation(fields: [candidatoId], references: [id], onDelete: Cascade)
 }
 
 // ── EMPRESA ──

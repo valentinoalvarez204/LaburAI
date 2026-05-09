@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { extname } from 'path';
 import { JwtGuard } from '../auth/jwt.guard';
 import { ProfileService } from './profile.service';
 import { SupabaseStorageService } from '../storage/supabase-storage.service';
@@ -98,6 +97,38 @@ export class ProfileController {
     }
 
     return { id, cvUrl, message: 'CV subido a Supabase Storage y procesado con IA exitosamente' };
+  }
+
+  // POST /api/profile/candidato/:id/re-analyze
+  @Post('candidato/:id/re-analyze')
+  @UseGuards(JwtGuard)
+  async reAnalyzeCv(@Param('id') id: string) {
+    const candidato = await this.profileService.getCandidato(id);
+    if (!candidato.cvUrl) {
+      throw new BadRequestException('El candidato no tiene un CV subido para analizar');
+    }
+
+    try {
+      console.log('Descargando CV para re-análisis desde:', candidato.cvUrl);
+      const response = await fetch(candidato.cvUrl);
+      if (!response.ok) throw new Error(`Status ${response.status} al descargar el CV`);
+      
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      console.log('Extrayendo texto del PDF descargado...');
+      const textoPdf = await extraerTextoPdf(buffer);
+      if (!textoPdf) throw new Error('El PDF parece estar vacío o no contiene texto extraíble');
+
+      console.log('Enviando a procesar con IA (Re-análisis)...');
+      await this.profileService.procesarCVConIA(id, textoPdf);
+      console.log('Re-análisis completado con éxito');
+      
+      return { message: 'CV re-analizado correctamente y datos estructurados actualizados' };
+    } catch (error) {
+      console.error('Error al intentar re-analizar el CV:', error);
+      throw new BadRequestException('Fallo al re-analizar el CV: ' + error.message);
+    }
   }
 
   // GET /api/profile/empresa
