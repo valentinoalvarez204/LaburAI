@@ -219,6 +219,16 @@ async function patchPerfilCandidato(id, data) {
     throw err;
   }
 }
+
+async function postReAnalyzeCV(id) {
+  try {
+    return await apiFetch(`/profile/candidato/${id}/re-analyze`, { method: 'POST' });
+  } catch (err) {
+    console.error(`[API] Error re-analizando CV del candidato ${id}:`, err.message);
+    throw err;
+  }
+}
+
 /* ─────────────────────────────────
    PERFIL EMPRESA
 ───────────────────────────────── */
@@ -277,6 +287,7 @@ window.API = {
   // Perfil
   getPerfilCandidato,
   patchPerfilCandidato,
+  postReAnalyzeCV,
   getPerfilEmpresa,
   patchPerfilEmpresa,
   getIndustrias,
