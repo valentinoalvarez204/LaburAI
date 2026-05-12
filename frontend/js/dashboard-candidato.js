@@ -16,6 +16,7 @@
 ─────────────────────────────────── */
 let CANDIDATO = {
   nombre: '',
+  cvUrl: '',
   score: 0,
   scoreData: {
     total: 0,
@@ -379,6 +380,76 @@ function initCopySummary() {
   });
 }
 
+function initUploadCv() {
+  const btnUpload = document.getElementById('btnUploadNew');
+  const fileInput = document.getElementById('cvFileInput');
+  if (!btnUpload || !fileInput) return;
+
+  // Función para actualizar el estado del botón según si hay CV
+  function updateUploadButton(hasCv) {
+    if (hasCv) {
+      btnUpload.style.opacity = '0.5';
+      btnUpload.style.cursor = 'not-allowed';
+      btnUpload.title = 'Ya tienes un CV subido. No puedes subir más de uno.';
+    } else {
+      btnUpload.style.opacity = '1';
+      btnUpload.style.cursor = 'pointer';
+      btnUpload.title = '';
+    }
+  }
+
+  // Inicializar estado del botón (asumir que no hay CV hasta que se cargue el perfil)
+  updateUploadButton(false);
+
+  btnUpload.addEventListener('click', (e) => {
+    const session = requireSession();
+    if (!session?.candidatoId) return;
+
+    // Verificar si ya tiene un CV subido
+    if (CANDIDATO.cvUrl) {
+      // Mostrar mensaje de error usando showToast
+      showToast('No es posible subir más de 1 CV', 'error');
+      e.preventDefault();
+      return;
+    }
+
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', async () => {
+    const session = requireSession();
+    if (!session?.candidatoId) return;
+
+    const file = fileInput.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      showToast('Solo se permiten archivos PDF', 'error');
+      fileInput.value = '';
+      return;
+    }
+
+    btnUpload.disabled = true;
+    btnUpload.textContent = 'Subiendo…';
+
+    try {
+      await API.uploadCv(session.candidatoId, file);
+      showToast('CV subido correctamente', 'success');
+      await fetchProfile(session.candidatoId);
+    } catch (err) {
+      console.error('[Dashboard] Error subiendo CV:', err);
+      showToast(err.message || 'Error al subir el CV', 'error');
+    } finally {
+      btnUpload.disabled = false;
+      btnUpload.textContent = 'Subir mi CV';
+      fileInput.value = '';
+    }
+  });
+
+  // Exponer la función para actualizar el botón desde otras partes del código
+  window.updateUploadButton = updateUploadButton;
+}
+
 /* ─────────────────────────────────
    GUARDAR PERFIL
 ───────────────────────────────── */
@@ -482,6 +553,7 @@ async function fetchProfile(candidatoId) {
 
     CANDIDATO.nombre = `${data.nombre || ''} ${data.apellido || ''}`.trim();
     CANDIDATO.score  = data.scoreCV || 0;
+    CANDIDATO.cvUrl  = data.cvUrl || '';
     CANDIDATO.resumen = data.resumenIA || 'Subí tu CV para que la IA genere un resumen de tu perfil profesional.';
 
     const firstName = CANDIDATO.nombre.split(' ')[0] || 'Usuario';
@@ -539,6 +611,9 @@ async function fetchProfile(candidatoId) {
       // Cargar PDF en frames (agregando #toolbar=0 para una vista más limpia en la miniatura)
       if (thumbFrame) thumbFrame.src = data.cvUrl + '#toolbar=0&navpanes=0&scrollbar=0';
       if (modalFrame) modalFrame.src = data.cvUrl;
+
+      // Actualizar botón de subida (deshabilitar si ya hay CV)
+      if (window.updateUploadButton) window.updateUploadButton(true);
     } else {
       if (cvFileName) cvFileName.textContent = 'Sin CV subido';
       if (cvFileMeta) cvFileMeta.textContent = 'Subí tu currículum vitae en formato PDF para que nuestro motor de IA pueda estructurar tu perfil profesional.';
@@ -548,6 +623,9 @@ async function fetchProfile(candidatoId) {
       
       if (thumbBtn)   thumbBtn.classList.add('hidden');
       if (emptyIcon)  emptyIcon.classList.remove('hidden');
+
+      // Actualizar botón de subida (habilitar si no hay CV)
+      if (window.updateUploadButton) window.updateUploadButton(false);
     }
 
     // Formulario de Mi perfil
@@ -668,10 +746,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const session = requireSession();
   if (!session) return;
 
-  // 3. Cargar perfil y postulaciones en paralelo
+  // 3. Cargar perfil primero, luego inicializar controles
   if (session.candidatoId) {
-    // Perfil (no bloqueante)
-    fetchProfile(session.candidatoId);
+    // Cargar perfil primero (esperar a que termine)
+    await fetchProfile(session.candidatoId);
+
+    // Inicializar controles de subida después de cargar el perfil
+    initUploadCv();
 
     // Postulaciones
     try {

@@ -17,7 +17,10 @@ async function apiFetch(path, options = {}) {
     catch { return {}; }
   })();
 
-  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  const headers = { ...options.headers };
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
   if (session.token) headers['Authorization'] = `Bearer ${session.token}`;
 
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
@@ -229,6 +232,20 @@ async function postReAnalyzeCV(id) {
   }
 }
 
+async function uploadCv(id, file) {
+  try {
+    const formData = new FormData();
+    formData.append('cv', file);
+    return await apiFetch(`/profile/candidato/${id}/cv`, {
+      method: 'POST',
+      body: formData,
+    });
+  } catch (err) {
+    console.error(`[API] Error subiendo CV del candidato ${id}:`, err.message);
+    throw err;
+  }
+}
+
 /* ─────────────────────────────────
    PERFIL EMPRESA
 ───────────────────────────────── */
@@ -288,6 +305,7 @@ window.API = {
   getPerfilCandidato,
   patchPerfilCandidato,
   postReAnalyzeCV,
+  uploadCv,
   getPerfilEmpresa,
   patchPerfilEmpresa,
   getIndustrias,
