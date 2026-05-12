@@ -17,10 +17,10 @@
 let CANDIDATO = {
   nombre: '',
   cvUrl: '',
-  score: 0,
+  score: null,
   scoreData: {
-    total: 0,
-    nivel: 'bajo',
+    total: null,
+    nivel: 'none',
     tip: 'Subí tu CV para que la IA lo analice y genere tu reporte de compatibilidad.',
     criterios: []
   },
@@ -46,8 +46,17 @@ function renderScore() {
   const ring = document.getElementById('scoreRingFill');
   if (ring) {
     const circumference = 2 * Math.PI * 50;
+    ring.style.strokeDasharray = `${circumference}`;
+
     setTimeout(() => {
-      ring.style.strokeDashoffset = circumference * (1 - total / 100);
+      if (total === null || total === undefined) {
+        ring.style.strokeDashoffset = circumference;
+        ring.style.opacity = '0';
+      } else {
+        const value = Math.max(0, Math.min(total, 100));
+        ring.style.strokeDashoffset = circumference * (1 - value / 100);
+        ring.style.opacity = '1';
+      }
     }, 200);
   }
 
@@ -55,14 +64,19 @@ function renderScore() {
   const nivelEl = document.getElementById('scoreLevel');
 
   if (nivelEl) {
-    const nivelMap = {
-      bueno: { cls: 'score-level--bueno', icon: '✓', label: 'CV Competitivo' },
-      regular: { cls: 'score-level--regular', icon: '⚠', label: 'Necesita mejoras' },
-      bajo: { cls: 'score-level--bajo', icon: '✗', label: 'CV incompleto' },
-    };
-    const n = nivelMap[nivel] || nivelMap.regular;
-    nivelEl.className = `score-level ${n.cls}`;
-    nivelEl.innerHTML = `${n.icon} ${n.label}`;
+    if (!nivel || nivel === 'none') {
+      nivelEl.className = 'score-level';
+      nivelEl.textContent = '';
+    } else {
+      const nivelMap = {
+        bueno: { cls: 'score-level--bueno', icon: '✓', label: 'CV Competitivo' },
+        regular: { cls: 'score-level--regular', icon: '⚠', label: 'Necesita mejoras' },
+        bajo: { cls: 'score-level--bajo', icon: '✗', label: 'CV incompleto' },
+      };
+      const n = nivelMap[nivel] || nivelMap.regular;
+      nivelEl.className = `score-level ${n.cls}`;
+      nivelEl.innerHTML = `${n.icon} ${n.label}`;
+    }
   }
 
   // Criterios
@@ -552,8 +566,8 @@ async function fetchProfile(candidatoId) {
     const data = await API.getPerfilCandidato(candidatoId);
 
     CANDIDATO.nombre = `${data.nombre || ''} ${data.apellido || ''}`.trim();
-    CANDIDATO.score  = data.scoreCV || 0;
     CANDIDATO.cvUrl  = data.cvUrl || '';
+    CANDIDATO.score  = CANDIDATO.cvUrl && data.scoreCV !== null && data.scoreCV !== undefined ? data.scoreCV : null;
     CANDIDATO.resumen = data.resumenIA || 'Subí tu CV para que la IA genere un resumen de tu perfil profesional.';
 
     const firstName = CANDIDATO.nombre.split(' ')[0] || 'Usuario';
@@ -577,7 +591,7 @@ async function fetchProfile(candidatoId) {
 
     // Score num
     const scoreNumEl = document.getElementById('scoreNum');
-    if (scoreNumEl) scoreNumEl.textContent = data.scoreCV > 0 ? data.scoreCV : '—';
+    if (scoreNumEl) scoreNumEl.textContent = data.scoreCV !== null && data.scoreCV !== undefined ? data.scoreCV : '—';
 
     // Resumen IA
     const aiSummary = document.getElementById('aiSummaryText');
@@ -658,10 +672,11 @@ async function fetchProfile(candidatoId) {
       ? data.formacion.map(f => `• ${f}`).join('<br>')
       : 'Subí tu CV para extraer tu formación académica';
 
+    const hasScore = CANDIDATO.cvUrl && data.scoreCV !== null && data.scoreCV !== undefined;
     CANDIDATO.scoreData = {
-      total:  data.scoreCV || 0,
-      nivel:  (data.scoreCV >= 75) ? 'bueno' : (data.scoreCV >= 50 ? 'regular' : 'bajo'),
-      tip:    data.scoreCV > 0
+      total:  hasScore ? data.scoreCV : null,
+      nivel:  hasScore ? ((data.scoreCV >= 75) ? 'bueno' : (data.scoreCV >= 50 ? 'regular' : 'bajo')) : 'none',
+      tip:    hasScore
                 ? '¡Buen trabajo! Seguí mejorando tu perfil para aumentar tu visibilidad.'
                 : 'Subí tu CV para obtener un análisis detallado.',
       criterios: [

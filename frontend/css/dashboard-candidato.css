@@ -243,9 +243,9 @@ body { background: var(--bg); }
 .score-ring-fill {
   fill: none; stroke: url(#scoreGrad); stroke-width: 10;
   stroke-linecap: round;
-  stroke-dasharray: 376.99;
-  stroke-dashoffset: 376.99;
-  transition: stroke-dashoffset 1.4s ease;
+  stroke-dasharray: 314.16;
+  stroke-dashoffset: 314.16;
+  transition: stroke-dashoffset 1.4s ease, opacity 0.2s ease;
 }
 .score-ring-inner {
   position: absolute; inset: 0;
