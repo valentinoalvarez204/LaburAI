@@ -329,6 +329,20 @@ function renderMatchRing(pct) {
   if (ringPct) ringPct.textContent = `${pct}%`;
 }
 
+function getPdfFileNameFromUrl(url) {
+  if (!url) return 'curriculum.pdf';
+
+  try {
+    const pathname = new URL(url).pathname;
+    const lastSegment = decodeURIComponent(pathname.split('/').pop() || '');
+    return lastSegment.replace(/^\d+-/, '') || 'curriculum.pdf';
+  } catch {
+    const cleanUrl = url.split('#')[0].split('?')[0];
+    const lastSegment = decodeURIComponent(cleanUrl.split('/').pop() || '');
+    return lastSegment.replace(/^\d+-/, '') || 'curriculum.pdf';
+  }
+}
+
 function initMatchAnalysis(oferta) {
   const analyzeBtn = document.getElementById('btnAnalyzeMatch');
   if (!analyzeBtn) return;
@@ -463,7 +477,56 @@ function initModal() {
   const btnCancel = document.getElementById('btnCancelModal');
   const btnConfirm= document.getElementById('btnConfirmApply');
 
-  function openModal()  { overlay?.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+  async function loadApplicationCvPreview() {
+    const session = getSession();
+    const thumb = document.getElementById('applicationCvThumb');
+    const frame = document.getElementById('applicationCvFrame');
+    const name = document.getElementById('applicationCvName');
+    const meta = document.getElementById('applicationCvMeta');
+    const viewBtn = document.getElementById('applicationCvView');
+
+    if (thumb) thumb.classList.remove('has-cv');
+    if (frame) frame.removeAttribute('src');
+    if (name) name.textContent = 'Cargando CV...';
+    if (meta) meta.textContent = 'Buscando el CV de tu perfil.';
+    if (viewBtn) {
+      viewBtn.disabled = true;
+      viewBtn.onclick = null;
+    }
+
+    if (!session?.token || !session?.candidatoId) {
+      if (name) name.textContent = 'Sin CV cargado';
+      if (meta) meta.textContent = 'Subí tu currículum vitae desde tu dashboard.';
+      return;
+    }
+
+    try {
+      const profile = await API.getPerfilCandidato(session.candidatoId);
+      if (profile?.cvUrl) {
+        if (thumb) thumb.classList.add('has-cv');
+        if (frame) frame.src = `${profile.cvUrl}#toolbar=0&navpanes=0&scrollbar=0`;
+        if (name) name.textContent = getPdfFileNameFromUrl(profile.cvUrl);
+        if (meta) meta.textContent = 'PDF cargado en tu perfil.';
+        if (viewBtn) {
+          viewBtn.disabled = false;
+          viewBtn.onclick = () => window.open(profile.cvUrl, '_blank');
+        }
+      } else {
+        if (name) name.textContent = 'Sin CV cargado';
+        if (meta) meta.textContent = 'Subí tu currículum vitae desde tu dashboard.';
+      }
+    } catch (err) {
+      console.error('Error cargando CV para postulación:', err);
+      if (name) name.textContent = 'Sin CV cargado';
+      if (meta) meta.textContent = 'No pudimos obtener el CV de tu perfil.';
+    }
+  }
+
+  function openModal()  {
+    overlay?.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    loadApplicationCvPreview();
+  }
   function closeModal() { overlay?.classList.add('hidden'); document.body.style.overflow = ''; }
   function showSuccess() {
     overlay?.classList.add('hidden');

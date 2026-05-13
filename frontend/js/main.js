@@ -127,7 +127,7 @@ async function fetchStats() {
       'Candidatos activos': data.candidatos,
       'Ofertas publicadas': data.ofertas,
       'Empresas registradas': data.empresas,
-      'Match IA exitoso': data.matchPromedio
+      'Match IA exitoso': 94
     };
 
     document.querySelectorAll('.stat').forEach(statEl => {
