@@ -5,38 +5,36 @@ import { IAPIService } from '../interfaces/ia-service.interface';
 import { AnalisisCVDto } from '../dto/analisis-cv.dto';
 
 const PROMPT_ANALISIS_CV = (textoCV: string) => `
-Sos un experto en reclutamiento de Argentina. Analizá el siguiente CV y respondé ÚNICAMENTE con un JSON válido sin markdown, sin explicaciones, sin texto extra.
+Sos un recruiter IT nivel Senior de Argentina con vista de águila. Tu función es extraer la información del siguiente CV con un nivel de precisión y detalle EXTRAORDINARIO. No podés obviar NINGUNA experiencia laboral, puesto, habilidad o tecnología.
 
-Estructura requerida (todos los campos son obligatorios, usá arrays vacíos si no hay datos):
+Tu salida debe ser ÚNICAMENTE un JSON válido, sin markdown, sin explicaciones ni texto extra. Formato estricto:
+
 {
-  "resumen": "resumen profesional de 2-3 oraciones en español",
-  "scoreCV": 72,
+  "resumen": "Resumen profesional redactado en tercera persona, muy completo (3-4 oraciones), destacando seniority, rubro y stack principal.",
+  "scoreCV": 85,
   "habilidades": ["habilidad1", "habilidad2"],
-  "habilidadesTech": ["Ventas B2B", "Negociación", "Gestión de cuentas"],
-  "habilidadesBlandas": ["Liderazgo", "Comunicación", "Trabajo en equipo"],
-  "tecnologias": ["Excel", "SAP", "Salesforce"],
-  "habilidadesFaltantes": ["Power BI", "SQL básico"],
-  "formacion": ["Lic. Recursos Humanos — UBA (2018)", "Posgrado en Gestión — UTDT (2021)"],
+  "habilidadesTech": ["Ventas B2B", "Negociación", "Arquitectura", "Testing"],
+  "habilidadesBlandas": ["Liderazgo", "Comunicación efectiva", "Resolución de problemas"],
+  "tecnologias": ["Excel", "React", "Node.js", "AWS", "Python"],
+  "habilidadesFaltantes": ["Inglés Avanzado", "Docker"],
+  "formacion": ["Lic. Recursos Humanos — UBA (2018)", "Curso de UX — Coderhouse (2022)"],
   "experiencias": [
     {
-      "rol": "Gerente de Ventas",
-      "empresa": "Empresa X",
-      "desde": "Mar 2020",
-      "hasta": "Presente",
-      "descripcion": "breve descripción del rol"
+      "rol": "Nombre exacto del cargo / puesto",
+      "empresa": "Nombre de la empresa o cliente",
+      "desde": "Mes Año",
+      "hasta": "Mes Año o Presente",
+      "descripcion": "Descripción EXHAUSTIVA de las responsabilidades, logros y tareas. Extraé absolutamente TODO el contexto del rol que figure en el CV, incluyendo las tecnologías usadas allí."
     }
   ]
 }
 
-Reglas:
-- scoreCV: número del 0 al 100
-- habilidadesTech: habilidades de la profesión/industria (no software)
-- habilidadesBlandas: habilidades interpersonales
-- tecnologias: software, herramientas, plataformas
-- habilidadesFaltantes: máximo 4 sugerencias de certificaciones o habilidades para mejorar el perfil
-- formacion: array de strings con título + institución + año si está disponible; máximo 4 entradas
-- habilidades: combinar los 3 arrays anteriores en uno plano
-- desde/hasta: formato "Mes Año" en español o "Presente"
+Reglas CRÍTICAS de extracción:
+1. EXTRACCIÓN DE EXPERIENCIA: Es tu máxima prioridad. Revisá todo el documento de arriba a abajo. Extraé ABSOLUTAMENTE TODAS las experiencias laborales detalladas. No recortes sus descripciones; si el CV incluye viñetas de tareas o logros, unilas en un párrafo completo detallado en 'descripcion'.
+2. habilidades, habilidadesTech, tecnologias: Escaneá a fondo buscando menciones implícitas y explícitas de software u oficios. (Ej: si dice que implementó una API en Python en una de las experiencias, 'Python' debe ir a 'tecnologias').
+3. habilidades: Combinar tech, blandas y tecnologías en un sólo array unificado para que el sistema indexe todo.
+4. desde/hasta: Mantené el formato "Mes Año" en español. Si sigue activo, "Presente".
+5. Si no hay datos para un array, devolvé [].
 
 CV a analizar:
 ${textoCV}

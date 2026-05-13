@@ -29,7 +29,13 @@ export class SupabaseStorageService {
     }
 
     try {
-      const fileName = `${candidatoId}/${Date.now()}-${fileNameInfo}`;
+      const sanitizedFileNameInfo = fileNameInfo
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9.\-_]/g, '_')
+        .toLowerCase();
+        
+      const fileName = `${candidatoId}/${Date.now()}-${sanitizedFileNameInfo}`;
 
       const { data, error } = await this.supabase.storage
         .from(this.BUCKET)
