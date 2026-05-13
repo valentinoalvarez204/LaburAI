@@ -244,11 +244,8 @@ function renderRecomendadas() {
   if (!grid) return;
   grid.innerHTML = RECOMENDADAS.map((o) => {
     const tags = o.tags.map((t, i) => `<span class="job-tag ${o.tagTypes[i] || ''}">${t}</span>`).join('');
-    const matchVal = o.match || 0;
-    const badge = `<div class="match-badge">✦ ${matchVal}% match</div>`;
     return `
       <a class="job-card" href="oferta-detalle.html?id=${o.id}">
-        ${badge}
         <div class="job-card-head">
           <div class="company-logo" style="color:${o.logoColor}">${o.logo}</div>
           <div class="job-meta">
