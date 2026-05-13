@@ -5,40 +5,65 @@ import { IAPIService } from '../interfaces/ia-service.interface';
 import { AnalisisCVDto } from '../dto/analisis-cv.dto';
 
 const PROMPT_ANALISIS_CV = (textoCV: string) => `
-Sos un experto en reclutamiento de Argentina. Analizá el siguiente CV y respondé ÚNICAMENTE con un JSON válido sin markdown, sin explicaciones, sin texto extra.
+Sos un parser ATS especializado en extracción de CVs.
 
-Estructura requerida (todos los campos son obligatorios, usá arrays vacíos si no hay datos):
+Tu tarea es extraer únicamente información explícita del CV.
+
+REGLAS:
+- NO inventes información.
+- NO deduzcas tecnologías.
+- NO agregues experiencia no escrita.
+- NO completes stacks.
+- Si el CV no es IT, NO agregues tecnologías IT.
+- Si un dato no existe, devolver [] o "".
+- Responder SOLO JSON válido.
+- Sin markdown.
+- Sin explicación.
+
+Formato:
+
 {
-  "resumen": "resumen profesional de 2-3 oraciones en español",
-  "scoreCV": 72,
-  "habilidades": ["habilidad1", "habilidad2"],
-  "habilidadesTech": ["Ventas B2B", "Negociación", "Gestión de cuentas"],
-  "habilidadesBlandas": ["Liderazgo", "Comunicación", "Trabajo en equipo"],
-  "tecnologias": ["Excel", "SAP", "Salesforce"],
-  "habilidadesFaltantes": ["Power BI", "SQL básico"],
-  "formacion": ["Lic. Recursos Humanos — UBA (2018)", "Posgrado en Gestión — UTDT (2021)"],
+  "resumen": "",
+  "scoreCV": {
+    "completitud": 0,
+    "claridad": 0,
+    "estructura": 0
+  },
+  "habilidadesTecnicas": [],
+  "habilidadesBlandas": [],
+  "tecnologias": [],
+  "idiomas": [],
+  "certificaciones": [],
+  "formacion": [
+    {
+      "titulo": "",
+      "institucion": "",
+      "anio": ""
+    }
+  ],
   "experiencias": [
     {
-      "rol": "Gerente de Ventas",
-      "empresa": "Empresa X",
-      "desde": "Mar 2020",
-      "hasta": "Presente",
-      "descripcion": "breve descripción del rol"
+      "rol": "",
+      "empresa": "",
+      "ubicacion": "",
+      "desde": "",
+      "hasta": "",
+      "descripcion": "",
+      "tecnologiasDetectadas": []
     }
   ]
 }
 
-Reglas:
-- scoreCV: número del 0 al 100
-- habilidadesTech: habilidades de la profesión/industria (no software)
-- habilidadesBlandas: habilidades interpersonales
-- tecnologias: software, herramientas, plataformas
-- habilidadesFaltantes: máximo 4 sugerencias de certificaciones o habilidades para mejorar el perfil
-- formacion: array de strings con título + institución + año si está disponible; máximo 4 entradas
-- habilidades: combinar los 3 arrays anteriores en uno plano
-- desde/hasta: formato "Mes Año" en español o "Presente"
+INSTRUCCIONES:
+- Extraer TODAS las experiencias laborales.
+- Mantener nombres exactos.
+- Unir viñetas en un solo texto.
+- No resumir demasiado.
+- Tecnologías SOLO si aparecen explícitamente.
+- Separar habilidades técnicas y blandas.
+- El resumen debe ser breve y fiel al CV.
 
-CV a analizar:
+CV:
 ${textoCV}
 `.trim();
 
@@ -48,13 +73,13 @@ export class GroqService implements IAPIService {
   private groq: Groq;
 
   private readonly FALLBACK: AnalisisCVDto = {
-    resumen: 'Error en Groq',
-    scoreCV: 0,
-    habilidades: [],
-    habilidadesTech: [],
+    resumen: 'Error en el procesamiento del CV con Groq.',
+    scoreCV: { completitud: 0, claridad: 0, estructura: 0 },
+    habilidadesTecnicas: [],
     habilidadesBlandas: [],
     tecnologias: [],
-    habilidadesFaltantes: [],
+    idiomas: [],
+    certificaciones: [],
     formacion: [],
     experiencias: [],
   };
@@ -63,6 +88,24 @@ export class GroqService implements IAPIService {
     const apiKey = this.configService.get<string>('GROQ_API_KEY');
     if (apiKey) {
       this.groq = new Groq({ apiKey });
+    }
+  }
+
+  private cleanAndParseJSON(text: string): any {
+    try {
+      const cleaned = text
+        .replace(/```json/g, '')
+        .replace(/```/g, '')
+        .trim();
+      
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+      return JSON.parse(cleaned);
+    } catch (e) {
+      this.logger.error('Error parseando JSON:', e);
+      return null;
     }
   }
 
@@ -76,15 +119,30 @@ export class GroqService implements IAPIService {
 
     try {
       const completion = await this.groq.chat.completions.create({
-        messages: [{ role: 'user', content: PROMPT_ANALISIS_CV(textoCV) }],
-        model: 'llama-3.1-8b-instant',
+        messages: [
+          {
+            role: 'system',
+            content: PROMPT_ANALISIS_CV('')
+          },
+          {
+            role: 'user',
+            content: textoCV
+          }
+        ],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0,
         response_format: { type: 'json_object' },
       });
 
       const content = completion.choices[0]?.message?.content;
       if (!content) throw new Error('Groq no devolvió contenido');
 
-      return JSON.parse(content) as AnalisisCVDto;
+      const parsed = this.cleanAndParseJSON(content);
+      if (parsed) {
+        return parsed as AnalisisCVDto;
+      }
+
+      throw new Error('No se pudo obtener un JSON válido');
     } catch (error) {
       this.logger.error('Error en Groq:', error);
       return this.FALLBACK;
@@ -100,8 +158,23 @@ export class GroqService implements IAPIService {
         model: 'llama-3.1-8b-instant',
         messages: [{
           role: 'user',
-          content: `Compara este candidato con la oferta y devuelve la compatibilidad del 0 al 100.
-Formato: JSON puro con la clave "match" y el número.
+          content: `Sos un asistente objetivo de matching profesional.
+Compará estrictamente el perfil del candidato con los requisitos de la oferta.
+No agregues información que no esté en los textos.
+Respondé solo JSON válido.
+
+Formato esperado:
+{
+  "match": 0,
+  "fortalezas": [],
+  "brechas": []
+}
+
+Instrucciones:
+- "match" debe ser un entero entre 0 y 100.
+- "fortalezas" lista hasta 3 puntos fuertes del candidato para esta oferta.
+- "brechas" lista hasta 3 áreas donde el candidato no cumple completamente.
+- No incluyas explicaciones adicionales ni markdown.
 
 Candidato:
 ${perfilCV}
@@ -109,15 +182,16 @@ ${perfilCV}
 Oferta:
 ${ofertaTrabajo}`,
         }],
+        temperature: 0,
         response_format: { type: 'json_object' },
-        max_tokens: 20,
+        max_tokens: 60,
       });
 
       const content = response.choices[0]?.message?.content;
       if (!content) return 0;
 
-      const parsed = JSON.parse(content);
-      return parsed.match || 0;
+      const parsed = this.cleanAndParseJSON(content);
+      return parsed?.match || 0;
     } catch (error) {
       this.logger.error('Error calculando match en Groq:', error);
       return 0;

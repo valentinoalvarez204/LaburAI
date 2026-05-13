@@ -29,7 +29,13 @@ export class SupabaseStorageService {
     }
 
     try {
-      const fileName = `${candidatoId}/${Date.now()}-${fileNameInfo}`;
+      const sanitizedFileNameInfo = fileNameInfo
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9.\-_]/g, '_')
+        .toLowerCase();
+        
+      const fileName = `${candidatoId}/${Date.now()}-${sanitizedFileNameInfo}`;
 
       const { data, error } = await this.supabase.storage
         .from(this.BUCKET)
@@ -51,6 +57,34 @@ export class SupabaseStorageService {
     } catch (error) {
       this.logger.error('Error al subir CV a Supabase Storage:', error.message);
       return '';
+    }
+  }
+
+  async eliminarCV(candidatoId: string): Promise<boolean> {
+    if (!this.supabase) return false;
+
+    try {
+      // Listamos los archivos del candidato en el bucket
+      const { data, error } = await this.supabase.storage
+        .from(this.BUCKET)
+        .list(candidatoId);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const filesToRemove = data.map(file => `${candidatoId}/${file.name}`);
+        const { error: deleteError } = await this.supabase.storage
+          .from(this.BUCKET)
+          .remove(filesToRemove);
+
+        if (deleteError) throw deleteError;
+        this.logger.log(`Archivos del candidato ${candidatoId} eliminados de Supabase Storage.`);
+      }
+
+      return true;
+    } catch (error) {
+      this.logger.error('Error al eliminar archivos de Supabase Storage:', error.message);
+      return false;
     }
   }
 }

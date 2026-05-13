@@ -203,7 +203,7 @@ function applyFilters() {
     case 'recientes': list.sort((a, b) => a.id - b.id); break;
     case 'salario-asc': list.sort((a, b) => a.salaryNum - b.salaryNum); break;
     case 'salario-desc': list.sort((a, b) => b.salaryNum - a.salaryNum); break;
-    default: list.sort((a, b) => b.match - a.match); break;
+    default: list.sort((a, b) => a.id - b.id); break;
   }
 
   state.results = list;
@@ -312,13 +312,9 @@ function renderCards() {
 
   grid.innerHTML = pageItems.map((job) => {
     const tags = job.tags.map((t, i) => buildTagHTML(t, job.tagTypes[i])).join('');
-    const matchVal = job.match || 0;
-    // Si es empresa, no renderizamos el badge
-    const badge = isEmpresa ? '' : `<div class="match-badge">✦ ${matchVal}% match</div>`;
 
     return `
       <a class="job-card" href="oferta-detalle.html?id=${job.id}">
-        ${badge}
         <div class="job-card-head">
           <div class="company-logo" style="color:${job.logoColor}">${job.logo}</div>
           <div class="job-meta">
