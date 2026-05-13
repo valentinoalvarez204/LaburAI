@@ -63,6 +63,7 @@ function renderPage(oferta) {
   // Match ring
   const session = getSession();
   const isEmpresa = String(session?.rol || '').toLowerCase() === 'empresa';
+  const canAnalyzeMatch = Boolean(session?.token);
 
   if (!isEmpresa) {
     const matchWrapper = document.getElementById('matchRingWrapper');
@@ -70,16 +71,33 @@ function renderPage(oferta) {
     const matchNote = document.getElementById('matchNote');
     const analyzeBtn = document.getElementById('btnAnalyzeMatch');
 
-    if (oferta.analizado) {
+    if (!canAnalyzeMatch) {
+      if (matchWrapper) matchWrapper.style.display = 'none';
+      if (matchPct) matchPct.textContent = '—%';
+      if (analyzeBtn) {
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = 'Iniciar sesión';
+      }
+      if (matchNote) {
+        matchNote.textContent = '';
+        matchNote.style.display = 'none';
+      }
+    } else if (oferta.analizado) {
       renderMatchRing(oferta.match);
       setText('matchPct', `${oferta.match}%`);
       if (analyzeBtn) analyzeBtn.disabled = true;
-      if (matchNote) matchNote.textContent = 'Este puesto ya fue analizado. No se puede repetir.';
+      if (matchNote) {
+        matchNote.style.display = '';
+        matchNote.textContent = 'Este puesto ya fue analizado. No se puede repetir.';
+      }
     } else {
       if (matchWrapper) matchWrapper.style.display = 'none';
       if (matchPct) matchPct.textContent = '—%';
       if (analyzeBtn) analyzeBtn.disabled = false;
-      if (matchNote) matchNote.textContent = `Te quedan ${oferta.analisisRestantes} análisis de match.`;
+      if (matchNote) {
+        matchNote.style.display = '';
+        matchNote.textContent = `Te quedan ${oferta.analisisRestantes} análisis de match.`;
+      }
     }
   } else {
     // Si es empresa, ocultamos todo el bloque de match
@@ -316,6 +334,12 @@ function initMatchAnalysis(oferta) {
   if (!analyzeBtn) return;
 
   analyzeBtn.addEventListener('click', async () => {
+    const session = getSession();
+    if (!session?.token) {
+      window.location.href = 'login.html';
+      return;
+    }
+
     analyzeBtn.disabled = true;
     analyzeBtn.textContent = 'Analizando…';
 
