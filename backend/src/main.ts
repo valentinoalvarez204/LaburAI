@@ -9,7 +9,7 @@ async function bootstrap() {
 
   // Permite que el frontend se conecte al backend
   app.enableCors({
-    origin: ['https://labur-ai.vercel.app', 'http://localhost:3000'], // Agrega tu dominio de Vercel aquí
+    origin: ['https://labur-ai.vercel.app', 'http://localhost:3000'],
     credentials: true,
   });
 
