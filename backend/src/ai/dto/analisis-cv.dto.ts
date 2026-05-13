@@ -1,19 +1,33 @@
 export class ExperienciaDto {
   rol: string;
   empresa: string;
+  ubicacion: string;
   desde: string;
   hasta: string;
-  descripcion?: string;
+  descripcion: string;
+  tecnologiasDetectadas: string[];
+}
+
+export class FormacionDto {
+  titulo: string;
+  institucion: string;
+  anio: string;
+}
+
+export class ScoreCVDto {
+  completitud: number;
+  claridad: number;
+  estructura: number;
 }
 
 export class AnalisisCVDto {
   resumen: string;
-  scoreCV: number;              // puntuación general del CV (0-100)
-  habilidades: string[];        // array plano — usado por el match IA low-token
-  habilidadesTech: string[];    // ej: "Ventas B2B", "Negociación", "Gestión de equipos"
-  habilidadesBlandas: string[]; // ej: "Liderazgo", "Comunicación", "Trabajo en equipo"
-  tecnologias: string[];        // ej: "Excel", "SAP", "Salesforce", "Python"
-  habilidadesFaltantes: string[]; // sugerencias: "Power BI", "SQL básico"
-  formacion: string[];          // ej: "Lic. Recursos Humanos — UBA (2018)"
+  scoreCV: ScoreCVDto;
+  habilidadesTecnicas: string[];
+  habilidadesBlandas: string[];
+  tecnologias: string[];
+  idiomas: string[];
+  certificaciones: string[];
+  formacion: FormacionDto[];
   experiencias: ExperienciaDto[];
 }

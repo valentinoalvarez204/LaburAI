@@ -222,7 +222,6 @@ function renderPostulaciones(filter = 'todas') {
         <div class="pi-company">${p.company}</div>
         <div class="pi-date">${p.fecha}</div>
       </div>
-      <div class="pi-match">✦ ${p.match}%</div>
       <div class="pi-status pi-status--${p.status}">${STATUS_LABELS[p.status]}</div>
     </a>`).join('');
 }

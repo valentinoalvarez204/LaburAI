@@ -181,6 +181,33 @@ export class ProfileController {
     return this.profileService.updateEmpresa(id, body);
   }
 
+  // DELETE /api/profile/candidato/:id/cv — elimina el CV y los datos asociados
+  @Post('candidato/:id/cv/delete')
+  @UseGuards(JwtGuard)
+  async deleteCvPost(@Param('id') id: string) {
+    return this.handleDeleteCv(id);
+  }
+
+  // Alternativa PATCH para limpiar datos
+  @Patch('candidato/:id/cv/clear')
+  @UseGuards(JwtGuard)
+  async clearCv(@Param('id') id: string) {
+    return this.handleDeleteCv(id);
+  }
+
+  private async handleDeleteCv(id: string) {
+    // 1. Obtener candidato para borrar archivos de storage
+    const candidate = await this.profileService.getCandidato(id).catch(() => null);
+    if (candidate) {
+      console.log(`Eliminando archivos de Storage para candidato: ${candidate.id}`);
+      await this.storageService.eliminarCV(candidate.id);
+    }
+
+    // 2. Eliminar datos de la DB
+    console.log(`Eliminando datos de DB para candidato/usuario: ${id}`);
+    return this.profileService.eliminarCV(id);
+  }
+
   // GET /api/profile/industrias  — público, sin autenticación
   @Get('industrias')
   getIndustrias() {
