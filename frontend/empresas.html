@@ -36,71 +36,6 @@
       overflow-x: hidden;
     }
 
-    /* ── NAVBAR ── */
-    nav#navbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(248,249,255,0.92);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      transition: box-shadow .3s;
-    }
-    nav#navbar.scrolled { box-shadow: 0 4px 24px rgba(102,126,234,.12); }
-    .nav-inner {
-      max-width: 1200px; margin: 0 auto;
-      padding: 0 24px; height: 64px;
-      display: flex; align-items: center; gap: 32px;
-    }
-    .logo {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 800; font-size: 20px;
-      color: var(--text1); text-decoration: none;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .logo-star { color: var(--primary); }
-    .nav-links { display: flex; gap: 28px; margin-left: 8px; }
-    .nav-links a {
-      color: var(--text2); text-decoration: none;
-      font-size: 14px; font-weight: 500;
-      transition: color .2s;
-    }
-    .nav-links a:hover, .nav-links a.active { color: var(--primary); }
-    .nav-actions { margin-left: auto; display: flex; gap: 12px; align-items: center; }
-    .btn-ghost {
-      padding: 8px 18px; border-radius: 10px; font-size: 14px; font-weight: 600;
-      color: var(--text1); background: transparent;
-      border: 1.5px solid var(--border); cursor: pointer; text-decoration: none;
-      transition: all .2s; display: inline-block;
-    }
-    .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
-    .btn-primary {
-      padding: 9px 20px; border-radius: 10px; font-size: 14px; font-weight: 700;
-      background: var(--grad); color: #fff; border: none; cursor: pointer;
-      text-decoration: none; display: inline-block; transition: all .2s;
-      box-shadow: 0 4px 16px rgba(102,126,234,.35);
-    }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(102,126,234,.45); }
-    .hamburger {
-      display: none; background: none; border: none; cursor: pointer;
-      flex-direction: column; gap: 5px; margin-left: auto;
-    }
-    .hamburger span { width: 22px; height: 2px; background: var(--text1); border-radius: 2px; display: block; transition: .3s; }
-    .mobile-menu {
-      display: none; flex-direction: column; gap: 4px;
-      padding: 16px 24px 20px; border-top: 1px solid var(--border);
-      background: rgba(248,249,255,0.98);
-    }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a {
-      padding: 10px 0; color: var(--text2); text-decoration: none;
-      font-weight: 500; font-size: 15px;
-    }
-    .mobile-menu hr { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
-
-    @media (max-width: 768px) {
-      .nav-links, .nav-actions { display: none; }
-      .hamburger { display: flex; }
-    }
-
     /* ── HERO ── */
     .hero-empresas {
       min-height: 100vh;
@@ -432,11 +367,12 @@
       <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
       <div class="nav-links">
         <a href="ofertas.html">Buscar empleo</a>
-        <a href="empresas.html" class="active">Para empresas</a>
+        <a href="empresas.html">Para empresas</a>
       </div>
+      <!-- Nav actions: cambia dinámicamente según sesión (ver main.js) -->
       <div class="nav-actions" id="navActions">
         <a href="login.html" class="btn-ghost">Ingresar</a>
-        <a href="login.html" class="btn-primary">Registrar empresa</a>
+        <a href="login.html" class="btn-primary">Publicar oferta</a>
       </div>
       <button class="hamburger" id="hamburger" aria-label="Menú">
         <span></span><span></span><span></span>
@@ -446,9 +382,10 @@
       <a href="ofertas.html">Buscar empleo</a>
       <a href="empresas.html">Para empresas</a>
       <hr />
-      <div id="mobileNavActions" style="display:flex;flex-direction:column;gap:10px">
-        <a href="login.html" class="btn-ghost" style="text-align:center">Ingresar</a>
-        <a href="login.html" class="btn-primary" style="text-align:center">Registrar empresa</a>
+      <div id="mobileNavActions">
+        <a href="login.html" class="btn-ghost" style="text-align:center;display:block">Ingresar</a>
+        <a href="login.html" class="btn-primary" style="text-align:center;display:block;margin-top:8px">Publicar
+          oferta</a>
       </div>
     </div>
   </nav>
@@ -738,10 +675,33 @@
   <script src="js/utils.js"></script>
   <script src="js/api.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       initNavbar();
       initNavSession();
       initReveal();
+
+      async function fetchEmpresaPageStats() {
+        try {
+          const data = await API.getGlobalStats();
+          const stats = [
+            { id: 'statCandidatos', target: data.candidatos, suffix: '' },
+            { id: 'statOfertas', target: data.ofertas, suffix: '' },
+            { id: 'statEmpresas', target: data.empresas, suffix: '' },
+            { id: 'statMatch', target: 94, suffix: '%' },
+          ];
+
+          stats.forEach(({ id, target, suffix }) => {
+            const el = document.getElementById(id);
+            if (!el || target === undefined || target === null) return;
+            el.dataset.target = target;
+            el.dataset.suffix = suffix;
+          });
+        } catch (err) {
+          console.error('Error fetching company landing stats:', err);
+        }
+      }
+
+      await fetchEmpresaPageStats();
 
       // Animación de counters
       const observers = new IntersectionObserver((entries) => {
@@ -755,33 +715,9 @@
         });
       }, { threshold: 0.5 });
 
-      [
-        { id: 'statCandidatos', target: 52400, suffix: '' },
-        { id: 'statOfertas', target: 11300, suffix: '' },
-        { id: 'statEmpresas', target: 3200, suffix: '' },
-      ].forEach(({ id, target, suffix }) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.dataset.target = target;
-        el.dataset.suffix = suffix;
+      document.querySelectorAll('.stat-num[data-target]').forEach((el) => {
         observers.observe(el);
       });
-
-      // Match counter especial
-      const matchEl = document.getElementById('statMatch');
-      if (matchEl) {
-        const obs2 = new IntersectionObserver((entries) => {
-          if (!entries[0].isIntersecting) return;
-          animateCounter(matchEl, 94, 1800, '%');
-          obs2.unobserve(matchEl);
-        }, { threshold: 0.5 });
-        obs2.observe(matchEl);
-      }
-
-      // Hamburger
-      const btn = document.getElementById('hamburger');
-      const menu = document.getElementById('mobileMenu');
-      btn?.addEventListener('click', () => menu?.classList.toggle('open'));
 
       // Smooth scroll
       document.querySelectorAll('a[href^="#"]').forEach(a => {

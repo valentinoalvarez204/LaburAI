@@ -59,4 +59,32 @@ export class SupabaseStorageService {
       return '';
     }
   }
+
+  async eliminarCV(candidatoId: string): Promise<boolean> {
+    if (!this.supabase) return false;
+
+    try {
+      // Listamos los archivos del candidato en el bucket
+      const { data, error } = await this.supabase.storage
+        .from(this.BUCKET)
+        .list(candidatoId);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const filesToRemove = data.map(file => `${candidatoId}/${file.name}`);
+        const { error: deleteError } = await this.supabase.storage
+          .from(this.BUCKET)
+          .remove(filesToRemove);
+
+        if (deleteError) throw deleteError;
+        this.logger.log(`Archivos del candidato ${candidatoId} eliminados de Supabase Storage.`);
+      }
+
+      return true;
+    } catch (error) {
+      this.logger.error('Error al eliminar archivos de Supabase Storage:', error.message);
+      return false;
+    }
+  }
 }

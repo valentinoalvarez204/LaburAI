@@ -5,34 +5,40 @@
    hacer fetch() directo; importar desde aquí.
 ══════════════════════════════════════════ */
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = 'https://laburai.onrender.com/api';
 
 /**
  * Wrapper base para llamadas a la API.
  * Lanza un Error si la respuesta no es 2xx.
  */
 async function apiFetch(path, options = {}) {
+  const { redirectOnUnauthorized = true, ...fetchOptions } = options;
   const session = (() => {
     try { return JSON.parse(sessionStorage.getItem('labuai_session') || '{}'); }
     catch { return {}; }
   })();
 
-  const headers = { ...options.headers };
-  if (!(options.body instanceof FormData)) {
+  const headers = { ...fetchOptions.headers };
+  if (!(fetchOptions.body instanceof FormData)) {
     headers['Content-Type'] = 'application/json';
   }
   if (session.token) headers['Authorization'] = `Bearer ${session.token}`;
 
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const res = await fetch(`${API_BASE}${path}`, { ...fetchOptions, headers });
 
   if (!res.ok) {
-    if (res.status === 401) {
-      sessionStorage.removeItem('labuai_session');
-      window.location.href = '/login.html';
-      return;
-    }
     const errBody = await res.json().catch(() => ({}));
-    throw new Error(errBody.message || `HTTP ${res.status}: ${path}`);
+    const message = errBody.message || `HTTP ${res.status}: ${path}`;
+
+    if (res.status === 401) {
+      if (redirectOnUnauthorized) {
+        sessionStorage.removeItem('labuai_session');
+        window.location.href = 'login.html';
+      }
+      throw new Error(message);
+    }
+
+    throw new Error(message);
   }
   return res.json();
 }
@@ -52,6 +58,7 @@ function assertFields(obj, fields, context) {
 async function login(email, password) {
   return apiFetch('/auth/login', {
     method: 'POST',
+    redirectOnUnauthorized: false,
     body: JSON.stringify({ email, password }),
   });
 }
@@ -127,6 +134,15 @@ async function getOferta(id) {
   }
 }
 
+async function postJobMatchAnalysis(id) {
+  try {
+    return await apiFetch(`/jobs/${id}/match`, { method: 'POST' });
+  } catch (err) {
+    console.error(`[API] Error analizando match para oferta ${id}:`, err.message);
+    throw err;
+  }
+}
+
 async function crearOferta(data) {
   try {
     return await apiFetch('/jobs', { method: 'POST', body: JSON.stringify(data) });
@@ -188,6 +204,15 @@ async function patchPostulacion(id, data) {
   }
 }
 
+async function postApplicationMatchAnalysis(id) {
+  try {
+    return await apiFetch(`/applications/${id}/match`, { method: 'POST' });
+  } catch (err) {
+    console.error(`[API] Error analizando match de postulacion ${id}:`, err.message);
+    throw err;
+  }
+}
+
 async function crearPostulacion(data) {
   try {
     return await apiFetch('/applications', { method: 'POST', body: JSON.stringify(data) });
@@ -228,6 +253,15 @@ async function postReAnalyzeCV(id) {
     return await apiFetch(`/profile/candidato/${id}/re-analyze`, { method: 'POST' });
   } catch (err) {
     console.error(`[API] Error re-analizando CV del candidato ${id}:`, err.message);
+    throw err;
+  }
+}
+
+async function postJobMatchAnalysis(id) {
+  try {
+    return await apiFetch(`/jobs/${id}/match`, { method: 'POST' });
+  } catch (err) {
+    console.error(`[API] Error analizando match para oferta ${id}:`, err.message);
     throw err;
   }
 }
@@ -300,6 +334,7 @@ window.API = {
   getPostulaciones,
   getPostulacion,
   patchPostulacion,
+  postApplicationMatchAnalysis,
   crearPostulacion,
   // Perfil
   getPerfilCandidato,
@@ -307,6 +342,8 @@ window.API = {
   postReAnalyzeCV,
   uploadCv,
   getPerfilEmpresa,
+  // Match IA
+  postJobMatchAnalysis,
   patchPerfilEmpresa,
   getIndustrias,
 };

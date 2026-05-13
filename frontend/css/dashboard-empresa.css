@@ -254,6 +254,16 @@ body {
   flex-shrink: 0;
 }
 
+.tc-empty {
+  padding: 18px 14px;
+  background: var(--bg2);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--r);
+  color: var(--text3);
+  font-size: 13px;
+  text-align: center;
+}
+
 /* ─────────────────────────────────
    ACTIVIDAD RECIENTE
 ───────────────────────────────── */
@@ -636,6 +646,25 @@ body {
   height: 60px;
 }
 
+.cand-score-wrap--pending {
+  min-width: 70px;
+}
+
+.cand-score-placeholder {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1.5px dashed #C5CCF0;
+  background: var(--grad-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--indigo);
+}
+
 .csr-svg {
   width: 60px;
   height: 60px;
@@ -702,6 +731,19 @@ body {
   border-color: var(--indigo);
   color: var(--indigo);
   background: var(--grad-soft);
+}
+
+.cand-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cand-btn:disabled:hover {
+  border-color: var(--border);
+  color: var(--text2);
+  background: var(--bg2);
+  box-shadow: none;
 }
 
 .cand-btn--primary {

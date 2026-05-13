@@ -71,7 +71,7 @@ export class ProfileService {
   async procesarCVConIA(id: string, textoCV: string) {
     const analisis = await this.aiService.analizarCV(textoCV);
     
-    // Buscar ID real de candidato (id puede ser de usuario o de candidato en pruebas actuales)
+    // Buscar ID real de candidato
     let candidato = await this.prisma.candidato.findUnique({ where: { id } });
     if (!candidato) {
       candidato = await this.prisma.candidato.findUnique({ where: { usuarioId: id } });
@@ -80,23 +80,47 @@ export class ProfileService {
 
     const cId = candidato.id;
 
-    // 1. Actualizar campos planos del candidato
+    // 1. Calcular un score general basado en el nuevo objeto scoreCV (con checks defensivos)
+    const score = analisis.scoreCV || { completitud: 0, claridad: 0, estructura: 0 };
+    const avgScore = Math.round(
+      ((score.completitud || 0) + 
+       (score.claridad || 0) + 
+       (score.estructura || 0)) / 3
+    );
+
+    // 2. Mapear formación a strings para el esquema actual
+    const formacion = Array.isArray(analisis.formacion) ? analisis.formacion : [];
+    const formacionStrings = formacion.map(f => {
+      const titulo = f?.titulo || '';
+      const inst = f?.institucion || '';
+      const anio = f?.anio || '';
+      return `${titulo} — ${inst} (${anio})`.replace(/ —  \(\)/, '').trim();
+    }).filter(s => s !== '');
+
+    // 3. Combinar todas las habilidades para el array plano de indexación
+    const habilidadesPlanas = [
+      ...(Array.isArray(analisis.habilidadesTecnicas) ? analisis.habilidadesTecnicas : []),
+      ...(Array.isArray(analisis.habilidadesBlandas) ? analisis.habilidadesBlandas : []),
+      ...(Array.isArray(analisis.tecnologias) ? analisis.tecnologias : [])
+    ];
+
+    // 4. Actualizar campos planos del candidato
     await this.prisma.candidato.update({
       where: { id: cId },
       data: {
-        resumenIA: analisis.resumen,
-        scoreCV: analisis.scoreCV,
-        habilidades: analisis.habilidades || [],
-        habilidadesFaltantes: analisis.habilidadesFaltantes || [],
-        formacion: analisis.formacion || [],
+        resumenIA: analisis.resumen || 'Sin resumen disponible.',
+        scoreCV: avgScore,
+        habilidades: habilidadesPlanas,
+        habilidadesFaltantes: [],
+        formacion: formacionStrings,
       }
     });
 
-    // 2. Limpiar y recrear Habilidades categorizadas
+    // 5. Limpiar y recrear Habilidades categorizadas
     await this.prisma.habilidadCandidato.deleteMany({ where: { candidatoId: cId } });
     const dataHabs: any[] = [];
-    if (Array.isArray(analisis.habilidadesTech)) {
-      dataHabs.push(...analisis.habilidadesTech.map(n => ({ nombre: n, tipo: 'TECNICA', candidatoId: cId })));
+    if (Array.isArray(analisis.habilidadesTecnicas)) {
+      dataHabs.push(...analisis.habilidadesTecnicas.map(n => ({ nombre: n, tipo: 'TECNICA', candidatoId: cId })));
     }
     if (Array.isArray(analisis.habilidadesBlandas)) {
       dataHabs.push(...analisis.habilidadesBlandas.map(n => ({ nombre: n, tipo: 'BLANDA', candidatoId: cId })));
@@ -200,5 +224,36 @@ export class ProfileService {
     return rows
       .map((r) => r.industria as string)
       .filter((v) => v && v.trim() !== '');
+  }
+
+  // Eliminar el CV y todos los datos asociados
+  async eliminarCV(id: string) {
+    // Buscar ID real de candidato
+    let candidato = await this.prisma.candidato.findUnique({ where: { id } });
+    if (!candidato) {
+      candidato = await this.prisma.candidato.findUnique({ where: { usuarioId: id } });
+    }
+    if (!candidato) throw new NotFoundException('Candidato no encontrado');
+
+    const cId = candidato.id;
+
+    // 1. Limpiar campos del candidato
+    await this.prisma.candidato.update({
+      where: { id: cId },
+      data: {
+        cvUrl: null,
+        resumenIA: null,
+        scoreCV: null,
+        habilidades: [],
+        habilidadesFaltantes: [],
+        formacion: [],
+      }
+    });
+
+    // 2. Eliminar habilidades y experiencias categorizadas
+    await this.prisma.habilidadCandidato.deleteMany({ where: { candidatoId: cId } });
+    await this.prisma.experienciaCandidato.deleteMany({ where: { candidatoId: cId } });
+
+    return { message: 'CV y datos asociados eliminados correctamente', candidatoId: cId };
   }
 }
