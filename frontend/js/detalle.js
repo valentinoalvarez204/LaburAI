@@ -62,11 +62,25 @@ function renderPage(oferta) {
 
   // Match ring
   const session = getSession();
-  const isEmpresa = session?.rol === 'empresa';
+  const isEmpresa = String(session?.rol || '').toLowerCase() === 'empresa';
 
   if (!isEmpresa) {
-    renderMatchRing(oferta.match);
-    setText('matchPct', `${oferta.match}%`);
+    const matchWrapper = document.getElementById('matchRingWrapper');
+    const matchPct = document.getElementById('matchPct');
+    const matchNote = document.getElementById('matchNote');
+    const analyzeBtn = document.getElementById('btnAnalyzeMatch');
+
+    if (oferta.analizado) {
+      renderMatchRing(oferta.match);
+      setText('matchPct', `${oferta.match}%`);
+      if (analyzeBtn) analyzeBtn.disabled = true;
+      if (matchNote) matchNote.textContent = 'Este puesto ya fue analizado. No se puede repetir.';
+    } else {
+      if (matchWrapper) matchWrapper.style.display = 'none';
+      if (matchPct) matchPct.textContent = '—%';
+      if (analyzeBtn) analyzeBtn.disabled = false;
+      if (matchNote) matchNote.textContent = `Te quedan ${oferta.analisisRestantes} análisis de match.`;
+    }
   } else {
     // Si es empresa, ocultamos todo el bloque de match
     const matchRingBox = document.querySelector('.match-ring-box')?.parentElement;
@@ -297,6 +311,38 @@ function renderMatchRing(pct) {
   if (ringPct) ringPct.textContent = `${pct}%`;
 }
 
+function initMatchAnalysis(oferta) {
+  const analyzeBtn = document.getElementById('btnAnalyzeMatch');
+  if (!analyzeBtn) return;
+
+  analyzeBtn.addEventListener('click', async () => {
+    analyzeBtn.disabled = true;
+    analyzeBtn.textContent = 'Analizando…';
+
+    try {
+      const result = await API.postJobMatchAnalysis(oferta.id);
+      oferta.match = result.match;
+      oferta.analizado = result.analizado;
+      oferta.analisisRestantes = result.analisisRestantes;
+
+      const matchWrapper = document.getElementById('matchRingWrapper');
+      if (matchWrapper) matchWrapper.style.display = '';
+      renderMatchRing(oferta.match);
+      setText('matchPct', `${oferta.match}%`);
+      const matchNote = document.getElementById('matchNote');
+      if (matchNote) matchNote.textContent = 'Este puesto ya fue analizado. No se puede repetir.';
+      showToast('Match analizado con IA. Resultado disponible.', 'success');
+    } catch (err) {
+      console.error('Error analizando match:', err);
+      analyzeBtn.disabled = false;
+      showToast(err.message || 'No se pudo analizar el match', 'error');
+    } finally {
+      analyzeBtn.disabled = oferta.analizado;
+      analyzeBtn.textContent = 'Analizar match con IA';
+    }
+  });
+}
+
 /* ─────────────────────────────────
    OFERTAS SIMILARES
 ───────────────────────────────── */
@@ -452,12 +498,10 @@ function renderSimilar(oferta) {
   const grid = document.getElementById('similarGrid');
   if (!grid) return;
 
-  // Intentar cargar ofertas reales para similar del mismo rubro
-  fetch(`http://localhost:3000/api/jobs?rubro=${oferta.rubro}`)
-    .then(r => r.json())
-    .then(data => {
+  API.getOfertas({ rubro: oferta.rubro })
+    .then((data) => {
       if (!Array.isArray(data)) return;
-      const list = data.filter(j => j.id !== oferta.id).slice(0, 3).map(j => ({
+      const list = data.filter((j) => j.id !== oferta.id).slice(0, 3).map((j) => ({
         id: j.id,
         title: j.titulo,
         company: j.empresa?.nombre || 'Empresa',
@@ -469,16 +513,16 @@ function renderSimilar(oferta) {
         salary: j.salarioMin ? `$${j.salarioMin.toLocaleString('es-AR')}` : 'A convenir',
         time: 'Reciente',
         match: j.matchIA || 0,
-        rubro: j.rubro
+        rubro: j.rubro,
       }));
       renderSimilarList(grid, list);
     })
-    .catch(err => console.error('Error fetching similar jobs:', err));
+    .catch((err) => console.error('Error cargando similares:', err));
 }
 
 function renderSimilarList(grid, list) {
   const session = getSession();
-  const isEmpresa = session?.rol === 'empresa';
+  const isEmpresa = String(session?.rol || '').toLowerCase() === 'empresa';
 
   grid.innerHTML = list.map((o) => {
     const tags = o.tags.map((t, i) => `<span class="job-tag ${o.tagTypes[i] || ''}">${t}</span>`).join('');
@@ -556,16 +600,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!id) { window.location.href = 'ofertas.html'; return; }
 
   try {
-    const session = JSON.parse(sessionStorage.getItem('labuai_session') || '{}');
-    const candidatoId = (session && session.rol === 'CANDIDATO') ? session.candidatoId : '';
-    const url = candidatoId 
-      ? `http://localhost:3000/api/jobs/${id}?candidatoId=${candidatoId}`
-      : `http://localhost:3000/api/jobs/${id}`;
+    const job = await API.getOferta(id);
 
-    const res  = await fetch(url);
-    const job  = await res.json();
-
-    if (!res.ok) { window.location.href = 'ofertas.html'; return; }
+    if (!job || !job.id) { window.location.href = 'ofertas.html'; return; }
 
     // Mapear datos de la API al formato que espera renderPage()
     const oferta = {
@@ -582,6 +619,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                       : 'Salario a convenir',
       time:         new Date(job.creadoEn).toLocaleDateString('es-AR'),
       match:        job.matchIA || 0,
+      analizado:    job.analizado || false,
+      analisisRestantes: job.analisisRestantes ?? 3,
       modalidad:    job.modalidad,
       jornada:      job.jornada,
       exp:          job.experiencia || 'No especificada',
@@ -602,6 +641,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     renderPage(oferta);
+    initMatchAnalysis(oferta);
     initTabs();
     initSave();
     initModal();

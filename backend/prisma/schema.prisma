@@ -45,6 +45,7 @@ model Candidato {
   postulaciones   Postulacion[]
   habilidadesTech HabilidadCandidato[]
   experiencias    ExperienciaCandidato[]
+  matchAnalisis   MatchAnalisis[]
 }
 
 // ── HABILIDADES DEL CANDIDATO (extraídas por IA) ──
@@ -117,6 +118,7 @@ model OfertaLaboral {
   empresa   Empresa @relation(fields: [empresaId], references: [id])
 
   postulaciones Postulacion[]
+  matchAnalisis MatchAnalisis[]
 }
 
 // ── POSTULACION ──
@@ -135,6 +137,19 @@ model Postulacion {
   oferta   OfertaLaboral @relation(fields: [ofertaId], references: [id])
 
   entrevistas Entrevista[]
+
+  @@unique([candidatoId, ofertaId])
+}
+
+model MatchAnalisis {
+  id          String   @id @default(uuid())
+  candidatoId String
+  ofertaId    String
+  match       Int
+  creadoEn    DateTime @default(now())
+
+  candidato Candidato   @relation(fields: [candidatoId], references: [id], onDelete: Cascade)
+  oferta    OfertaLaboral @relation(fields: [ofertaId], references: [id], onDelete: Cascade)
 
   @@unique([candidatoId, ofertaId])
 }

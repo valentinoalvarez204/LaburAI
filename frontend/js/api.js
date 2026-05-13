@@ -127,6 +127,15 @@ async function getOferta(id) {
   }
 }
 
+async function postJobMatchAnalysis(id) {
+  try {
+    return await apiFetch(`/jobs/${id}/match`, { method: 'POST' });
+  } catch (err) {
+    console.error(`[API] Error analizando match para oferta ${id}:`, err.message);
+    throw err;
+  }
+}
+
 async function crearOferta(data) {
   try {
     return await apiFetch('/jobs', { method: 'POST', body: JSON.stringify(data) });
@@ -232,6 +241,15 @@ async function postReAnalyzeCV(id) {
   }
 }
 
+async function postJobMatchAnalysis(id) {
+  try {
+    return await apiFetch(`/jobs/${id}/match`, { method: 'POST' });
+  } catch (err) {
+    console.error(`[API] Error analizando match para oferta ${id}:`, err.message);
+    throw err;
+  }
+}
+
 async function uploadCv(id, file) {
   try {
     const formData = new FormData();
@@ -307,6 +325,8 @@ window.API = {
   postReAnalyzeCV,
   uploadCv,
   getPerfilEmpresa,
+  // Match IA
+  postJobMatchAnalysis,
   patchPerfilEmpresa,
   getIndustrias,
 };

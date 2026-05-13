@@ -10,6 +10,8 @@ import {
   UseGuards,
   Req,
   ForbiddenException,
+  BadRequestException,
+  HttpException,
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/jwt.guard';
 import { JobsService } from './jobs.service';
@@ -34,8 +36,28 @@ export class JobsController {
 
   // GET /api/jobs/:id
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.jobsService.findOne(id);
+  findOne(
+    @Param('id') id: string,
+    @Query('candidatoId') candidatoId?: string,
+  ) {
+    return this.jobsService.findOne(id, candidatoId);
+  }
+
+  @Post(':id/match')
+  @UseGuards(JwtGuard)
+  async analyzeMatch(@Param('id') id: string, @Req() req: any) {
+    if (req.user.rol !== 'CANDIDATO') {
+      throw new ForbiddenException('Solo los candidatos pueden analizar match con IA');
+    }
+
+    try {
+      return await this.jobsService.analizarMatch(id, req.user.sub);
+    } catch (error: any) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new BadRequestException(error.message || 'Error calculando match');
+    }
   }
 
   // GET /api/jobs/:id/match — Calcula compatibilidad previa

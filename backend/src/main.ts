@@ -7,9 +7,18 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // Permite que el frontend se conecte al backend
+// Permite que el frontend se conecte al backend
   app.enableCors({
+<<<<<<< HEAD
     origin: ['https://labur-ai.vercel.app', 'http://localhost:3000'],
+=======
+    origin: [
+      'https://labur-ai.vercel.app',
+      'http://localhost:3000',
+      'http://localhost:5500',
+      'http://127.0.0.1:5500',
+    ],
+>>>>>>> e364b36eb951485b639a8397f947733cdf6c473b
     credentials: true,
   });
 
