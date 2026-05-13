@@ -8,7 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Permite que el frontend se conecte al backend
-  app.enableCors({ origin: '*' });
+  app.enableCors({
+    origin: ['https://laburai.vercel.app', 'http://localhost:3000'], // Agrega tu dominio de Vercel aquí
+    credentials: true,
+  });
 
   // Valida los datos que llegan al backend
   app.useGlobalPipes(new ValidationPipe({

@@ -5,7 +5,7 @@
    hacer fetch() directo; importar desde aquí.
 ══════════════════════════════════════════ */
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = 'https://laburai.onrender.com/api';
 
 /**
  * Wrapper base para llamadas a la API.
