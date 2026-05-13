@@ -13,18 +13,21 @@ const API_BASE = 'http://localhost:3000/api';
  */
 async function apiFetch(path, options = {}) {
   const session = (() => {
-    try { return JSON.parse(localStorage.getItem('labuai_session') || '{}'); }
+    try { return JSON.parse(sessionStorage.getItem('labuai_session') || '{}'); }
     catch { return {}; }
   })();
 
-  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  const headers = { ...options.headers };
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
   if (session.token) headers['Authorization'] = `Bearer ${session.token}`;
 
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
 
   if (!res.ok) {
     if (res.status === 401) {
-      localStorage.removeItem('labuai_session');
+      sessionStorage.removeItem('labuai_session');
       window.location.href = '/login.html';
       return;
     }
@@ -219,6 +222,30 @@ async function patchPerfilCandidato(id, data) {
     throw err;
   }
 }
+
+async function postReAnalyzeCV(id) {
+  try {
+    return await apiFetch(`/profile/candidato/${id}/re-analyze`, { method: 'POST' });
+  } catch (err) {
+    console.error(`[API] Error re-analizando CV del candidato ${id}:`, err.message);
+    throw err;
+  }
+}
+
+async function uploadCv(id, file) {
+  try {
+    const formData = new FormData();
+    formData.append('cv', file);
+    return await apiFetch(`/profile/candidato/${id}/cv`, {
+      method: 'POST',
+      body: formData,
+    });
+  } catch (err) {
+    console.error(`[API] Error subiendo CV del candidato ${id}:`, err.message);
+    throw err;
+  }
+}
+
 /* ─────────────────────────────────
    PERFIL EMPRESA
 ───────────────────────────────── */
@@ -277,6 +304,8 @@ window.API = {
   // Perfil
   getPerfilCandidato,
   patchPerfilCandidato,
+  postReAnalyzeCV,
+  uploadCv,
   getPerfilEmpresa,
   patchPerfilEmpresa,
   getIndustrias,

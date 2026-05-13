@@ -213,7 +213,7 @@ function getParam(key) {
 ───────────────────────────────── */
 function getSession() {
   try {
-    const raw = localStorage.getItem('labuai_session');
+    const raw = sessionStorage.getItem('labuai_session');
     return raw ? JSON.parse(raw) : null;
   } catch { return null; }
 }
@@ -310,7 +310,7 @@ function initNavSession() {
    CERRAR SESIÓN
 ───────────────────────────────── */
 function cerrarSesion() {
-  localStorage.removeItem('labuai_session');
+  sessionStorage.removeItem('labuai_session');
   window.location.href = 'index.html';
 }
 
@@ -323,7 +323,7 @@ function cerrarSesion() {
 ───────────────────────────────── */
 function requireSession() {
   try {
-    const raw = localStorage.getItem('labuai_session');
+    const raw = sessionStorage.getItem('labuai_session');
     const session = raw ? JSON.parse(raw) : null;
     if (!session?.token) {
       window.location.href = 'login.html';

@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { AI_PROVIDER_TOKEN } from '../ai/ai.module';
+import type { IAPIService } from '../ai/interfaces/ia-service.interface';
 
 @Injectable()
 export class JobsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(
+    private prisma: PrismaService,
+    @Inject(AI_PROVIDER_TOKEN) private aiService: IAPIService,
+  ) { }
 
   // Obtener todas las ofertas activas (con filtros opcionales)
   async findAll(filtros?: {
@@ -79,6 +84,29 @@ export class JobsService {
     const vencida = oferta.fechaLimite && oferta.fechaLimite < ahora;
     const estado = oferta.esBorrador ? 'BORRADOR' : (vencida ? 'CERRADA' : 'ACTIVA');
     return { ...oferta, estado };
+  }
+
+  // PREVIEW: Calcula el match para un candidato sin obligarlo a postularse
+  async calcularMatchPreview(ofertaId: string, usuarioId: string): Promise<{ match: number }> {
+    const candidato = await this.prisma.candidato.findUnique({
+      where: { usuarioId }
+    });
+    
+    if (!candidato) {
+      throw new ForbiddenException('Solo los candidatos pueden calcular su compatibilidad');
+    }
+
+    const oferta = await this.prisma.ofertaLaboral.findUnique({
+      where: { id: ofertaId }
+    });
+
+    if (!oferta) throw new NotFoundException('Oferta no encontrada');
+
+    const candidatoTexto = `Habilidades: ${candidato.habilidades.join(', ')}. Resumen: ${candidato.resumenIA || 'Sin resumen'}`;
+    const ofertaTexto = `Rol: ${oferta.titulo}. Requisitos: ${oferta.descripcion}. Habilidades requeridas: ${oferta.habilidades.join(', ')}`;
+    
+    const score = await this.aiService.calcularMatch(candidatoTexto, ofertaTexto);
+    return { match: score };
   }
 
   // Crear una oferta (solo empresas)

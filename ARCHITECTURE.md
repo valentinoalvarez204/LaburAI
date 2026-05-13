@@ -249,3 +249,41 @@ Las vistas del sistema reaccionan al rol de la key `labuai_session.usuario.rol`:
 - [ ] Manejo de sesión: verificar `labuai_session` al cargar la página
 - [ ] Errores de API manejados con `showToast()`
 - [ ] Diseño consistente con `base.css`
+
+---
+
+## 3. Arquitectura de IA y Storage (Implementación Reciente)
+
+### Patrón Strategy Multimodelo (IA)
+El núcleo inteligente de LaburAI fue diseñado arquitectónicamente utilizando un **Patrón Strategy** inyectado a través del sistema de dependencias de NestJS. 
+Esto permite que el backend pueda conmutar dinámicamente entre distintos proveedores de Inteligencia Artificial cambiando únicamente una variable de entorno (`PROVEEDOR_IA`).
+
+Los modelos integrados actualmente son:
+- **Groq (Llama 3.1 8B):** Prioridad en velocidad de inferencia extrema.
+- **Cerebras (Llama 3.1 8B):** Procesamiento ultra-rápido en hardware WSE-3.
+- **Gemini (Flash 2.0):** Potencia analítica de Google (sujeto a cuotas diarias).
+
+```typescript
+// ai.module.ts (Ejemplo de la fábrica de inyección)
+useFactory: (gemini, groq, cerebras) => {
+  const provider = process.env.PROVEEDOR_IA;
+  switch (provider) {
+    case 'gemini': return gemini;
+    case 'cerebras': return cerebras;
+    default: return groq;
+  }
+}
+```
+
+### Low-Token Matching (Optimización de Costos y Rendimiento)
+Para resolver la problemática del coste y latencia al calcular la compatibilidad (Match) entre un Candidato y una Oferta Laboral, se implementó una estrategia **Low-Token**:
+1. En vez de procesar el currículum completo en cada postulación, el PDF se analiza **una sola vez** al subirse, extrayendo un `resumenIA` y un array de `habilidades`.
+2. Al momento de aplicar a un trabajo (o previsualizar el match), el algoritmo construye un *prompt minimalista* concatenando las habilidades extraídas del candidato con los requerimientos técnicos de la oferta.
+3. Se restringe a la IA a devolver un JSON estricto (`max_tokens: 20`) mediante el esquema `{"match": <number>}`.
+Esto reduce los tiempos de computación de segundos a milisegundos y minimiza drásticamente el consumo de red.
+
+### Integración de Almacenamiento en la Nube (Supabase Storage)
+El sistema abandona el almacenamiento de archivos temporales locales para integrarse completamente con Supabase:
+- El backend en NestJS recibe el PDF y lo carga inmediatamente en el bucket público `cvs` de Supabase.
+- Se elimina el archivo local para no saturar el servidor y prevenir vulnerabilidades (limpieza de temporales).
+- Se persiste en PostgreSQL la URL pública generada por Supabase, permitiendo a las empresas acceder al documento sin comprometer el ancho de banda del backend de LaburAI.

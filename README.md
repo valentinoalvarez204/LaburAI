@@ -15,15 +15,15 @@ y utilizar IA para analizar perfiles y sugerir candidatos adecuados.
 -   Diferenciación de roles (Candidato / Empresa)
 -   Publicación de ofertas laborales
 -   Postulación a empleos
--   Subida de currículums en PDF
--   Análisis de CV mediante inteligencia artificial
--   Sistema de matching candidato ↔ oferta
+-   Subida de currículums en PDF (Supabase Storage Integrado)
+-   Análisis de CV mediante inteligencia artificial (Estrategia Multimodelo: Groq, Cerebras, Gemini)
+-   Sistema de matching candidato ↔ oferta (Low-Token Mode para máxima eficiencia y bajo coste)
 
 ------------------------------------------------------------------------
 
 # Arquitectura del sistema
 
-El sistema utiliza una arquitectura **cliente-servidor**.
+El sistema utiliza una arquitectura **cliente-servidor** modular y escalable. Para información detallada sobre los patrones de diseño y decisiones técnicas, consulte el documento [`architecture.md`](./architecture.md).
 
 Frontend (HTML / CSS / JavaScript) ↓ REST API (NestJS) ↓ Prisma ORM ↓
 PostgreSQL (Supabase)

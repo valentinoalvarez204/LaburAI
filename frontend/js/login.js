@@ -335,7 +335,7 @@ function initForms() {
         const data = await API.login(email, password);
         setLoading('btnLogin', false);
 
-        localStorage.setItem('labuai_session', JSON.stringify({
+        sessionStorage.setItem('labuai_session', JSON.stringify({
           nombre: data.usuario.nombre,
           rol: data.usuario.rol.toLowerCase(),
           email: data.usuario.email,
@@ -406,7 +406,7 @@ function initForms() {
 
         setLoading('btnRegister', false);
 
-        localStorage.setItem('labuai_session', JSON.stringify({
+        sessionStorage.setItem('labuai_session', JSON.stringify({
           nombre: data.usuario.nombre,
           rol: rol,
           email: email,

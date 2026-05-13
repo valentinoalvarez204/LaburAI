@@ -1,7 +1,7 @@
-/* ══════════════════════════════════════════
+/* ═══════════════════════════════════════════
    LaburAI — dashboard-candidato.js
    Módulos:
-   - Datos del candidato (simulados)
+   - Datos del candidato (desde API)
    - Navegación entre secciones
    - Score ring animado
    - Habilidades detectadas
@@ -9,20 +9,18 @@
    - Ofertas recomendadas
    - Avatar dropdown
    - Sidebar mobile
-══════════════════════════════════════════ */
+════════════════════════════════════════════ */
 
 /* ─────────────────────────────────
-   DATOS DEL CANDIDATO
-───────────────────────────────── */
-/* ─────────────────────────────────
-   DATOS DEL CANDIDATO (ahora desde API)
-───────────────────────────────── */
+   DATOS DEL CANDIDATO (desde API)
+─────────────────────────────────── */
 let CANDIDATO = {
   nombre: '',
-  score: 0,
+  cvUrl: '',
+  score: null,
   scoreData: {
-    total: 0,
-    nivel: 'bajo',
+    total: null,
+    nivel: 'none',
     tip: 'Subí tu CV para que la IA lo analice y genere tu reporte de compatibilidad.',
     criterios: []
   },
@@ -48,8 +46,17 @@ function renderScore() {
   const ring = document.getElementById('scoreRingFill');
   if (ring) {
     const circumference = 2 * Math.PI * 50;
+    ring.style.strokeDasharray = `${circumference}`;
+
     setTimeout(() => {
-      ring.style.strokeDashoffset = circumference * (1 - total / 100);
+      if (total === null || total === undefined) {
+        ring.style.strokeDashoffset = circumference;
+        ring.style.opacity = '0';
+      } else {
+        const value = Math.max(0, Math.min(total, 100));
+        ring.style.strokeDashoffset = circumference * (1 - value / 100);
+        ring.style.opacity = '1';
+      }
     }, 200);
   }
 
@@ -57,14 +64,19 @@ function renderScore() {
   const nivelEl = document.getElementById('scoreLevel');
 
   if (nivelEl) {
-    const nivelMap = {
-      bueno: { cls: 'score-level--bueno', icon: '✓', label: 'CV Competitivo' },
-      regular: { cls: 'score-level--regular', icon: '⚠', label: 'Necesita mejoras' },
-      bajo: { cls: 'score-level--bajo', icon: '✗', label: 'CV incompleto' },
-    };
-    const n = nivelMap[nivel] || nivelMap.regular;
-    nivelEl.className = `score-level ${n.cls}`;
-    nivelEl.innerHTML = `${n.icon} ${n.label}`;
+    if (!nivel || nivel === 'none') {
+      nivelEl.className = 'score-level';
+      nivelEl.textContent = '';
+    } else {
+      const nivelMap = {
+        bueno: { cls: 'score-level--bueno', icon: '✓', label: 'CV Competitivo' },
+        regular: { cls: 'score-level--regular', icon: '⚠', label: 'Necesita mejoras' },
+        bajo: { cls: 'score-level--bajo', icon: '✗', label: 'CV incompleto' },
+      };
+      const n = nivelMap[nivel] || nivelMap.regular;
+      nivelEl.className = `score-level ${n.cls}`;
+      nivelEl.innerHTML = `${n.icon} ${n.label}`;
+    }
   }
 
   // Criterios
@@ -350,12 +362,23 @@ function initReanalyze() {
   const btn = document.getElementById('btnReanalyze');
   if (!btn) return;
   btn.addEventListener('click', async () => {
+    const session = requireSession();
+    if (!session || !session.candidatoId) return;
+
     btn.disabled = true;
     btn.textContent = 'Analizando…';
-    await delay(2000);
-    btn.disabled = false;
-    btn.textContent = 'Re-analizar';
-    showToast('✦ Análisis completado — Score actualizado', 'success');
+    
+    try {
+      await API.postReAnalyzeCV(session.candidatoId);
+      // Recargar la vista con los datos nuevos
+      await fetchProfile(session.candidatoId);
+      showToast('✦ Análisis completado — CV Structurado', 'success');
+    } catch (err) {
+      showToast('Error re-analizando el CV', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Re-analizar';
+    }
   });
 }
 
@@ -371,13 +394,83 @@ function initCopySummary() {
   });
 }
 
+function initUploadCv() {
+  const btnUpload = document.getElementById('btnUploadNew');
+  const fileInput = document.getElementById('cvFileInput');
+  if (!btnUpload || !fileInput) return;
+
+  // Función para actualizar el estado del botón según si hay CV
+  function updateUploadButton(hasCv) {
+    if (hasCv) {
+      btnUpload.style.opacity = '0.5';
+      btnUpload.style.cursor = 'not-allowed';
+      btnUpload.title = 'Ya tienes un CV subido. No puedes subir más de uno.';
+    } else {
+      btnUpload.style.opacity = '1';
+      btnUpload.style.cursor = 'pointer';
+      btnUpload.title = '';
+    }
+  }
+
+  // Inicializar estado del botón (asumir que no hay CV hasta que se cargue el perfil)
+  updateUploadButton(false);
+
+  btnUpload.addEventListener('click', (e) => {
+    const session = requireSession();
+    if (!session?.candidatoId) return;
+
+    // Verificar si ya tiene un CV subido
+    if (CANDIDATO.cvUrl) {
+      // Mostrar mensaje de error usando showToast
+      showToast('No es posible subir más de 1 CV', 'error');
+      e.preventDefault();
+      return;
+    }
+
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', async () => {
+    const session = requireSession();
+    if (!session?.candidatoId) return;
+
+    const file = fileInput.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      showToast('Solo se permiten archivos PDF', 'error');
+      fileInput.value = '';
+      return;
+    }
+
+    btnUpload.disabled = true;
+    btnUpload.textContent = 'Subiendo…';
+
+    try {
+      await API.uploadCv(session.candidatoId, file);
+      showToast('CV subido correctamente', 'success');
+      await fetchProfile(session.candidatoId);
+    } catch (err) {
+      console.error('[Dashboard] Error subiendo CV:', err);
+      showToast(err.message || 'Error al subir el CV', 'error');
+    } finally {
+      btnUpload.disabled = false;
+      btnUpload.textContent = 'Subir mi CV';
+      fileInput.value = '';
+    }
+  });
+
+  // Exponer la función para actualizar el botón desde otras partes del código
+  window.updateUploadButton = updateUploadButton;
+}
+
 /* ─────────────────────────────────
    GUARDAR PERFIL
 ───────────────────────────────── */
 function initSaveProfile() {
   document.getElementById('btnSaveProfile')?.addEventListener('click', async () => {
     const btn = document.getElementById('btnSaveProfile');
-    const session = JSON.parse(localStorage.getItem('labuai_session') || '{}');
+    const session = JSON.parse(sessionStorage.getItem('labuai_session') || '{}');
 
     if (!session.candidatoId) {
       showToast('No se encontró tu perfil', 'error');
@@ -430,6 +523,35 @@ function initSaveProfile() {
 }
 
 /* ─────────────────────────────────
+   MODAL PDF
+───────────────────────────────── */
+function initPdfModal() {
+  const modal = document.getElementById('pdfModal');
+  const frame = document.getElementById('pdfModalFrame');
+  const close = document.getElementById('pdfModalClose');
+  const btn   = document.getElementById('cvThumbnailBtn');
+
+  if (!modal || !frame || !btn) return;
+
+  const openModal = () => {
+    // Solo permitimos abrir si hay un src definido
+    if (frame.src) {
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  };
+
+  const closeModal = () => {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  btn.addEventListener('click', openModal);
+  close.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+}
+
+/* ─────────────────────────────────
    TOAST
 ───────────────────────────────── */
 
@@ -444,35 +566,122 @@ async function fetchProfile(candidatoId) {
     const data = await API.getPerfilCandidato(candidatoId);
 
     CANDIDATO.nombre = `${data.nombre || ''} ${data.apellido || ''}`.trim();
-    CANDIDATO.score = data.scoreCV || 0;
+    CANDIDATO.cvUrl  = data.cvUrl || '';
+    CANDIDATO.score  = CANDIDATO.cvUrl && data.scoreCV !== null && data.scoreCV !== undefined ? data.scoreCV : null;
     CANDIDATO.resumen = data.resumenIA || 'Subí tu CV para que la IA genere un resumen de tu perfil profesional.';
-    // Sincronizar formulario de Mi perfil
-    const profileNombre = document.getElementById('profileNombre');
-    const profileApellido = document.getElementById('profileApellido');
-    const profileEmail = document.getElementById('profileEmail');
+
+    const firstName = CANDIDATO.nombre.split(' ')[0] || 'Usuario';
+    const inicial   = firstName.charAt(0).toUpperCase();
+
+    // Sidebar
+    const spAvatar = document.getElementById('spAvatar');
+    const spName   = document.getElementById('spName');
+    if (spAvatar) spAvatar.textContent = inicial;
+    if (spName)   spName.textContent   = CANDIDATO.nombre || firstName;
+
+    // Todos los avatares y nombres dinámicos del dash
+    document.querySelectorAll('.avatar-circle').forEach(el => el.textContent = inicial);
+    document.querySelectorAll('.avatar-name').forEach(el   => el.textContent = CANDIDATO.nombre);
+
+    // Saludo
+    const greetTitle = document.getElementById('greetingTitle');
+    const greetSub   = document.getElementById('greetingSub');
+    if (greetTitle) greetTitle.textContent = `¡Hola, ${firstName}! 👋`;
+    if (greetSub)   greetSub.innerHTML    = `Tu perfil está activo y visible para las empresas.`;
+
+    // Score num
+    const scoreNumEl = document.getElementById('scoreNum');
+    if (scoreNumEl) scoreNumEl.textContent = data.scoreCV !== null && data.scoreCV !== undefined ? data.scoreCV : '—';
+
+    // Resumen IA
+    const aiSummary = document.getElementById('aiSummaryText');
+    if (aiSummary) aiSummary.textContent = CANDIDATO.resumen;
+
+    // CV info y Miniatura
+    const cvFileName   = document.getElementById('cvFileName');
+    const cvFileMeta   = document.getElementById('cvFileMeta');
+    const thumbBtn     = document.getElementById('cvThumbnailBtn');
+    const thumbFrame   = document.getElementById('cvThumbnail');
+    const emptyIcon    = document.getElementById('cvEmptyIcon');
+    const modalFrame   = document.getElementById('pdfModalFrame');
+    const badgeText    = document.getElementById('cvBadgeText');
+    const statusDot    = document.querySelector('.cvp-status-dot');
+    const btnDownload  = document.getElementById('btnDownloadCV');
+
+    if (data.cvUrl) {
+      if (cvFileName) cvFileName.textContent = 'Tu Currículum Vitae';
+      if (cvFileMeta) cvFileMeta.innerHTML = 'Documento principal visible para búsquedas y procesado por el motor de IA.';
+      if (badgeText)  badgeText.textContent = 'Analizado y activo';
+      if (statusDot)  statusDot.classList.add('active');
+      if (btnDownload) {
+        btnDownload.disabled = false;
+        btnDownload.onclick = () => window.open(data.cvUrl, '_blank');
+      }
+      
+      // Mostrar miniatura
+      if (thumbBtn)   thumbBtn.classList.remove('hidden');
+      if (emptyIcon)  emptyIcon.classList.add('hidden');
+      
+      // Cargar PDF en frames (agregando #toolbar=0 para una vista más limpia en la miniatura)
+      if (thumbFrame) thumbFrame.src = data.cvUrl + '#toolbar=0&navpanes=0&scrollbar=0';
+      if (modalFrame) modalFrame.src = data.cvUrl;
+
+      // Actualizar botón de subida (deshabilitar si ya hay CV)
+      if (window.updateUploadButton) window.updateUploadButton(true);
+    } else {
+      if (cvFileName) cvFileName.textContent = 'Sin CV subido';
+      if (cvFileMeta) cvFileMeta.textContent = 'Subí tu currículum vitae en formato PDF para que nuestro motor de IA pueda estructurar tu perfil profesional.';
+      if (badgeText)  badgeText.textContent = 'Pendiente';
+      if (statusDot)  statusDot.classList.remove('active');
+      if (btnDownload) btnDownload.disabled = true;
+      
+      if (thumbBtn)   thumbBtn.classList.add('hidden');
+      if (emptyIcon)  emptyIcon.classList.remove('hidden');
+
+      // Actualizar botón de subida (habilitar si no hay CV)
+      if (window.updateUploadButton) window.updateUploadButton(false);
+    }
+
+    // Formulario de Mi perfil
+    const profileNombre    = document.getElementById('profileNombre');
+    const profileApellido  = document.getElementById('profileApellido');
+    const profileEmail     = document.getElementById('profileEmail');
     const profileUbicacion = document.getElementById('profileUbicacion');
-    const profileTelefono = document.getElementById('profileTelefono');
-    if (profileNombre) profileNombre.value = data.nombre || '';
-    if (profileApellido) profileApellido.value = data.apellido || '';
-    if (profileEmail) profileEmail.value = data.usuario?.email || '';
+    const profileTelefono  = document.getElementById('profileTelefono');
+    if (profileNombre)    profileNombre.value    = data.nombre    || '';
+    if (profileApellido)  profileApellido.value  = data.apellido  || '';
+    if (profileEmail)     profileEmail.value     = data.usuario?.email || '';
     if (profileUbicacion) profileUbicacion.value = data.ubicacion || '';
-    if (profileTelefono) profileTelefono.value = data.telefono || '';
+    if (profileTelefono)  profileTelefono.value  = data.telefono  || '';
 
     updateProfileCompleteness({
-      nombre: data.nombre,
-      apellido: data.apellido,
-      email: data.usuario?.email,
+      nombre:    data.nombre,
+      apellido:  data.apellido,
+      email:     data.usuario?.email,
       ubicacion: data.ubicacion,
-      telefono: data.telefono,
+      telefono:  data.telefono,
     });
 
+    const hasExp = Array.isArray(data.experiencias) && data.experiencias.length > 0;
+    const expDetail = hasExp 
+      ? data.experiencias.map(e => `• ${e.rol} en ${e.empresa}`).join('<br>')
+      : 'Subí tu CV para extraer tu experiencia';
+
+    const hasFormacion = Array.isArray(data.formacion) && data.formacion.length > 0;
+    const formacionDetail = hasFormacion
+      ? data.formacion.map(f => `• ${f}`).join('<br>')
+      : 'Subí tu CV para extraer tu formación académica';
+
+    const hasScore = CANDIDATO.cvUrl && data.scoreCV !== null && data.scoreCV !== undefined;
     CANDIDATO.scoreData = {
-      total: data.scoreCV || 0,
-      nivel: (data.scoreCV >= 75) ? 'bueno' : (data.scoreCV >= 50 ? 'regular' : 'bajo'),
-      tip: data.scoreCV > 0 ? '¡Buen trabajo! Seguí mejorando tu perfil para aumentar tu visibilidad.' : 'Subí tu CV para obtener un análisis detallado.',
+      total:  hasScore ? data.scoreCV : null,
+      nivel:  hasScore ? ((data.scoreCV >= 75) ? 'bueno' : (data.scoreCV >= 50 ? 'regular' : 'bajo')) : 'none',
+      tip:    hasScore
+                ? '¡Buen trabajo! Seguí mejorando tu perfil para aumentar tu visibilidad.'
+                : 'Subí tu CV para obtener un análisis detallado.',
       criterios: [
-        { icono: '💼', label: 'Experiencia laboral', estado: data.scoreCV > 10 ? 'ok' : 'warn', puntos: '-', detalle: 'Datos extraídos de tu CV' },
-        { icono: '🎓', label: 'Formación académica', estado: data.scoreCV > 10 ? 'ok' : 'warn', puntos: '-', detalle: 'Datos extraídos de tu CV' },
+        { icono: '💼', label: 'Experiencia laboral', estado: hasExp ? 'ok' : 'warn', puntos: hasExp ? data.experiencias.length : '-', detalle: expDetail },
+        { icono: '🎓', label: 'Formación académica', estado: hasFormacion ? 'ok' : 'warn', puntos: hasFormacion ? data.formacion.length : '-', detalle: formacionDetail },
       ]
     };
 
@@ -480,15 +689,26 @@ async function fetchProfile(candidatoId) {
       CANDIDATO.habilidades = data.habilidades.map(s => ({ name: s.trim(), type: 'main' }));
     }
 
+    CANDIDATO.missing = data.habilidadesFaltantes || [];
+
+    if (Array.isArray(data.habilidadesTech)) {
+      CANDIDATO.techSkills = data.habilidadesTech.filter(h => h.tipo === 'TECNICA').map(h => h.nombre);
+      CANDIDATO.softSkills = data.habilidadesTech.filter(h => h.tipo === 'BLANDA').map(h => h.nombre);
+      CANDIDATO.techs = data.habilidadesTech.filter(h => h.tipo === 'TECNOLOGIA').map(h => h.nombre);
+    }
+
+    if (Array.isArray(data.experiencias)) {
+      CANDIDATO.experiencia = data.experiencias.map(e => ({
+        role: e.rol,
+        company: e.empresa,
+        period: `${e.desde} – ${e.hasta}`,
+        desc: e.descripcion || ''
+      }));
+    }
+
     renderScore();
     renderSkills();
     renderIAAnalysis();
-
-    const firstName = CANDIDATO.nombre.split(' ')[0];
-    const greetEl = document.querySelector('.greeting-title');
-    if (greetEl) greetEl.textContent = `¡Hola, ${firstName}! 👋`;
-    document.querySelectorAll('.sp-avatar, .avatar-circle').forEach(el => el.textContent = firstName.charAt(0).toUpperCase());
-    document.querySelectorAll('.sp-name, .avatar-name').forEach(el => el.textContent = CANDIDATO.nombre);
 
   } catch (err) {
     console.error('[Dashboard] Error cargando perfil:', err.message);
@@ -532,16 +752,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const hash = window.location.hash.substring(1);
   const initialSection = params.get('section') || hash || 'overview';
+  initCopySummary();
+  initPdfModal();
+  
   if (SECTIONS.includes(initialSection)) switchSection(initialSection);
 
   // 2. Validar sesión
   const session = requireSession();
   if (!session) return;
 
-  // 3. Cargar perfil y postulaciones en paralelo
+  // 3. Cargar perfil primero, luego inicializar controles
   if (session.candidatoId) {
-    // Perfil (no bloqueante)
-    fetchProfile(session.candidatoId);
+    // Cargar perfil primero (esperar a que termine)
+    await fetchProfile(session.candidatoId);
+
+    // Inicializar controles de subida después de cargar el perfil
+    initUploadCv();
 
     // Postulaciones
     try {
@@ -557,6 +783,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           status: p.estado.toLowerCase(),
           match: p.matchIA || null,
         }));
+
+        // Actualizar el contador del botón "Todas"
+        const pfBtnTodas = document.getElementById('pfBtnTodas');
+        if (pfBtnTodas) pfBtnTodas.textContent = `Todas (${POSTULACIONES.length})`;
 
         const badge = document.querySelector('.snav-item[data-section="postulaciones"] .snav-badge');
         if (badge) badge.textContent = POSTULACIONES.length;

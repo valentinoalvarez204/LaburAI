@@ -38,6 +38,16 @@ export class JobsController {
     return this.jobsService.findOne(id);
   }
 
+  // GET /api/jobs/:id/match — Calcula compatibilidad previa
+  @Get(':id/match')
+  @UseGuards(JwtGuard)
+  getMatchPreview(@Param('id') id: string, @Req() req: any) {
+    if (req.user.rol !== 'CANDIDATO') {
+      throw new ForbiddenException('Solo los candidatos pueden ver su compatibilidad');
+    }
+    return this.jobsService.calcularMatchPreview(id, req.user.sub);
+  }
+
   // POST /api/jobs — solo empresas autenticadas
   @Post()
   @UseGuards(JwtGuard)
