@@ -39,6 +39,16 @@ export class ApplicationsController {
     return this.applicationsService.findOne(id);
   }
 
+  // POST /api/applications/:id/match — análisis IA pedido por empresa
+  @Post(':id/match')
+  @UseGuards(JwtGuard)
+  analyzeMatch(@Param('id') id: string, @Req() req: any) {
+    if (req.user?.rol !== 'EMPRESA') {
+      throw new ForbiddenException('Solo las empresas pueden analizar matching de postulaciones');
+    }
+    return this.applicationsService.analizarMatchEmpresa(id, req.user.sub);
+  }
+
   // PATCH /api/applications/:id — solo empresas autenticadas
   @Patch(':id')
   @UseGuards(JwtGuard)

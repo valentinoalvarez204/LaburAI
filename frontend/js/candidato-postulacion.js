@@ -198,10 +198,22 @@ function renderIA(app) {
   const score = app.matchIA || 0;
   const num = document.getElementById('iaScoreValue');
   const ring = document.getElementById('iaScoreRing');
+  const desc = document.getElementById('iaAnalysisText');
+  const strengths = document.getElementById('iaStrengths');
+  const gaps = document.getElementById('iaGaps');
+  const circumference = 2 * Math.PI * 35; // r=35
+
+  if (!app.matchAnalizadoEmpresa) {
+    num.textContent = '—%';
+    if (ring) ring.style.strokeDashoffset = circumference;
+    if (desc) desc.textContent = 'La empresa todavía no analizó el matching con IA para esta postulación.';
+    if (strengths) strengths.innerHTML = '<li>Analizá el matching desde la lista de candidatos.</li>';
+    if (gaps) gaps.innerHTML = '<li>El diagnóstico se genera cuando la IA compara el perfil con la oferta.</li>';
+    return;
+  }
   
   // Animar score
   num.textContent = score + '%';
-  const circumference = 2 * Math.PI * 35; // r=35
   const offset = circumference * (1 - score / 100);
   
   setTimeout(() => {
@@ -209,10 +221,6 @@ function renderIA(app) {
   }, 100);
 
   // Análisis de compatibilidad
-  const desc = document.getElementById('iaAnalysisText');
-  const strengths = document.getElementById('iaStrengths');
-  const gaps = document.getElementById('iaGaps');
-
   // Lógica de fortalezas/gaps basada en las habilidades de la oferta vs candidato
   const ofertaSkills = app.oferta?.habilidades || [];
   const candSkills = app.candidato?.habilidades || [];

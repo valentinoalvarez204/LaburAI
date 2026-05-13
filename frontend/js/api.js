@@ -204,6 +204,15 @@ async function patchPostulacion(id, data) {
   }
 }
 
+async function postApplicationMatchAnalysis(id) {
+  try {
+    return await apiFetch(`/applications/${id}/match`, { method: 'POST' });
+  } catch (err) {
+    console.error(`[API] Error analizando match de postulacion ${id}:`, err.message);
+    throw err;
+  }
+}
+
 async function crearPostulacion(data) {
   try {
     return await apiFetch('/applications', { method: 'POST', body: JSON.stringify(data) });
@@ -325,6 +334,7 @@ window.API = {
   getPostulaciones,
   getPostulacion,
   patchPostulacion,
+  postApplicationMatchAnalysis,
   crearPostulacion,
   // Perfil
   getPerfilCandidato,
