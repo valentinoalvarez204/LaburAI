@@ -498,12 +498,10 @@ function renderSimilar(oferta) {
   const grid = document.getElementById('similarGrid');
   if (!grid) return;
 
-  // Intentar cargar ofertas reales para similar del mismo rubro
-  fetch(`http://localhost:3000/api/jobs?rubro=${oferta.rubro}`)
-    .then(r => r.json())
-    .then(data => {
+  API.getOfertas({ rubro: oferta.rubro })
+    .then((data) => {
       if (!Array.isArray(data)) return;
-      const list = data.filter(j => j.id !== oferta.id).slice(0, 3).map(j => ({
+      const list = data.filter((j) => j.id !== oferta.id).slice(0, 3).map((j) => ({
         id: j.id,
         title: j.titulo,
         company: j.empresa?.nombre || 'Empresa',
@@ -515,11 +513,11 @@ function renderSimilar(oferta) {
         salary: j.salarioMin ? `$${j.salarioMin.toLocaleString('es-AR')}` : 'A convenir',
         time: 'Reciente',
         match: j.matchIA || 0,
-        rubro: j.rubro
+        rubro: j.rubro,
       }));
       renderSimilarList(grid, list);
     })
-    .catch(err => console.error('Error fetching similar jobs:', err));
+    .catch((err) => console.error('Error cargando similares:', err));
 }
 
 function renderSimilarList(grid, list) {
@@ -602,17 +600,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!id) { window.location.href = 'ofertas.html'; return; }
 
   try {
-    const session = JSON.parse(sessionStorage.getItem('labuai_session') || '{}');
-    const isCandidato = String(session?.rol || '').toLowerCase() === 'candidato';
-    const candidatoId = isCandidato ? session.candidatoId : '';
-    const url = candidatoId 
-      ? `http://localhost:3000/api/jobs/${id}?candidatoId=${candidatoId}`
-      : `http://localhost:3000/api/jobs/${id}`;
+    const job = await API.getOferta(id);
 
-    const res  = await fetch(url);
-    const job  = await res.json();
-
-    if (!res.ok) { window.location.href = 'ofertas.html'; return; }
+    if (!job || !job.id) { window.location.href = 'ofertas.html'; return; }
 
     // Mapear datos de la API al formato que espera renderPage()
     const oferta = {
