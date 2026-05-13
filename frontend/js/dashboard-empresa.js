@@ -8,6 +8,7 @@
 let EMPRESA = { nombre: '', iniciales: '' };
 let OFERTAS_DATA = [];
 let CANDIDATOS_DATA = [];
+const MATCH_ANALYSIS_LIMIT = 5;
 
 /* ─────────────────────────────────
    NAVEGACIÓN
@@ -126,7 +127,14 @@ function renderOfertasMini() {
 function renderTopCandidatos() {
   const el = document.getElementById('topCandidatos');
   if (!el) return;
-  const top = [...CANDIDATOS_DATA].sort((a, b) => b.match - a.match).slice(0, 4);
+  const top = [...CANDIDATOS_DATA]
+    .filter((c) => c.matchAnalizado)
+    .sort((a, b) => b.match - a.match)
+    .slice(0, 4);
+  if (!top.length) {
+    el.innerHTML = `<div class="tc-empty">Analizá candidatos para ver el ranking IA.</div>`;
+    return;
+  }
   const rankClass = ['gold', 'silver', 'bronze', ''];
   el.innerHTML = top.map((c, i) => `
     <div class="tc-item" onclick="switchSection('candidatos')">
@@ -275,8 +283,15 @@ function renderCandidatos(ofertaId = 'todas') {
     return;
   }
 
-  // Ordenar por match
-  const sorted = [...list].sort((a, b) => b.match - a.match);
+  const usedAnalyses = CANDIDATOS_DATA.filter((c) => c.matchAnalizado).length;
+  const remainingAnalyses = Math.max(0, MATCH_ANALYSIS_LIMIT - usedAnalyses);
+
+  // Ordenar primero los ya analizados por match, después los pendientes por fecha de carga.
+  const sorted = [...list].sort((a, b) => {
+    if (a.matchAnalizado !== b.matchAnalizado) return a.matchAnalizado ? -1 : 1;
+    if (a.matchAnalizado && b.matchAnalizado) return b.match - a.match;
+    return new Date(b.creadoEn || 0) - new Date(a.creadoEn || 0);
+  });
 
   el.innerHTML = sorted.map((c, i) => {
     const rankCls = i === 0 ? 'cand-rank--1' : i === 1 ? 'cand-rank--2' : i === 2 ? 'cand-rank--3' : '';
@@ -286,6 +301,27 @@ function renderCandidatos(ofertaId = 'todas') {
     const offset = circ * (1 - c.match / 100);
     const statusColors = { PENDIENTE: '#9e9e9e', REVISADA: 'var(--indigo)', ENTREVISTA: 'var(--violet)', RECHAZADA: '#E53935' };
     const borderColor = statusColors[c.estado] || '#e4e8f0';
+    const canAnalyze = remainingAnalyses > 0 || c.matchAnalizado;
+    const matchBlock = c.matchAnalizado ? `
+        <div class="cand-score-wrap">
+          <div class="cand-score-ring">
+            <svg class="csr-svg" viewBox="0 0 60 60">
+              <circle cx="30" cy="30" r="24" class="csr-bg"/>
+              <circle cx="30" cy="30" r="24" class="csr-fill"
+                stroke="url(#candGrad)"
+                style="stroke-dashoffset:${offset}"/>
+            </svg>
+            <div class="csr-num">${c.match}%</div>
+          </div>
+          <div class="cand-score-label">compatibilidad</div>
+        </div>` : `
+        <div class="cand-score-wrap cand-score-wrap--pending">
+          <div class="cand-score-placeholder">IA</div>
+          <div class="cand-score-label">sin analizar</div>
+        </div>`;
+    const analyzeButton = c.matchAnalizado
+      ? ''
+      : `<button class="cand-btn cand-btn--primary" onclick="analizarMatchingCandidato('${c.id}', event)" ${canAnalyze ? '' : 'disabled'}>Analizar matching</button>`;
 
     return `
       <div class="cand-card" data-id="${c.id}" style="border-left-color: ${borderColor}">
@@ -300,18 +336,7 @@ function renderCandidatos(ofertaId = 'todas') {
           <div class="cand-meta">${c.exp} · ${c.oferta}</div>
           <div class="cand-skills">${skills}</div>
         </div>
-        <div class="cand-score-wrap">
-          <div class="cand-score-ring">
-            <svg class="csr-svg" viewBox="0 0 60 60">
-              <circle cx="30" cy="30" r="24" class="csr-bg"/>
-              <circle cx="30" cy="30" r="24" class="csr-fill"
-                stroke="url(#candGrad)"
-                style="stroke-dashoffset:${offset}"/>
-            </svg>
-            <div class="csr-num">${c.match}%</div>
-          </div>
-          <div class="cand-score-label">compatibilidad</div>
-        </div>
+        ${matchBlock}
         <div class="cand-actions" style="flex-direction: row; gap: 8px; align-items: center;">
           <div class="status-dropdown" id="sd-${c.id}" data-id="${c.id}" data-estado="${c.estado}">
             <button class="status-dropdown-btn sd-${c.estado.toLowerCase()}" onclick="toggleStatusDropdown('${c.id}', event)">
@@ -327,6 +352,7 @@ function renderCandidatos(ofertaId = 'todas') {
                 </button>`).join('')}
             </div>
           </div>
+          ${analyzeButton}
           <a href="candidato-postulacion.html?id=${c.id}" class="cand-btn" style="padding: 7px 12px; font-size: 11px;">Ver detalle</a>
         </div>
       </div>`;
@@ -360,6 +386,37 @@ function initFilterStatus() {
     renderCandidatos(document.getElementById('selectOferta')?.value || 'todas');
   });
 }
+
+window.analizarMatchingCandidato = async function (id, event) {
+  event?.preventDefault();
+  event?.stopPropagation();
+  const btn = event?.currentTarget;
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Analizando...';
+  }
+
+  try {
+    const result = await API.postApplicationMatchAnalysis(id);
+    const cand = CANDIDATOS_DATA.find((c) => c.id === id);
+    if (cand) {
+      cand.match = result.match || 0;
+      cand.matchAnalizado = true;
+      cand.matchAnalizadoEn = new Date().toISOString();
+    }
+
+    renderCandidatos(document.getElementById('selectOferta')?.value || 'todas');
+    renderTopCandidatos();
+    showToast(`Matching analizado: ${result.match}% de compatibilidad`, 'success');
+  } catch (err) {
+    console.error('[Dashboard] Error analizando matching:', err.message);
+    showToast(err.message || 'No se pudo analizar el matching', 'error');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Analizar matching';
+    }
+  }
+};
 
 /* Lógica de colores y dropdown de estado movida a utils.js */
 
@@ -958,9 +1015,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           oferta: oferta.titulo,
           exp: p.candidato?.habilidades?.join(', ') || 'Sin datos',
           match: p.matchIA || 0,
+          matchAnalizado: !!p.matchAnalizadoEmpresa,
+          matchAnalizadoEn: p.matchAnalizadoEn,
           skills: p.candidato?.habilidades?.slice(0, 3) || [],
           missing: 0,
           estado: p.estado,
+          creadoEn: p.creadoEn,
         }));
       });
 

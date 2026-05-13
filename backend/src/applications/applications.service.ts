@@ -1,10 +1,12 @@
-import { Injectable, BadRequestException, NotFoundException, Inject } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException, NotFoundException, Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { AI_PROVIDER_TOKEN } from '../ai/ai.module';
 import type { IAPIService } from '../ai/interfaces/ia-service.interface';
 
 @Injectable()
 export class ApplicationsService {
+  private readonly MAX_EMPRESA_MATCH_ANALYSES = 5;
+
   constructor(
     private prisma: PrismaService,
     @Inject(AI_PROVIDER_TOKEN) private aiService: IAPIService,
@@ -40,20 +42,12 @@ export class ApplicationsService {
     });
     if (yaPostulado) throw new BadRequestException('Ya te postulaste a esta oferta');
 
-    // Calcular match usando la IA de forma óptima
-    console.log('Calculando match...');
-    const candidatoTexto = `Habilidades: ${candidato.habilidades.join(', ')}. Resumen: ${candidato.resumenIA || 'Sin resumen'}`;
-    const ofertaTexto = `Rol: ${oferta.titulo}. Requisitos: ${oferta.descripcion}. Habilidades deseadas: ${oferta.habilidades.join(', ')}`;
-    const matchScore = await this.aiService.calcularMatch(candidatoTexto, ofertaTexto);
-    console.log('Match calculado:', matchScore);
-
     return this.prisma.postulacion.create({
       data: {
         candidatoId: candidato.id,
         ofertaId: data.ofertaId,
         cartaMotivacion: data.cartaMotivacion,
         estado: 'PENDIENTE', // siempre forzado al crear
-        matchIA: matchScore,
       },
       include: {
         oferta: {
@@ -75,6 +69,81 @@ export class ApplicationsService {
         },
       },
       orderBy: { creadoEn: 'desc' },
+    });
+  }
+
+  async analizarMatchEmpresa(postulacionId: string, usuarioId: string) {
+    const empresa = await this.prisma.empresa.findUnique({ where: { usuarioId } });
+    if (!empresa) {
+      throw new ForbiddenException('Solo las empresas pueden analizar matching de postulaciones');
+    }
+
+    const postulacion = await this.prisma.postulacion.findUnique({
+      where: { id: postulacionId },
+      include: {
+        candidato: true,
+        oferta: true,
+      },
+    });
+    if (!postulacion) throw new NotFoundException('Postulación no encontrada');
+    if (postulacion.oferta.empresaId !== empresa.id) {
+      throw new ForbiddenException('No podés analizar postulaciones de otra empresa');
+    }
+
+    if (postulacion.matchAnalizadoEmpresa && postulacion.matchIA !== null) {
+      const usados = await this.countEmpresaMatchAnalyses(empresa.id);
+      return {
+        match: postulacion.matchIA,
+        analizado: true,
+        analisisUsados: usados,
+        analisisRestantes: Math.max(0, this.MAX_EMPRESA_MATCH_ANALYSES - usados),
+      };
+    }
+
+    const usados = await this.countEmpresaMatchAnalyses(empresa.id);
+    if (usados >= this.MAX_EMPRESA_MATCH_ANALYSES) {
+      throw new BadRequestException(`Solo podés analizar matching con IA ${this.MAX_EMPRESA_MATCH_ANALYSES} veces`);
+    }
+
+    const candidatoTexto = [
+      `Habilidades: ${postulacion.candidato.habilidades.join(', ') || 'Sin habilidades cargadas'}`,
+      `Resumen: ${postulacion.candidato.resumenIA || 'Sin resumen disponible'}`,
+      `Formación: ${postulacion.candidato.formacion.join(', ') || 'No especificada'}`,
+    ].join('. ');
+    const ofertaTexto = [
+      `Rol: ${postulacion.oferta.titulo}`,
+      `Requisitos: ${postulacion.oferta.descripcion}`,
+      `Habilidades requeridas: ${postulacion.oferta.habilidades.join(', ') || 'No especificadas'}`,
+      `Experiencia: ${postulacion.oferta.experiencia || 'No especificada'}`,
+      `Estudios: ${postulacion.oferta.estudios || 'No especificados'}`,
+    ].join('. ');
+
+    const score = await this.aiService.calcularMatch(candidatoTexto, ofertaTexto);
+    const normalized = Math.max(0, Math.min(100, Math.round(score || 0)));
+
+    const updated = await this.prisma.postulacion.update({
+      where: { id: postulacionId },
+      data: {
+        matchIA: normalized,
+        matchAnalizadoEmpresa: true,
+        matchAnalizadoEn: new Date(),
+      },
+    });
+
+    return {
+      match: updated.matchIA,
+      analizado: true,
+      analisisUsados: usados + 1,
+      analisisRestantes: Math.max(0, this.MAX_EMPRESA_MATCH_ANALYSES - (usados + 1)),
+    };
+  }
+
+  private countEmpresaMatchAnalyses(empresaId: string) {
+    return this.prisma.postulacion.count({
+      where: {
+        matchAnalizadoEmpresa: true,
+        oferta: { empresaId },
+      },
     });
   }
 

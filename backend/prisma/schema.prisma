@@ -34,9 +34,9 @@ model Candidato {
   cvUrl                String?
   scoreCV              Int?
   resumenIA            String?
-  habilidades          String[]  // array plano usado por el match IA low-token
-  habilidadesFaltantes String[]  // sugerencias de la IA
-  formacion            String[]  // títulos y estudios detectados por la IA
+  habilidades          String[] // array plano usado por el match IA low-token
+  habilidadesFaltantes String[] // sugerencias de la IA
+  formacion            String[] // títulos y estudios detectados por la IA
   creadoEn             DateTime @default(now())
 
   usuarioId String  @unique
@@ -123,12 +123,14 @@ model OfertaLaboral {
 
 // ── POSTULACION ──
 model Postulacion {
-  id              String   @id @default(uuid())
-  estado          Estado   @default(PENDIENTE)
-  cartaMotivacion String?
-  matchIA         Int?
-  creadoEn        DateTime @default(now())
-  notes           String?
+  id                    String    @id @default(uuid())
+  estado                Estado    @default(PENDIENTE)
+  cartaMotivacion       String?
+  matchIA               Int?
+  matchAnalizadoEmpresa Boolean   @default(false)
+  matchAnalizadoEn      DateTime?
+  creadoEn              DateTime  @default(now())
+  notes                 String?
 
   candidatoId String
   candidato   Candidato @relation(fields: [candidatoId], references: [id])
@@ -148,7 +150,7 @@ model MatchAnalisis {
   match       Int
   creadoEn    DateTime @default(now())
 
-  candidato Candidato   @relation(fields: [candidatoId], references: [id], onDelete: Cascade)
+  candidato Candidato     @relation(fields: [candidatoId], references: [id], onDelete: Cascade)
   oferta    OfertaLaboral @relation(fields: [ofertaId], references: [id], onDelete: Cascade)
 
   @@unique([candidatoId, ofertaId])
