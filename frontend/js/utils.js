@@ -357,16 +357,25 @@ function getStatusLabel(estado) {
 /* Abrir / cerrar dropdown de estado */
 window.toggleStatusDropdown = function (id, e) {
   e.stopPropagation();
+  const menu = document.getElementById(`sdm-${id}`);
+  const container = document.getElementById(`sd-${id}`);
+
   // Cerrar todos los otros abiertos
   document.querySelectorAll('.status-dropdown-menu.open').forEach(m => {
     if (m.id !== `sdm-${id}`) m.classList.remove('open');
   });
-  document.getElementById(`sdm-${id}`)?.classList.toggle('open');
+  document.querySelectorAll('.status-dropdown.open').forEach(c => {
+    if (c.id !== `sd-${id}`) c.classList.remove('open');
+  });
+
+  menu?.classList.toggle('open');
+  container?.classList.toggle('open');
 };
 
 // Cerrar al clickear fuera
 document.addEventListener('click', () => {
   document.querySelectorAll('.status-dropdown-menu.open').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.status-dropdown.open').forEach(c => c.classList.remove('open'));
 });
 
 /* ─────────────────────────────────

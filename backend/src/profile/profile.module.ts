@@ -9,6 +9,6 @@ import { PrismaService } from '../prisma.service';
 @Module({
   imports: [AuthModule, AiModule, StorageModule],
   controllers: [ProfileController],
-  providers: [ProfileService, PrismaService],
+  providers: [ProfileService],
 })
 export class ProfileModule {}
