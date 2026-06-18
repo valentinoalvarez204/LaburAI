@@ -9,11 +9,13 @@ import { StatsModule } from './stats/stats.module';
 import { EntrevistasModule } from './entrevistas/entrevistas.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 
+import { PrismaModule } from './prisma.module';
 import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
     AuthModule,
     JobsModule,
     ApplicationsModule,
@@ -23,7 +25,5 @@ import { AiModule } from './ai/ai.module';
     DashboardModule,
     AiModule,
   ],
-  providers: [PrismaService],
-  exports: [PrismaService],
 })
 export class AppModule {}
