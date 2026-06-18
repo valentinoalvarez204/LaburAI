@@ -1491,8 +1491,18 @@ body {
   box-shadow: var(--shadow-lg);
   min-width: 148px;
   padding: 5px;
-  z-index: 400;
+  z-index: 1000;
 }
+.status-dropdown.open {
+  z-index: 1001;
+}
+
+/* Elevamos la tarjeta completa para que el dropdown no quede debajo de la siguiente */
+.cand-card:has(.status-dropdown.open),
+.cand-card:has(.status-dropdown-menu.open) {
+  z-index: 100;
+}
+
 .status-dropdown-menu.open {
   display: block;
   animation: dropdown-in .15s ease;
