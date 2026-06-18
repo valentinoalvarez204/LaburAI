@@ -226,14 +226,17 @@
       <div class="modal-body">
         <div class="modal-job-preview" id="modalJobPreview"></div>
         <div class="modal-section">
-          <div class="modal-label">CV que vas a enviar</div>
-          <div class="cv-preview">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <div>
-              <div class="cv-name">mi-curriculum.pdf</div>
-              <div class="cv-meta">Subido hace 3 días · 2.4 MB</div>
+          <div class="modal-label">Mi Curriculum Vitae</div>
+          <div class="cv-preview" id="applicationCvPreview">
+            <div class="cv-pdf-thumb" id="applicationCvThumb">
+              <iframe id="applicationCvFrame" class="cv-pdf-frame" title="Vista previa del CV" scrolling="no"></iframe>
+              <div class="cv-empty-state" id="applicationCvEmpty">Sin CV cargado</div>
             </div>
-            <a href="login.html" class="cv-change">Cambiar</a>
+            <div class="cv-preview-info">
+              <div class="cv-name" id="applicationCvName">Cargando CV...</div>
+              <div class="cv-meta" id="applicationCvMeta">Buscando el CV de tu perfil.</div>
+            </div>
+            <button type="button" class="cv-change" id="applicationCvView" disabled>Visualizar</button>
           </div>
         </div>
         <div class="modal-section">
