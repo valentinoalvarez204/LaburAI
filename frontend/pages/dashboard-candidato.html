@@ -7,29 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/base.css"/>
-  <link rel="stylesheet" href="css/dashboard-candidato.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/dashboard-candidato.css"/>
 </head>
 <body>
 
   <!-- ══ NAVBAR ══ -->
-  <nav id="navbar">
-    <div class="nav-inner">
-      <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
-      <div class="nav-links">
-        <!-- Links dinámicos vía utils.js -->
-      </div>
-      <div class="nav-actions" id="navActions">
-        <!-- Acciones dinámicas vía utils.js -->
-      </div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-    <div class="mobile-menu" id="mobileMenu">
-      <!-- Menú mobile dinámico vía utils.js -->
-    </div>
-  </nav>
+  <nav id="navbar"></nav>
 
   <!-- ══ LAYOUT ══ -->
   <div class="dash-layout">
@@ -64,7 +48,7 @@
           <p class="greeting-sub" id="greetingSub">Cargando tus novedades…</p>
         </div>
         <a href="ofertas.html" class="btn-primary">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-search"></use></svg>
           Buscar más empleos
         </a>
       </div>
@@ -77,28 +61,28 @@
           <div class="dash-stats">
             <div class="dstat">
               <div class="dstat-icon dstat-icon--blue">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+                <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-send"></use></svg>
               </div>
             <div class="dstat-num">0</div>
               <div class="dstat-label">Postulaciones</div>
             </div>
             <div class="dstat">
               <div class="dstat-icon dstat-icon--green">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-eye"></use></svg>
               </div>
             <div class="dstat-num">0</div>
               <div class="dstat-label">Vistas al perfil</div>
             </div>
             <div class="dstat">
               <div class="dstat-icon dstat-icon--amber">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-star"></use></svg>
               </div>
             <div class="dstat-num">0</div>
               <div class="dstat-label">Ofertas nuevas</div>
             </div>
             <div class="dstat">
               <div class="dstat-icon dstat-icon--indigo">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-users"></use></svg>
               </div>
             <div class="dstat-num">0</div>
               <div class="dstat-label">Entrevistas</div>
@@ -201,13 +185,13 @@
                 <div class="cv-thumbnail-overlay">
                   <div class="overlay-blur"></div>
                   <div class="overlay-content">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+                    <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-maximize"></use></svg>
                     <span>Abrir CV</span>
                   </div>
                 </div>
               </div>
               <div class="cvp-empty-icon" id="cvEmptyIcon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <svg class="icon icon-lg"><use href="../assets/icons.svg#icon-file-text"></use></svg>
               </div>
             </div>
             <div class="cvp-right">
@@ -218,11 +202,11 @@
               </div>
               <div class="cvp-actions">
                 <button class="btn-ghost" id="btnDownloadCV" disabled>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-download"></use></svg>
                   Descargar
                 </button>
                 <button class="btn-primary" id="btnUploadNew">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-upload"></use></svg>
                   Subir mi CV
                 </button>
                 <input type="file" id="cvFileInput" accept="application/pdf,.pdf" style="display:none" />
@@ -383,11 +367,11 @@
             <h3 class="pf-card-title">Configuraciónes</h3>
             <div class="cuenta-options">
               <button class="btn-primary btn-sm" id="btnVerificarEmail">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-check"></use></svg>
                 Verificar email <span id="emailStatus" class="status-pending"></span>
               </button>
               <button class="btn-ghost btn-sm" id="btnBorrarCuenta">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-trash"></use></svg>
                 Borrar cuenta
               </button>
             </div>
@@ -403,7 +387,7 @@
   <div class="pdf-modal" id="pdfModal">
     <div class="pdf-modal-content">
       <button class="pdf-modal-close" id="pdfModalClose">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg class="icon"><use href="../assets/icons.svg#icon-x"></use></svg>
       </button>
       <iframe id="pdfModalFrame" style="width:100%; height:100%; border:none;"></iframe>
     </div>
@@ -411,8 +395,8 @@
 
   <div class="dash-overlay" id="dashOverlay"></div>
 
-  <script src="js/utils.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/dashboard-candidato.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/dashboard-candidato.js"></script>
 </body>
 </html>

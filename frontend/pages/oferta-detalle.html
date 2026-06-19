@@ -7,42 +7,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/base.css"/>
-  <link rel="stylesheet" href="css/detalle.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/detalle.css"/>
 </head>
 <body>
 
   <!-- ══ NAVBAR ══ -->
-  <nav id="navbar">
-    <div class="nav-inner">
-      <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
-      <div class="nav-links">
-        <a href="ofertas.html" class="active">Buscar empleo</a>
-        <a href="empresas.html">Para empresas</a>
-      </div>
-      <div class="nav-actions" id="navActions">
-        <a href="login.html" class="btn-ghost">Ingresar</a>
-        <a href="login.html" class="btn-primary">Publicar oferta</a>
-      </div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="ofertas.html">Buscar empleo</a>
-      <a href="empresas.html">Para empresas</a>
-      <hr/>
-      <div id="mobileNavActions">
-        <a href="login.html" class="btn-ghost" style="text-align:center;display:block">Ingresar</a>
-        <a href="login.html" class="btn-primary" style="text-align:center;display:block;margin-top:8px">Publicar oferta</a>
-      </div>
-    </div>
-  </nav>
+  <nav id="navbar"></nav>
 
   <!-- ══ BREADCRUMB ══ -->
   <div class="breadcrumb-bar">
     <nav class="breadcrumb">
-      <a href="index.html">Inicio</a>
+      <a href="../index.html">Inicio</a>
       <span class="breadcrumb-sep">›</span>
       <a href="ofertas.html">Buscar empleo</a>
       <span class="breadcrumb-sep">›</span>
@@ -66,7 +42,7 @@
             <div class="jhc-company-row">
               <span class="jhc-company-name" id="jobCompany">—</span>
               <span class="jhc-dot">·</span>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-location"></use></svg>
               <span id="jobLocation">—</span>
               <span class="jhc-dot">·</span>
               <span class="jhc-time" id="jobTime">—</span>
@@ -74,10 +50,10 @@
           </div>
           <div class="jhc-actions">
             <button class="btn-icon" id="btnSave" title="Guardar oferta">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-star"></use></svg>
             </button>
             <button class="btn-icon" id="btnShare" title="Compartir">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-share"></use></svg>
             </button>
           </div>
         </div>
@@ -173,11 +149,11 @@
         <div class="apply-salary" id="applySalary">—</div>
         <div class="apply-salary-label">Rango salarial estimado</div>
         <button class="btn-apply" id="btnApply">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-send"></use></svg>
           Postularme ahora
         </button>
         <button class="btn-apply-ghost" id="btnSaveAlt">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-star"></use></svg>
           Guardar para después
         </button>
         <a href="login.html" class="btn-apply" id="btnLoginToApply" style="display:none; text-decoration:none; text-align:center;">
@@ -197,7 +173,7 @@
 
       <!-- Reportar -->
       <button class="report-btn" id="reportBtn">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-bell"></use></svg>
         Reportar esta oferta
       </button>
 
@@ -220,7 +196,7 @@
       <div class="modal-header">
         <h3 class="modal-title">Confirmar postulación</h3>
         <button class="modal-close" id="modalClose">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-x"></use></svg>
         </button>
       </div>
       <div class="modal-body">
@@ -268,9 +244,9 @@
     </div>
   </div>
 
-  <script src="js/api.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/main.js"></script>
-  <script src="js/detalle.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/detalle.js"></script>
 </body>
 </html>

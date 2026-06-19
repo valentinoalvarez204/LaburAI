@@ -350,7 +350,7 @@ function initMatchAnalysis(oferta) {
   analyzeBtn.addEventListener('click', async () => {
     const session = getSession();
     if (!session?.token) {
-      window.location.href = 'login.html';
+      window.location.href = UI_PAGES.login;
       return;
     }
 
@@ -402,7 +402,7 @@ function renderSimilar(oferta) {
     const matchVal = o.match || 0;
     const badge = `<div class="match-badge">✦ ${matchVal}% match</div>`;
     return `
-      <a class="job-card" href="oferta-detalle.html?id=${o.id}">
+      <a class="job-card" href="${UI_PAGES.oferta_detalle}?id=${o.id}">
         ${badge}
         <div class="job-card-head">
           <div class="company-logo" style="color:${o.logoColor}">${o.logo}</div>
@@ -551,7 +551,7 @@ function initModal() {
 
       if (!session.token) {
         showToast('Necesitás iniciar sesión para postularte', 'error');
-        setTimeout(() => window.location.href = 'login.html', 1500);
+        setTimeout(() => window.location.href = UI_PAGES.login, 1500);
         return;
       }
 
@@ -616,7 +616,7 @@ function renderSimilarList(grid, list) {
     const matchVal = o.match || 0;
     const badge = isEmpresa ? '' : `<div class="match-badge">✦ ${matchVal}% match</div>`;
     return `
-      <a class="job-card" href="oferta-detalle.html?id=${o.id}">
+      <a class="job-card" href="${UI_PAGES.oferta_detalle}?id=${o.id}">
         ${badge}
         <div class="job-card-head">
           <div class="company-logo" style="color:${o.logoColor}">${o.logo}</div>
@@ -684,12 +684,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   initNavSession();
 
   const id = getParam('id');
-  if (!id) { window.location.href = 'ofertas.html'; return; }
+  if (!id) { window.location.href = UI_PAGES.ofertas; return; }
 
   try {
     const job = await API.getOferta(id);
 
-    if (!job || !job.id) { window.location.href = 'ofertas.html'; return; }
+    if (!job || !job.id) { window.location.href = UI_PAGES.ofertas; return; }
 
     // Mapear datos de la API al formato que espera renderPage()
     const oferta = {
@@ -737,6 +737,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   } catch (err) {
     console.error('Error cargando oferta:', err);
-    window.location.href = 'ofertas.html';
+    window.location.href = UI_PAGES.ofertas;
   }
 });

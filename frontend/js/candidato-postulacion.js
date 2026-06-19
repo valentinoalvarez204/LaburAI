@@ -12,7 +12,7 @@ async function initPage() {
   const appId = getParam('id');
   if (!appId) {
     showToast('Error: No se proporcionó un ID de postulación', 'error');
-    setTimeout(() => window.location.href = 'dashboard-empresa.html', 1500);
+    setTimeout(() => window.location.href = UI_PAGES.dashboard_empresa, 1500);
     return;
   }
 
