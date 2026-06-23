@@ -316,6 +316,64 @@ async function getIndustrias() {
   }
 }
 /* ─────────────────────────────────
+   NOTIFICACIONES
+───────────────────────────────── */
+
+async function getNotifications() {
+  try {
+    return await apiFetch('/notifications');
+  } catch (err) {
+    console.error('[API] Error obteniendo notificaciones:', err.message);
+    throw err;
+  }
+}
+
+async function getNotificationsUnreadCount() {
+  try {
+    return await apiFetch('/notifications/unread-count');
+  } catch (err) {
+    console.error('[API] Error count notif:', err.message);
+    throw err;
+  }
+}
+
+async function patchNotificationRead(id) {
+  try {
+    return await apiFetch(`/notifications/${id}/read`, { method: 'PATCH' });
+  } catch (err) {
+    console.error('[API] Error marking notif as read:', err.message);
+    throw err;
+  }
+}
+
+async function patchNotificationsReadAll() {
+  try {
+    return await apiFetch('/notifications/read-all', { method: 'PATCH' });
+  } catch (err) {
+    console.error('[API] Error marking all as read:', err.message);
+    throw err;
+  }
+}
+
+async function deleteNotificationsAll() {
+  try {
+    return await apiFetch('/notifications/all', { method: 'DELETE' });
+  } catch (err) {
+    console.error('[API] Error deleting all notifications:', err.message);
+    throw err;
+  }
+}
+
+async function deleteNotification(id) {
+  try {
+    return await apiFetch(`/notifications/${id}`, { method: 'DELETE' });
+  } catch (err) {
+    console.error('[API] Error deleting notification:', err.message);
+    throw err;
+  }
+}
+
+/* ─────────────────────────────────
    EXPORT GLOBAL
 ───────────────────────────────── */
 window.API = {
@@ -348,4 +406,11 @@ window.API = {
   postJobMatchAnalysis,
   patchPerfilEmpresa,
   getIndustrias,
+  // Notificaciones
+  getNotifications,
+  getNotificationsUnreadCount,
+  patchNotificationRead,
+  patchNotificationsReadAll,
+  deleteNotificationsAll,
+  deleteNotification,
 };

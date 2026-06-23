@@ -17,6 +17,7 @@ model Usuario {
 
   candidato Candidato?
   empresa   Empresa?
+  notificaciones Notificacion[]
 }
 
 enum Rol {
@@ -173,4 +174,18 @@ enum Estado {
   REVISADA
   ENTREVISTA
   RECHAZADA
+}
+
+// ── NOTIFICACIONES ──
+model Notificacion {
+  id       String   @id @default(uuid())
+  titulo   String
+  mensaje  String
+  tipo     String   @default("info") // info, success, warning, alert
+  leida    Boolean  @default(false)
+  link     String?
+  creadoEn DateTime @default(now())
+
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId String
 }

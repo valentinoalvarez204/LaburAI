@@ -67,10 +67,24 @@ function renderNavbar() {
     const profileSection = isEmpresa ? 'empresa' : 'perfil';
     
     actionsHtml = `
-      <button class="topbar-notif" id="btnNotif" aria-label="Notificaciones" style="margin-right:4px">
-        ${getIcon('bell', 'icon-xs')}
-        <span class="notif-dot"></span>
-      </button>
+      <div class="topbar-notif-wrapper" style="position:relative">
+        <button class="topbar-notif" id="btnNotif" aria-label="Notificaciones" style="margin-right:4px">
+          ${getIcon('bell', 'icon-xs')}
+          <span class="notif-dot" id="notifDot" style="display:none"></span>
+        </button>
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="notif-header">
+            <h4>Notificaciones</h4>
+            <button class="notif-mark-all" id="btnNotifClearAll">Limpiar todo</button>
+          </div>
+          <div class="notif-list" id="notifList">
+            <div class="notif-empty">Cargando...</div>
+          </div>
+          <div class="notif-footer">
+            <a href="${dashboard}?section=postulaciones">Ver todas mis postulaciones</a>
+          </div>
+        </div>
+      </div>
       <div class="nav-user-btn" id="avatarMenu" style="cursor:pointer">
         <div class="nav-avatar">${firstName.charAt(0).toUpperCase()}</div>
         <span class="nav-user-name">${firstName}</span>
@@ -132,7 +146,10 @@ function renderNavbar() {
 
   // 5. Setup final
   setupNavbarEvents();
-  if (session) initAvatarDropdown();
+  if (session) {
+    initAvatarDropdown();
+    initNotifications();
+  }
 }
 
 function initNavbar() {
@@ -534,3 +551,201 @@ function renderFooter() {
 document.addEventListener('DOMContentLoaded', () => {
   renderFooter();
 });
+
+/* ─────────────────────────────────
+   NOTIFICACIONES (NAVBAR)
+───────────────────────────────── */
+function initNotifications() {
+  const btn = document.getElementById('btnNotif');
+  const dropdown = document.getElementById('notifDropdown');
+  const btnClearAll = document.getElementById('btnNotifClearAll');
+
+  if (!btn || !dropdown) return;
+
+  // Toggle dropdown
+  btn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.classList.toggle('active');
+    if (isOpen) {
+      await loadNotificationsList();
+    }
+  });
+
+  // Cerrar al click afuera
+  const handleOutsideClick = (e) => {
+    if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+      dropdown.classList.remove('active');
+    }
+  };
+  document.addEventListener('click', handleOutsideClick);
+
+  // Limpiar todo
+  if (btnClearAll) {
+    btnClearAll.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      try {
+        // En lugar de solo marcar como leídas, las borramos por completo como pidió el usuario
+        await API.deleteNotificationsAll();
+        await loadNotificationsList();
+        updateNotificationsBadge();
+      } catch (err) {
+        console.error('Error al borrar todas las notificaciones:', err);
+      }
+    });
+  }
+
+  // Carga inicial de count
+  updateNotificationsBadge();
+  
+  // Polling para "Real-time"
+  initNotificationPolling();
+}
+
+let lastUnreadCount = -1;
+
+function initNotificationPolling() {
+  // Solo candidatos por ahora para evitar carga innecesaria
+  const session = getSession();
+  if (!session || session.rol !== 'candidato') return;
+
+  setInterval(async () => {
+    try {
+      const { count } = await API.getNotificationsUnreadCount();
+      
+      // Si el contador aumentó, cargamos la lista y mostramos el toast más reciente
+      if (lastUnreadCount !== -1 && count > lastUnreadCount) {
+        await handleNewNotificationReceived();
+      }
+      
+      lastUnreadCount = count;
+      updateNotificationsBadge();
+    } catch (err) {
+      // Silencioso para no ensuciar consola en polling
+    }
+  }, 10000); // Cada 10 segundos
+}
+
+async function handleNewNotificationReceived() {
+  try {
+    const list = await API.getNotifications();
+    if (!list || list.length === 0) return;
+    
+    // La más reciente es la primera por el orderBy (desc)
+    const latest = list[0];
+    if (!latest.leida) {
+      showRealTimeNotification(latest);
+    }
+  } catch (err) {
+    console.error('Error al manejar nueva notificación:', err);
+  }
+}
+
+function showRealTimeNotification(notif) {
+  let portal = document.getElementById('notifPortal');
+  if (!portal) {
+    portal = document.createElement('div');
+    portal.id = 'notifPortal';
+    document.body.appendChild(portal);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `rt-notif rt-notif--${notif.tipo || 'info'}`;
+  
+  // Icono según tipo
+  const iconName = notif.tipo === 'alert' ? 'alert-triangle' : 
+                   notif.tipo === 'success' ? 'check-circle' : 'bell';
+
+  toast.innerHTML = `
+    <div class="icon-box">${getIcon(iconName, 'icon-sm')}</div>
+    <div class="content">
+      <div class="title">${notif.titulo}</div>
+      <div class="msg">${notif.mensaje}</div>
+    </div>
+  `;
+
+  toast.onclick = () => {
+    handleNotifClick(notif.id, notif.link);
+    toast.classList.add('hiding');
+    setTimeout(() => toast.remove(), 400);
+  };
+
+  portal.appendChild(toast);
+
+  // Auto-remove después de 5 segundos
+  setTimeout(() => {
+    if (toast.parentElement) {
+      toast.classList.add('hiding');
+      setTimeout(() => toast.remove(), 400);
+    }
+  }, 5000);
+}
+
+async function updateNotificationsBadge() {
+  const dot = document.getElementById('notifDot');
+  if (!dot) return;
+
+  try {
+    const { count } = await API.getNotificationsUnreadCount();
+    if (count > 0) {
+      dot.style.display = 'flex';
+      dot.textContent = count > 9 ? '9+' : count;
+    } else {
+      dot.style.display = 'none';
+    }
+  } catch (err) {
+    console.error('Error actualizando badge:', err);
+  }
+}
+
+async function loadNotificationsList() {
+  const list = document.getElementById('notifList');
+  if (!list) return;
+
+  try {
+    const res = await API.getNotifications();
+    
+    if (!res || res.length === 0) {
+      list.innerHTML = '<div class="notif-empty">No tenés notificaciones nuevas</div>';
+      return;
+    }
+
+    list.innerHTML = res.map(n => `
+      <div class="notif-item ${n.leida ? 'read' : 'unread'}" onclick="handleNotifClick('${n.id}', '${n.link || ''}')">
+        <div class="notif-i-status"></div>
+        <div class="notif-i-content">
+          <div class="notif-i-title">${n.titulo}</div>
+          <div class="notif-i-msg">${n.mensaje}</div>
+          <div class="notif-i-date">${formatRelativeTime(n.creadoEn)}</div>
+        </div>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    list.innerHTML = '<div class="notif-empty">Error al cargar las notificaciones</div>';
+  }
+}
+
+async function handleNotifClick(id, link) {
+  try {
+    await API.patchNotificationRead(id);
+    if (link) {
+      window.location.href = link;
+    } else {
+      await loadNotificationsList();
+      updateNotificationsBadge();
+    }
+  } catch (err) {
+    console.error('Error al clickear notificación:', err);
+  }
+}
+
+function formatRelativeTime(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diff < 60) return 'Ahora';
+  if (diff < 3600) return `Hace ${Math.floor(diff / 60)}m`;
+  if (diff < 86400) return `Hace ${Math.floor(diff / 3600)}h`;
+  return date.toLocaleDateString();
+}
