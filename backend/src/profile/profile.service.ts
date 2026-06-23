@@ -36,11 +36,14 @@ export class ProfileService {
 
   // Actualizar perfil del candidato
   async updateCandidato(candidatoId: string, data: {
-    nombre?:    string;
-    apellido?:  string;
-    ubicacion?: string;
-    telefono?:  string;
-    linkedin?:  string;
+    nombre?:            string;
+    apellido?:          string;
+    ubicacion?:         string;
+    telefono?:          string;
+    linkedin?:          string;
+    areaRubro?:         string;
+    modalidadBuscada?:  string;
+    pretensionSalarial?: string;
   }) {
     return this.prisma.candidato.update({
       where: { id: candidatoId },

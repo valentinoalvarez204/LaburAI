@@ -38,11 +38,14 @@ export class ProfileController {
   updateCandidato(
     @Param('id') id: string,
     @Body() body: {
-      nombre?:    string;
-      apellido?:  string;
-      ubicacion?: string;
-      telefono?:  string;
-      linkedin?:  string;
+      nombre?:            string;
+      apellido?:          string;
+      ubicacion?:         string;
+      telefono?:          string;
+      linkedin?:          string;
+      areaRubro?:         string;
+      modalidadBuscada?:  string;
+      pretensionSalarial?: string;
     },
   ) {
     return this.profileService.updateCandidato(id, body);

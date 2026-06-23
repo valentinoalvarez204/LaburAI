@@ -483,6 +483,9 @@ function initSaveProfile() {
         apellido: document.getElementById('profileApellido')?.value?.trim() || undefined,
         ubicacion: document.getElementById('profileUbicacion')?.value?.trim() || undefined,
         telefono: telefonoVal ? telefonoVal : null,
+        areaRubro: document.getElementById('profileAreaRubro')?.value || undefined,
+        modalidadBuscada: document.getElementById('profileModalidadBuscada')?.value || undefined,
+        pretensionSalarial: document.getElementById('profilePretensionSalarial')?.value?.trim() || undefined,
       };
 
       await API.patchPerfilCandidato(session.candidatoId, payload);
@@ -639,16 +642,22 @@ async function fetchProfile(candidatoId) {
     }
 
     // Formulario de Mi perfil
-    const profileNombre    = document.getElementById('profileNombre');
-    const profileApellido  = document.getElementById('profileApellido');
-    const profileEmail     = document.getElementById('profileEmail');
-    const profileUbicacion = document.getElementById('profileUbicacion');
-    const profileTelefono  = document.getElementById('profileTelefono');
-    if (profileNombre)    profileNombre.value    = data.nombre    || '';
-    if (profileApellido)  profileApellido.value  = data.apellido  || '';
-    if (profileEmail)     profileEmail.value     = data.usuario?.email || '';
-    if (profileUbicacion) profileUbicacion.value = data.ubicacion || '';
-    if (profileTelefono)  profileTelefono.value  = data.telefono  || '';
+    const profileNombre         = document.getElementById('profileNombre');
+    const profileApellido       = document.getElementById('profileApellido');
+    const profileEmail          = document.getElementById('profileEmail');
+    const profileUbicacion      = document.getElementById('profileUbicacion');
+    const profileTelefono       = document.getElementById('profileTelefono');
+    const profileAreaRubro      = document.getElementById('profileAreaRubro');
+    const profileModalidadBuscada = document.getElementById('profileModalidadBuscada');
+    const profilePretensionSalarial = document.getElementById('profilePretensionSalarial');
+    if (profileNombre)           profileNombre.value           = data.nombre    || '';
+    if (profileApellido)         profileApellido.value         = data.apellido  || '';
+    if (profileEmail)            profileEmail.value            = data.usuario?.email || '';
+    if (profileUbicacion)        profileUbicacion.value        = data.ubicacion || '';
+    if (profileTelefono)         profileTelefono.value         = data.telefono  || '';
+    if (profileAreaRubro)        profileAreaRubro.value        = data.areaRubro || '';
+    if (profileModalidadBuscada) profileModalidadBuscada.value = data.modalidadBuscada || '';
+    if (profilePretensionSalarial) profilePretensionSalarial.value = data.pretensionSalarial || '';
 
     updateProfileCompleteness({
       nombre:    data.nombre,

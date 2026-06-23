@@ -32,6 +32,9 @@ model Candidato {
   ubicacion            String?
   telefono             String?
   linkedin             String?
+  areaRubro            String?
+  modalidadBuscada     String?
+  pretensionSalarial   String?
   cvUrl                String?
   scoreCV              Int?
   resumenIA            String?

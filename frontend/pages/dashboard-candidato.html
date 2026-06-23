@@ -329,12 +329,13 @@
             <h3 class="pf-card-title">Perfil profesional</h3>
             <div class="form-field">
               <label class="form-label">Área / Rubro</label>
-              <select class="form-select">
-                <option selected>Ventas y Comercial</option>
-                <option>Administración y RRHH</option>
-                <option>Tecnología e IT</option>
-                <option>Salud y Medicina</option>
-                <option>Educación y Docencia</option>
+              <select id="profileAreaRubro" class="form-select">
+                <option value="" selected disabled>Seleccioná un rubro</option>
+                <option value="Ventas y Comercial">Ventas y Comercial</option>
+                <option value="Administración y RRHH">Administración y RRHH</option>
+                <option value="Tecnología e IT">Tecnología e IT</option>
+                <option value="Salud y Medicina">Salud y Medicina</option>
+                <option value="Educación y Docencia">Educación y Docencia</option>
               </select>
             </div>
             <div class="form-row">
@@ -349,17 +350,17 @@
               </div>
               <div class="form-field">
                 <label class="form-label">Modalidad buscada</label>
-                <select class="form-select">
-                  <option>Presencial</option>
-                  <option selected>Remoto</option>
-                  <option>Híbrido</option>
-                  <option>Indiferente</option>
+                <select id="profileModalidadBuscada" class="form-select">
+                  <option value="Presencial">Presencial</option>
+                  <option value="Remoto">Remoto</option>
+                  <option value="Híbrido">Híbrido</option>
+                  <option value="Indiferente">Indiferente</option>
                 </select>
               </div>
             </div>
             <div class="form-field">
               <label class="form-label">Pretensión salarial</label>
-              <input type="text" class="form-input" value="$500.000 – $700.000"/>
+              <input id="profilePretensionSalarial" type="text" class="form-input" value=""/>
             </div>
           </div>
           <!-- Configuración de cuenta -->
