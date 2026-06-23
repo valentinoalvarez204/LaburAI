@@ -158,6 +158,15 @@
 .match-pct-big   { font-family: var(--font-head); font-size: 24px; font-weight: 800; color: var(--indigo); letter-spacing: -.5px; line-height: 1; }
 .match-pct-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
+/* Contenedor de botones (IA Analysis) */
+.match-actions {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+}
+
 /* Skills de matching */
 .match-skills { display: flex; gap: 8px; flex-wrap: wrap; }
 .skill-match {
@@ -309,7 +318,9 @@
 /* ─────────────────────────────────
    OFERTAS SIMILARES
 ───────────────────────────────── */
-.similar-section { }
+.similar-section {
+  padding-top: 10px;
+}
 .similar-title {
   font-family: var(--font-head);
   font-size: 20px;
@@ -685,4 +696,46 @@
   .jhc-logo  { width: 48px; height: 48px; font-size: 20px; }
   .jhc-title { font-size: 18px; }
   .match-ring-wrap { display: none; }
+}
+
+/* ─────────────────────────────────
+   AI ANALYSIS LIMIT PILL (match-note)
+───────────────────────────────── */
+.match-note {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--indigo);
+  background: var(--white);
+  border: 1.2px solid var(--border-h);
+  padding: 4px 12px;
+  border-radius: 100px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  box-shadow: var(--shadow-sm);
+  transition: all .3s ease;
+  white-space: nowrap;
+}
+
+.match-note::before {
+  content: '✦';
+  font-size: 12px;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: sparkle-pulse 2s infinite ease-in-out;
+}
+
+@keyframes sparkle-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+.match-note:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--indigo);
+  background: var(--grad-soft);
 }

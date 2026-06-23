@@ -4,26 +4,28 @@ import Groq from 'groq-sdk';
 import { IAPIService } from '../interfaces/ia-service.interface';
 import { AnalisisCVDto } from '../dto/analisis-cv.dto';
 
-const PROMPT_ANALISIS_CV = (textoCV: string) => `
+// El CV se pasa siempre en el role: user, nunca dentro del system prompt.
+const PROMPT_ANALISIS_CV = () => `
 Sos un parser ATS especializado en extracción de CVs.
+Tu tarea es extraer ÚNICAMENTE información explícita del CV que recibirás.
 
-Tu tarea es extraer únicamente información explícita del CV.
+REGLAS ESTRICTAS:
+- NO inventes información que no esté escrita.
+- NO deduzcas tecnologías ni completes stacks.
+- NO agregues experiencia no mencionada.
+- Si el CV no es IT, NO incluyas tecnologías IT.
+- Si un dato no existe, usá [] para arrays y "" para strings.
+- Respondé SOLO JSON válido, sin markdown, sin texto adicional.
 
-REGLAS:
-- NO inventes información.
-- NO deduzcas tecnologías.
-- NO agregues experiencia no escrita.
-- NO completes stacks.
-- Si el CV no es IT, NO agregues tecnologías IT.
-- Si un dato no existe, devolver [] o "".
-- Responder SOLO JSON válido.
-- Sin markdown.
-- Sin explicación.
+CRITERIOS PARA scoreCV (escala 0-100 cada uno):
+- "completitud": ¿qué tan completo está el CV? (tiene contacto, resumen, experiencia, formación, habilidades)
+- "claridad": ¿qué tan fácil es leer y entender el contenido?
+- "estructura": ¿está bien organizado y ordenado cronológicamente?
 
-Formato:
+Formato de respuesta:
 
 {
-  "resumen": "",
+  "resumen": "Breve descripción fiel al CV, máximo 3 oraciones.",
   "scoreCV": {
     "completitud": 0,
     "claridad": 0,
@@ -54,17 +56,12 @@ Formato:
   ]
 }
 
-INSTRUCCIONES:
-- Extraer TODAS las experiencias laborales.
-- Mantener nombres exactos.
-- Unir viñetas en un solo texto.
-- No resumir demasiado.
-- Tecnologías SOLO si aparecen explícitamente.
-- Separar habilidades técnicas y blandas.
-- El resumen debe ser breve y fiel al CV.
-
-CV:
-${textoCV}
+INSTRUCCIONES ADICIONALES:
+- Extraer TODAS las experiencias laborales sin omitir ninguna.
+- Mantener nombres exactos de empresas, roles y tecnologías.
+- Unir viñetas/bullets de una misma experiencia en un solo texto en "descripcion".
+- Separar habilidades técnicas (herramientas, metodologías) de blandas (comunicación, liderazgo).
+- Incluir tecnologías en "tecnologiasDetectadas" SOLO si aparecen explícitamente en esa experiencia.
 `.trim();
 
 @Injectable()
@@ -97,7 +94,7 @@ export class GroqService implements IAPIService {
         .replace(/```json/g, '')
         .replace(/```/g, '')
         .trim();
-      
+
       const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
@@ -119,17 +116,17 @@ export class GroqService implements IAPIService {
 
     try {
       const completion = await this.groq.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
         messages: [
           {
             role: 'system',
-            content: PROMPT_ANALISIS_CV('')
+            content: PROMPT_ANALISIS_CV(), // Sin parámetro — el CV va en el user message
           },
           {
             role: 'user',
-            content: textoCV
-          }
+            content: textoCV,
+          },
         ],
-        model: 'llama-3.3-70b-versatile',
         temperature: 0,
         response_format: { type: 'json_object' },
       });
@@ -153,45 +150,41 @@ export class GroqService implements IAPIService {
     this.logger.log('Calculando Match con Groq (Low Token Mode)...');
     if (!this.groq) return 0;
 
+    // Truncar inputs para respetar el rate limit de 6000 tokens/min del plan free.
+    // El CV ya viene procesado (resumen del DTO), así que 600 chars es suficiente.
+    const cvTruncado = perfilCV.slice(0, 600);
+    const ofertaTruncada = ofertaTrabajo.slice(0, 400);
+
     try {
       const response = await this.groq.chat.completions.create({
         model: 'llama-3.1-8b-instant',
-        messages: [{
-          role: 'user',
-          content: `Sos un asistente objetivo de matching profesional.
-Compará estrictamente el perfil del candidato con los requisitos de la oferta.
-No agregues información que no esté en los textos.
-Respondé solo JSON válido.
-
-Formato esperado:
-{
-  "match": 0,
-  "fortalezas": [],
-  "brechas": []
-}
-
-Instrucciones:
-- "match" debe ser un entero entre 0 y 100.
-- "fortalezas" lista hasta 3 puntos fuertes del candidato para esta oferta.
-- "brechas" lista hasta 3 áreas donde el candidato no cumple completamente.
-- No incluyas explicaciones adicionales ni markdown.
+        messages: [
+          {
+            role: 'system',
+            // Sistema separado del user: el modelo lo procesa mejor y gasta menos tokens
+            content: 'Respondé SOLO con JSON válido. Sin markdown. Sin texto adicional. Formato: {"match": 0}',
+          },
+          {
+            role: 'user',
+            content: `Compatibilidad candidato/oferta del 0 al 100. Devolvé solo {"match": N}.
 
 Candidato:
-${perfilCV}
+${cvTruncado}
 
 Oferta:
-${ofertaTrabajo}`,
-        }],
+${ofertaTruncada}`,
+          },
+        ],
         temperature: 0,
         response_format: { type: 'json_object' },
-        max_tokens: 60,
+        max_tokens: 20, // {"match": 85} son ~8 tokens, 20 es suficiente y seguro
       });
 
       const content = response.choices[0]?.message?.content;
       if (!content) return 0;
 
       const parsed = this.cleanAndParseJSON(content);
-      return parsed?.match || 0;
+      return parsed?.match ?? 0;
     } catch (error) {
       this.logger.error('Error calculando match en Groq:', error);
       return 0;

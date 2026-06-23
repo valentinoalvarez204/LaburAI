@@ -118,6 +118,7 @@ export class JobsService {
     const oferta = await this.prisma.ofertaLaboral.findUnique({ where: { id: ofertaId } });
     if (!oferta) throw new NotFoundException('Oferta no encontrada');
 
+    /* ── COMENTADO TEMPORALMENTE: QUITAR RESTRICCIONES DE ANÁLISIS ──
     const existing = await this.prisma.matchAnalisis.findUnique({
       where: { candidatoId_ofertaId: { candidatoId, ofertaId } },
     });
@@ -129,6 +130,7 @@ export class JobsService {
     if (totalAnalyses >= 3) {
       throw new BadRequestException('Solo podés analizar match con IA 3 veces');
     }
+    */
 
     const candidatoTexto = `Habilidades: ${candidato.habilidades.join(', ')}. Resumen: ${candidato.resumenIA || 'Sin resumen disponible'}.`;
     const ofertaTexto = `Rol: ${oferta.titulo}. Requisitos: ${oferta.descripcion}. Habilidades requeridas: ${oferta.habilidades.join(', ')}. Experiencia: ${oferta.experiencia || 'No especificada'}. Estudios: ${oferta.estudios || 'No especificados'}.`;
@@ -136,8 +138,11 @@ export class JobsService {
     const score = await this.aiService.calcularMatch(candidatoTexto, ofertaTexto);
     const normalized = Math.max(0, Math.min(100, Math.round(score || 0)));
 
-    const matchAnalisis = await this.prisma.matchAnalisis.create({
-      data: {
+    // Usar upsert para permitir repetir el análisis si el usuario quiere
+    const matchAnalisis = await this.prisma.matchAnalisis.upsert({
+      where: { candidatoId_ofertaId: { candidatoId, ofertaId } },
+      update: { match: normalized },
+      create: {
         candidatoId,
         ofertaId,
         match: normalized,
@@ -147,7 +152,7 @@ export class JobsService {
     return {
       match: matchAnalisis.match,
       analizado: true,
-      analisisRestantes: Math.max(0, 3 - (totalAnalyses + 1)),
+      analisisRestantes: 99, // Valor simbólico mientras no hay límite
     };
   }
 
