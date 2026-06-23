@@ -314,7 +314,7 @@ function renderCards() {
     const tags = job.tags.map((t, i) => buildTagHTML(t, job.tagTypes[i])).join('');
 
     return `
-      <a class="job-card" href="oferta-detalle.html?id=${job.id}">
+      <a class="job-card" href="${UI_PAGES.oferta_detalle}?id=${job.id}">
         <div class="job-card-head">
           <div class="company-logo" style="color:${job.logoColor}">${job.logo}</div>
           <div class="job-meta">

@@ -84,7 +84,7 @@ function renderCategories() {
     const meta = RUBROS_MAP[r];
     const count = counts[r] || 0;
     return `
-      <a class="cat-card" href="ofertas.html?rubro=${r}">
+      <a class="cat-card" href="${UI_PAGES.ofertas}?rubro=${r}">
         <div class="cat-icon">${meta.icon}</div>
         <div class="cat-name">${meta.label}</div>
         <div class="cat-count">${count} oferta${count !== 1 ? 's' : ''}</div>
@@ -169,8 +169,8 @@ function initCtaSession() {
   if (!inner || !session) return;
 
   const dashboard = session.rol === 'empresa'
-    ? 'dashboard-empresa.html'
-    : 'dashboard-candidato.html';
+    ? UI_PAGES.dashboard_empresa
+    : UI_PAGES.dashboard_candidato;
   const firstName = session.nombre.split(' ')[0];
 
   inner.innerHTML = `
@@ -179,7 +179,7 @@ function initCtaSession() {
     <p class="cta-sub">Tu perfil está activo. La IA sigue buscando las mejores oportunidades para vos.</p>
     <div class="cta-btns">
       <a href="${dashboard}" class="btn-primary btn-lg">Ir a mi dashboard</a>
-      <a href="ofertas.html" class="btn-outline btn-lg">Explorar empleos</a>
+      <a href="${UI_PAGES.ofertas}" class="btn-outline btn-lg">Explorar empleos</a>
     </div>
     <p class="cta-note">Tu cuenta está activa · Todo tu historial te espera</p>`;
 }
@@ -218,14 +218,14 @@ function initSearch() {
 
     // Vacío → mostrar todas las ofertas
     if (!q && !l) {
-      window.location.href = 'ofertas.html';
+      window.location.href = UI_PAGES.ofertas;
       return;
     }
 
     const params = new URLSearchParams();
     if (q) params.set('q', q);
     if (l) params.set('loc', l);
-    window.location.href = `ofertas.html?${params.toString()}`;
+    window.location.href = `${UI_PAGES.ofertas}?${params.toString()}`;
   }
 
   btn.addEventListener('click', doSearch);
@@ -266,7 +266,7 @@ function renderJobs(filter = 'todos') {
     const badge = matchVal > 0 ? `<div class="match-badge">✦ ${matchVal}% match</div>` : '';
 
     return `
-      <a class="job-card" href="oferta-detalle.html?id=${job.id}">
+      <a class="job-card" href="${UI_PAGES.oferta_detalle}?id=${job.id}">
         ${badge}
         <div class="job-card-head">
           <div class="company-logo" style="color:${job.logoColor}">${job.logo}</div>

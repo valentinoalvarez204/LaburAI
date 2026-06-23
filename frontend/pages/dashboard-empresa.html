@@ -7,29 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/base.css"/>
-  <link rel="stylesheet" href="css/dashboard-empresa.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/dashboard-empresa.css"/>
 </head>
 <body>
 
   <!-- ══ NAVBAR ══ -->
-  <nav id="navbar">
-    <div class="nav-inner">
-      <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
-      <div class="nav-links">
-        <!-- Links dinámicos vía utils.js -->
-      </div>
-      <div class="nav-actions" id="navActions">
-        <!-- Acciones dinámicas vía utils.js -->
-      </div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-    <div class="mobile-menu" id="mobileMenu">
-      <!-- Menú mobile dinámico vía utils.js -->
-    </div>
-  </nav>
+  <nav id="navbar"></nav>
 
   <!-- ══ LAYOUT ══ -->
   <div class="dash-layout">
@@ -65,21 +49,21 @@
         <div class="dash-stats">
           <div class="dstat">
             <div class="dstat-icon dstat-icon--blue">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+              <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-briefcase"></use></svg>
             </div>
             <div class="dstat-num" id="statOfertasActivas">0</div>
             <div class="dstat-label">Ofertas activas</div>
           </div>
           <div class="dstat">
             <div class="dstat-icon dstat-icon--indigo">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-users"></use></svg>
             </div>
             <div class="dstat-num" id="statPostulaciones">0</div>
             <div class="dstat-label">Postulaciones totales</div>
           </div>
           <div class="dstat">
             <div class="dstat-icon dstat-icon--green">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-check"></use></svg>
             </div>
             <div class="dstat-num" id="statEntrevistas">0</div>
             <div class="dstat-label">Entrevistas agendadas</div>
@@ -352,11 +336,11 @@
               <!-- Acciones -->
               <div class="pub-actions">
                 <button class="btn-ghost" id="btnBorrador">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                  <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-save"></use></svg>
                   Guardar borrador
                 </button>
                 <button class="btn-primary pub-btn-submit" id="btnPublicar">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+                  <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-send"></use></svg>
                   <span class="pub-btn-text">Publicar oferta</span>
                   <div class="pub-spinner hidden"></div>
                 </button>
@@ -492,11 +476,11 @@
             <h3 class="pf-card-title">Configuraciónes</h3>
             <div class="cuenta-options">
               <button class="btn-primary btn-sm" id="btnVerificarEmail">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-check"></use></svg>
                 Verificar email <span id="emailStatus" class="status-pending"></span>
               </button>
               <button class="btn-ghost btn-sm" id="btnBorrarCuenta">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-trash"></use></svg>
                 Borrar cuenta
               </button>
             </div>
@@ -508,8 +492,8 @@
   </div>
 
   <div class="dash-overlay" id="dashOverlay"></div>
-  <script src="js/utils.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/dashboard-empresa.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/dashboard-empresa.js"></script>
 </body>
 </html>

@@ -6,20 +6,147 @@
      <script src="js/main.js"></script>
 ══════════════════════════════════════════ */
 
+// ── CONFIGURACIÓN DE RUTAS (Organización de carpetas) ──
+const IS_PAGES_DIR = window.location.pathname.includes('/pages/');
+const PATH_TO_ROOT = IS_PAGES_DIR ? '../' : './';
+const PATH_TO_PAGES = IS_PAGES_DIR ? '' : 'pages/';
+
+const UI_PAGES = {
+  index: PATH_TO_ROOT + 'index.html',
+  ofertas: PATH_TO_PAGES + 'ofertas.html',
+  empresas: PATH_TO_PAGES + 'empresas.html',
+  login: PATH_TO_PAGES + 'login.html',
+  dashboard_candidato: PATH_TO_PAGES + 'dashboard-candidato.html',
+  dashboard_empresa: PATH_TO_PAGES + 'dashboard-empresa.html',
+  oferta_detalle: PATH_TO_PAGES + 'oferta-detalle.html',
+  postulacion: PATH_TO_PAGES + 'candidato-postulacion.html'
+};
+
+/**
+ *getIcon — Estrategia modular para iconos Reutilizables
+ * @param {string} name - ID del icono en icons.svg (ej: 'search')
+ * @param {string} className - Clases CSS adicionales (ej: 'icon-sm')
+ */
+function getIcon(name, className = '') {
+  const spritePath = `${PATH_TO_ROOT}assets/icons.svg#icon-${name}`;
+  return `<svg class="icon ${className}"><use href="${spritePath}"></use></svg>`;
+}
+
 /* ─────────────────────────────────
-   NAVBAR — efecto scroll
-   Agrega clase .scrolled al hacer scroll
+   NAVBAR — Componente reutilizable
 ───────────────────────────────── */
+function renderNavbar() {
+  const navContainer = document.getElementById('navbar');
+  if (!navContainer) return;
+
+  const session = getSession();
+  
+  // 1. Definir Links Principales
+  let linksHtml = '';
+  if (session) {
+    const isEmpresa = session.rol === 'empresa';
+    linksHtml = isEmpresa
+      ? `<a href="${UI_PAGES.ofertas}">Ver ofertas</a>
+         <a href="${UI_PAGES.dashboard_empresa}#ofertas">Mis ofertas</a>
+         <a href="${UI_PAGES.dashboard_empresa}">Panel empresa</a>`
+      : `<a href="${UI_PAGES.ofertas}">Buscar empleo</a>
+         <a href="${UI_PAGES.dashboard_candidato}#postulaciones">Postulaciones</a>`;
+  } else {
+    linksHtml = `
+      <a href="${UI_PAGES.ofertas}">Buscar empleo</a>
+      <a href="${UI_PAGES.empresas || '#'}">Para empresas</a>
+    `;
+  }
+
+  // 2. Definir Acciones (Desktop)
+  let actionsHtml = '';
+  if (session) {
+    const isEmpresa = session.rol === 'empresa';
+    const dashboard = isEmpresa ? UI_PAGES.dashboard_empresa : UI_PAGES.dashboard_candidato;
+    const firstName = session.nombre.split(' ')[0];
+    const profileSection = isEmpresa ? 'empresa' : 'perfil';
+    
+    actionsHtml = `
+      <button class="topbar-notif" id="btnNotif" aria-label="Notificaciones" style="margin-right:4px">
+        ${getIcon('bell', 'icon-xs')}
+        <span class="notif-dot"></span>
+      </button>
+      <div class="nav-user-btn" id="avatarMenu" style="cursor:pointer">
+        <div class="nav-avatar">${firstName.charAt(0).toUpperCase()}</div>
+        <span class="nav-user-name">${firstName}</span>
+        ${getIcon('chevron-down', 'icon-xs')}
+        <div class="avatar-dropdown" id="avatarDropdown">
+          <a href="${dashboard}?section=${profileSection}">Mi perfil</a>
+          <a href="#" class="dropdown-logout" onclick="cerrarSesion(); return false;">Cerrar sesión</a>
+        </div>
+      </div>
+      <a href="${dashboard}" class="btn-primary">Dashboard</a>
+    `;
+  } else {
+    actionsHtml = `
+      <a href="${UI_PAGES.login}" class="btn-ghost">Ingresar</a>
+      <a href="${UI_PAGES.login}" class="btn-primary">Publicar oferta</a>
+    `;
+  }
+
+  // 3. Estructura Completa
+  navContainer.innerHTML = `
+    <div class="nav-inner">
+      <a href="${UI_PAGES.index}" class="logo"><span class="logo-star">✦</span>LaburAI</a>
+      
+      <nav class="nav-links" id="navLinks">
+        ${linksHtml}
+      </nav>
+
+      <div class="nav-actions" id="navActions">
+        ${actionsHtml}
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-links">${linksHtml}</div>
+      <hr/>
+      <div id="mobileNavActions">
+        ${session ? `
+          <button onclick="cerrarSesion()" class="btn-ghost" style="width:100%">Cerrar sesión</button>
+        ` : `
+          <a href="${UI_PAGES.login}" class="btn-ghost" style="display:block;text-align:center">Ingresar</a>
+          <a href="${UI_PAGES.login}" class="btn-primary" style="display:block;text-align:center;margin-top:8px">Publicar oferta</a>
+        `}
+      </div>
+    </div>
+  `;
+
+  // 4. Activar links actuales
+  const currentPath = window.location.pathname;
+  navContainer.querySelectorAll('nav a, .mobile-links a').forEach(a => {
+    const href = a.getAttribute('href');
+    if (href && currentPath.includes(href) && href !== '../index.html' && href !== './index.html') {
+      a.classList.add('active');
+    }
+  });
+
+  // 5. Setup final
+  setupNavbarEvents();
+  if (session) initAvatarDropdown();
+}
+
 function initNavbar() {
+  renderNavbar();
+  
   const navbar = document.getElementById('navbar');
-  if (!navbar) return;
+  if (navbar) {
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+  }
+}
 
-  // 1. Efecto Scroll
-  window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 20);
-  }, { passive: true });
-
-  // 2. Hamburger (Menú Mobile / Sidebar Dashboard)
+function setupNavbarEvents() {
   const btn = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobileMenu');
   const dashSidebar = document.getElementById('dashSidebar');
@@ -28,19 +155,16 @@ function initNavbar() {
   if (btn) {
     btn.addEventListener('click', () => {
       if (dashSidebar) {
-        // En Dashboard: Abre/Cierra Sidebar
         const open = dashSidebar.classList.toggle('open');
         btn.classList.toggle('open', open);
         dashOverlay?.classList.toggle('visible', open);
         document.body.style.overflow = open ? 'hidden' : '';
       } else if (mobileMenu) {
-        // En Páginas Públicas: Abre/Cierra Menú Mobile
         const open = mobileMenu.classList.toggle('open');
         btn.classList.toggle('open', open);
       }
     });
 
-    // Cerrar al hacer clic fuera
     document.addEventListener('click', (e) => {
       if (!btn.contains(e.target)) {
         if (mobileMenu && !mobileMenu.contains(e.target)) {
@@ -222,87 +346,13 @@ function getSession() {
    NAVBAR — adaptar según sesión
 ───────────────────────────────── */
 function initNavSession() {
+  // Ahora integrado en renderNavbar() para mayor consistencia
+  // Solo mantenemos la lógica de actualización de CTAs externos
   const session = getSession();
-  const actions = document.getElementById('navActions');
-  const navLinks = document.querySelector('.nav-links');
-  const mobileMenu = document.getElementById('mobileMenu');
-
-  if (!actions) return;
-
-  if (session) {
-    const isEmpresa = session.rol === 'empresa';
-    const dashboard = isEmpresa ? 'dashboard-empresa.html' : 'dashboard-candidato.html';
-    const firstName = session.nombre.split(' ')[0];
-    const profileSection = isEmpresa ? 'empresa' : 'perfil';
-
-    // Campana de notificaciones
-    const notifHtml = `
-      <button class="topbar-notif" id="btnNotif" aria-label="Notificaciones" style="margin-right:4px">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="notif-dot"></span>
-      </button>`;
-
-    // 1. Links del Navbar (Desktop)
-    if (navLinks) {
-      if (isEmpresa) {
-        navLinks.innerHTML = `
-          <a href="ofertas.html">Ver ofertas</a>
-          <a href="dashboard-empresa.html#ofertas">Mis ofertas</a>
-          <a href="dashboard-empresa.html">Herramientas para empresas</a>`;
-      } else {
-        navLinks.innerHTML = `
-          <a href="ofertas.html">Buscar empleo</a>
-          <a href="dashboard-candidato.html#postulaciones">Mis postulaciones</a>`;
-      }
-    }
-
-    // 2. Menú Lateral (Mobile)
-    if (mobileMenu) {
-      const linksHtml = isEmpresa
-        ? `<a href="ofertas.html">Ver ofertas</a>
-           <a href="dashboard-empresa.html#ofertas">Mis ofertas</a>
-           <a href="dashboard-empresa.html">Herramientas para empresas</a>`
-        : `<a href="ofertas.html">Buscar empleo</a>
-           <a href="dashboard-candidato.html#postulaciones">Mis postulaciones</a>`;
-
-
-      mobileMenu.innerHTML = `
-        ${linksHtml}
-        <hr/>
-        <div id="mobileNavActions">
-          <div style="display:flex; justify-content:center; margin-bottom:12px">${notifHtml}</div>
-          <a href="${dashboard}" class="btn-primary" style="text-align:center;display:block">
-            Mi dashboard — ${firstName}
-          </a>
-          <button onclick="cerrarSesion()" class="btn-ghost" 
-            style="text-align:center;display:block;width:100%;margin-top:8px">
-            Cerrar sesión
-          </button>
-        </div>`;
-    }
-
-    // 3. Acciones (Botones derecha Desktop)
-    actions.innerHTML = `
-      ${notifHtml}
-      <div class="nav-user-btn" id="avatarMenu" style="cursor:pointer">
-        <div class="nav-avatar">${firstName.charAt(0).toUpperCase()}</div>
-        <span class="nav-user-name">${firstName}</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-        <div class="avatar-dropdown" id="avatarDropdown">
-          <a href="${dashboard}?section=${profileSection}">Mi perfil</a>
-          <a href="#" class="dropdown-logout" onclick="cerrarSesion(); return false;">Cerrar sesión</a>
-        </div>
-      </div>
-      <a href="${dashboard}" class="btn-primary">Mi dashboard</a>`;
-
-    initAvatarDropdown();
-
-    // 4. Actualizar CTAs de "Publicar oferta" en la página principal
-    if (isEmpresa) {
-      document.querySelectorAll('.pub-oferta-cta').forEach(btn => {
-        btn.href = 'dashboard-empresa.html?section=publicar';
-      });
-    }
+  if (session && session.rol === 'empresa') {
+    document.querySelectorAll('.pub-oferta-cta').forEach(btn => {
+      btn.href = `${UI_PAGES.dashboard_empresa}?section=publicar`;
+    });
   }
 }
 
@@ -311,7 +361,7 @@ function initNavSession() {
 ───────────────────────────────── */
 function cerrarSesion() {
   sessionStorage.removeItem('labuai_session');
-  window.location.href = 'index.html';
+  window.location.href = UI_PAGES.index;
 }
 
 /* ─────────────────────────────────
@@ -326,12 +376,12 @@ function requireSession() {
     const raw = sessionStorage.getItem('labuai_session');
     const session = raw ? JSON.parse(raw) : null;
     if (!session?.token) {
-      window.location.href = 'login.html';
+      window.location.href = UI_PAGES.login;
       return null;
     }
     return session;
   } catch {
-    window.location.href = 'login.html';
+    window.location.href = UI_PAGES.login;
     return null;
   }
 }
@@ -384,18 +434,18 @@ document.addEventListener('click', () => {
 ───────────────────────────────── */
 const SIDEBAR_CONFIG = {
   empresa: [
-    { id: 'overview', label: 'Resumen', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>' },
-    { id: 'ofertas', label: 'Mis ofertas', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>' },
-    { id: 'candidatos', label: 'Candidatos', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' },
-    { id: 'publicar', label: 'Publicar oferta', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>' },
-    { id: 'empresa', label: 'Perfil de empresa', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' }
+    { id: 'overview', label: 'Resumen', icon: getIcon('layout', 'icon-sm') },
+    { id: 'ofertas', label: 'Mis ofertas', icon: getIcon('briefcase', 'icon-sm') },
+    { id: 'candidatos', label: 'Candidatos', icon: getIcon('users', 'icon-sm') },
+    { id: 'publicar', label: 'Publicar oferta', icon: getIcon('plus-circle', 'icon-sm') },
+    { id: 'empresa', label: 'Perfil de empresa', icon: getIcon('building', 'icon-sm') }
   ],
   candidato: [
-    { id: 'overview', label: 'Resumen', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>' },
-    { id: 'cv', label: 'Mi CV e IA', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' },
-    { id: 'postulaciones', label: 'Postulaciones', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>' },
-    { id: 'recomendadas', label: 'Recomendadas', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' },
-    { id: 'perfil', label: 'Mi perfil', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' }
+    { id: 'overview', label: 'Resumen', icon: getIcon('layout', 'icon-sm') },
+    { id: 'cv', label: 'Mi CV e IA', icon: getIcon('file-text', 'icon-sm') },
+    { id: 'postulaciones', label: 'Postulaciones', icon: getIcon('send', 'icon-sm') },
+    { id: 'recomendadas', label: 'Recomendadas', icon: getIcon('star', 'icon-sm') },
+    { id: 'perfil', label: 'Mi perfil', icon: getIcon('user', 'icon-sm') }
   ]
 };
 
@@ -416,7 +466,7 @@ window.renderSidebarNav = function (type, activeSection = 'overview') {
     // Configuración condicional de href vs data-section
     const linkAttr = isDashboardSPA
       ? `data-section="${item.id}" href="#" onclick="event.preventDefault()"`
-      : `href="dashboard-${type}.html#${item.id}"`;
+      : `href="${UI_PAGES[`dashboard_${type}`]}#${item.id}"`;
 
     return `
       <a class="snav-item ${isActive}" ${linkAttr}>
@@ -444,22 +494,22 @@ function renderFooter() {
   <footer>
     <div class="footer-grid">
       <div class="footer-brand">
-        <a href="index.html" class="logo" style="margin-bottom:14px;display:inline-flex"><span class="logo-star">✦</span>LaburAI</a>
+        <a href="${UI_PAGES.index}" class="logo" style="margin-bottom:14px;display:inline-flex"><span class="logo-star">✦</span>LaburAI</a>
         <p>La plataforma de empleo impulsada por IA. Conectamos talento con las mejores oportunidades de Argentina en todos los rubros.</p>
       </div>
       <div class="footer-col">
         <h4>Candidatos</h4>
-        <a href="ofertas.html">Buscar empleo</a>
-        <a href="login.html">Subir CV</a>
-        <a href="login.html">Análisis de perfil</a>
-        <a href="login.html">Historial de postulaciones</a>
-        <a href="login.html">Perfil público</a>
+        <a href="${UI_PAGES.ofertas}">Buscar empleo</a>
+        <a href="${UI_PAGES.login}">Subir CV</a>
+        <a href="${UI_PAGES.login}">Análisis de perfil</a>
+        <a href="${UI_PAGES.login}">Historial de postulaciones</a>
+        <a href="${UI_PAGES.login}">Perfil público</a>
       </div>
       <div class="footer-col">
         <h4>Empresas</h4>
-        <a href="login.html" class="pub-oferta-cta">Publicar oferta</a>
-        <a href="login.html">Buscar candidatos</a>
-        <a href="login.html">Dashboard</a>
+        <a href="${UI_PAGES.login}" class="pub-oferta-cta">Publicar oferta</a>
+        <a href="${UI_PAGES.login}">Buscar candidatos</a>
+        <a href="${UI_PAGES.login}">Dashboard</a>
       </div>
       <div class="footer-col">
         <h4>LaburAI</h4>

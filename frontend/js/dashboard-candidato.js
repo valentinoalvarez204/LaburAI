@@ -215,7 +215,7 @@ function renderPostulaciones(filter = 'todas') {
   }
 
   el.innerHTML = list.map((p) => `
-    <a class="postul-item" href="oferta-detalle.html?id=${p.id}">
+    <a class="postul-item" href="${UI_PAGES.oferta_detalle}?id=${p.id}">
       <div class="pi-logo" style="color:${p.logoColor}">${p.logo}</div>
       <div class="pi-info">
         <div class="pi-title">${p.title}</div>
@@ -245,7 +245,7 @@ function renderRecomendadas() {
   grid.innerHTML = RECOMENDADAS.map((o) => {
     const tags = o.tags.map((t, i) => `<span class="job-tag ${o.tagTypes[i] || ''}">${t}</span>`).join('');
     return `
-      <a class="job-card" href="oferta-detalle.html?id=${o.id}">
+      <a class="job-card" href="${UI_PAGES.oferta_detalle}?id=${o.id}">
         <div class="job-card-head">
           <div class="company-logo" style="color:${o.logoColor}">${o.logo}</div>
           <div class="job-meta">

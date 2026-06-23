@@ -10,40 +10,14 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/ofertas.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/ofertas.css" />
 </head>
 
 <body>
 
   <!-- ══ NAVBAR ══ -->
-  <nav id="navbar">
-    <div class="nav-inner">
-      <a href="index.html" class="logo"><span class="logo-star">✦</span>LaburAI</a>
-      <div class="nav-links">
-        <a href="ofertas.html" class="active">Buscar empleo</a>
-        <a href="empresas.html">Para empresas</a>
-      </div>
-      <div class="nav-actions" id="navActions">
-        <a href="login.html" class="btn-ghost">Ingresar</a>
-        <a href="login.html" class="btn-primary">Publicar oferta</a>
-      </div>
-      <button class="hamburger" id="hamburger" aria-label="Menú">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="ofertas.html">Buscar empleo</a>
-      <a href="ofertas.html">Buscar empleo</a>
-      <a href="empresas.html">Para empresas</a>
-      <hr />
-      <div id="mobileNavActions">
-        <a href="login.html" class="btn-ghost" style="text-align:center;display:block">Ingresar</a>
-        <a href="login.html" class="btn-primary" style="text-align:center;display:block;margin-top:8px">Publicar
-          oferta</a>
-      </div>
-    </div>
-  </nav>
+  <nav id="navbar"></nav>
 
   <!-- ══ PAGE HEADER ══ -->
   <div class="page-header">
@@ -56,25 +30,16 @@
       <div class="ph-search">
         <div class="search-box-sm">
           <div class="search-field-sm">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
+            <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-search"></use></svg>
             <input type="text" id="searchQuery" placeholder="Puesto, empresa o rubro…" autocomplete="off" />
           </div>
           <div class="search-sep-sm"></div>
           <div class="search-field-sm search-field-sm--loc">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
+            <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-location"></use></svg>
             <input type="text" id="searchLocation" placeholder="Ciudad o provincia" />
           </div>
           <button class="search-btn-sm" id="searchBtn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
+            <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-search"></use></svg>
             Buscar
           </button>
         </div>
@@ -147,10 +112,7 @@
       <div class="filter-group">
         <div class="filter-group-header" data-toggle="experiencia">
           <span>Experiencia</span>
-          <svg class="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2.5">
-            <path d="m6 9 6 6 6-6" />
-          </svg>
+          <svg class="icon icon-xs toggle-icon"><use href="../assets/icons.svg#icon-chevron-down"></use></svg>
         </div>
         <div class="filter-group-body" id="experiencia">
           <!-- Dinámico -->
@@ -203,11 +165,7 @@
           </div>
           <!-- Botón filtros mobile -->
           <button class="btn-ghost filters-toggle-btn" id="filtersToggleBtn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="4" y1="6" x2="20" y2="6" />
-              <line x1="8" y1="12" x2="16" y2="12" />
-              <line x1="11" y1="18" x2="13" y2="18" />
-            </svg>
+            <svg class="icon icon-xs"><use href="../assets/icons.svg#icon-filter"></use></svg>
             Filtros
           </button>
         </div>
@@ -226,9 +184,9 @@
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 
-  <script src="js/utils.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/ofertas.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/ofertas.js"></script>
 </body>
 
 </html>

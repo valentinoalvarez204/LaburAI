@@ -353,7 +353,7 @@ function renderCandidatos(ofertaId = 'todas') {
             </div>
           </div>
           ${analyzeButton}
-          <a href="candidato-postulacion.html?id=${c.id}" class="cand-btn" style="padding: 7px 12px; font-size: 11px;">Ver detalle</a>
+          <a href="${UI_PAGES.postulacion}?id=${c.id}" class="cand-btn" style="padding: 7px 12px; font-size: 11px;">Ver detalle</a>
         </div>
       </div>`;
   }).join('');

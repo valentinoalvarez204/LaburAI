@@ -349,8 +349,8 @@ function initForms() {
         await delay(1000);
 
         const destino = data.usuario.rol === 'EMPRESA'
-          ? 'dashboard-empresa.html'
-          : 'dashboard-candidato.html';
+          ? UI_PAGES.dashboard_empresa
+          : UI_PAGES.dashboard_candidato;
         window.location.href = destino;
 
       } catch (err) {
@@ -416,7 +416,7 @@ function initForms() {
           empresaId: data.usuario.empresaId,
         }));
 
-        const destino = rol === 'empresa' ? 'dashboard-empresa.html' : 'dashboard-candidato.html';
+        const destino = rol === 'empresa' ? UI_PAGES.dashboard_empresa : UI_PAGES.dashboard_candidato;
         const label = rol === 'empresa' ? 'al panel de empresa' : 'a tu dashboard';
 
         formReg.classList.add('hidden');
