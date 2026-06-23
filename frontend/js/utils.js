@@ -444,6 +444,7 @@ const SIDEBAR_CONFIG = {
     { id: 'overview', label: 'Resumen', icon: getIcon('layout', 'icon-sm') },
     { id: 'cv', label: 'Mi CV e IA', icon: getIcon('file-text', 'icon-sm') },
     { id: 'postulaciones', label: 'Postulaciones', icon: getIcon('send', 'icon-sm') },
+    { id: 'favoritos', label: 'Favoritos', icon: getIcon('star', 'icon-sm') },
     { id: 'recomendadas', label: 'Recomendadas', icon: getIcon('star', 'icon-sm') },
     { id: 'perfil', label: 'Mi perfil', icon: getIcon('user', 'icon-sm') }
   ]

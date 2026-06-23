@@ -41,6 +41,7 @@ model Candidato {
   habilidades          String[] // array plano usado por el match IA low-token
   habilidadesFaltantes String[] // sugerencias de la IA
   formacion            String[] // títulos y estudios detectados por la IA
+  favoritos            String[] @default([]) // enlaces de ofertas guardadas por el candidato
   creadoEn             DateTime @default(now())
 
   usuarioId String  @unique

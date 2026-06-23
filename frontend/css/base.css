@@ -492,6 +492,60 @@ footer {
 .salary         { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text); }
 .time-ago       { font-size: 11px; color: var(--text3); }
 
+.share-popover {
+  position: absolute;
+  z-index: 9999;
+  width: min(340px, calc(100vw - 32px));
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-lg);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+.share-popover.hidden { display: none; }
+.share-popover-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.share-popover-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+.share-input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg2);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--font-body);
+}
+.share-input:focus {
+  outline: none;
+  border-color: var(--indigo);
+}
+.share-copy-btn {
+  border: none;
+  background: var(--indigo);
+  color: #fff;
+  padding: 11px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.share-copy-btn:hover {
+  filter: brightness(1.05);
+}
+
 /* ─────────────────────────────────
    BREADCRUMB
    (reutilizable en detalle, dashboard, etc.)

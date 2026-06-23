@@ -270,6 +270,14 @@
         <div class="postulaciones-list" id="postulacionesList"></div>
       </section>
 
+      <!-- ── SECCIÓN: FAVORITOS ── -->
+      <section id="favoritos" class="dash-section hidden">
+        <div class="section-title-row">
+          <h2 class="dash-section-title">Favoritos</h2>
+        </div>
+        <div class="offers-grid" id="favGrid"></div>
+      </section>
+
       <!-- ── SECCIÓN: RECOMENDADAS ── -->
       <section id="recomendadas" class="dash-section hidden">
         <div class="section-title-row">
@@ -338,29 +346,23 @@
                 <option value="Educación y Docencia">Educación y Docencia</option>
               </select>
             </div>
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label">Años de experiencia</label>
-                <select class="form-select">
-                  <option>1 – 2 años</option>
-                  <option>3 – 5 años</option>
-                  <option selected>5 – 10 años</option>
-                  <option>Más de 10 años</option>
-                </select>
-              </div>
-              <div class="form-field">
-                <label class="form-label">Modalidad buscada</label>
-                <select id="profileModalidadBuscada" class="form-select">
-                  <option value="Presencial">Presencial</option>
-                  <option value="Remoto">Remoto</option>
-                  <option value="Híbrido">Híbrido</option>
-                  <option value="Indiferente">Indiferente</option>
-                </select>
-              </div>
+            <div class="form-field">
+              <label class="form-label">Modalidad buscada</label>
+              <select id="profileModalidadBuscada" class="form-select">
+                <option value="Presencial">Presencial</option>
+                <option value="Remoto">Remoto</option>
+                <option value="Híbrido">Híbrido</option>
+                <option value="Indiferente">Indiferente</option>
+              </select>
             </div>
             <div class="form-field">
               <label class="form-label">Pretensión salarial</label>
-              <input id="profilePretensionSalarial" type="text" class="form-input" value=""/>
+              <select id="profilePretensionSalarial" class="form-select">
+                <option value="" selected disabled>Seleccioná una pretensión</option>
+                <option value="$800000-$1200000">$800.000 - $1.200.000</option>
+                <option value="$1200000-$1800000">$1.200.000 - $1.800.000</option>
+                <option value="$1800000 +">+ $1.800.000</option>
+              </select>
             </div>
           </div>
           <!-- Configuración de cuenta -->

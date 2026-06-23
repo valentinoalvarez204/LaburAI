@@ -31,6 +31,7 @@ let CANDIDATO = {
   techs: [],
   missing: [],
   experiencia: [],
+  favoritos: [],
 };
 
 let POSTULACIONES = [];
@@ -262,10 +263,256 @@ function renderRecomendadas() {
   }).join('');
 }
 
+function parseOfertaIdFromLink(link) {
+  try {
+    const url = new URL(link, window.location.origin);
+    return url.searchParams.get('id');
+  } catch {
+    return null;
+  }
+}
+
+async function renderFavoritos() {
+  const grid = document.getElementById('favGrid');
+  if (!grid) return;
+
+  const favoritos = Array.isArray(CANDIDATO.favoritos) ? CANDIDATO.favoritos.filter((link) => !!link) : [];
+  if (!favoritos.length) {
+    grid.innerHTML = `
+      <div style="text-align: center; padding: 60px 20px; color: var(--text3);">
+        <div style="font-size: 16px; font-weight: 500;">No hay favoritos</div>
+      </div>`;
+    return;
+  }
+
+  const ids = favoritos.map(parseOfertaIdFromLink).filter(Boolean);
+  let offerCards = [];
+
+  try {
+    const data = await API.getOfertas();
+    if (Array.isArray(data)) {
+      offerCards = data
+        .filter((job) => ids.includes(job.id))
+        .map((job) => ({
+          id: job.id,
+          title: job.titulo,
+          company: job.empresa?.nombre || 'Empresa',
+          location: job.ubicacion,
+          logo: job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+          logoColor: '#5C6BC0',
+          tags: [job.modalidad, job.jornada],
+          tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', ''],
+          salary: job.salarioMin ? `$${job.salarioMin.toLocaleString('es-AR')}` : 'A convenir',
+          time: new Date(job.creadoEn).toLocaleDateString('es-AR'),
+          desc: job.descripcion || 'Oferta guardada en favoritos',
+          link: getPerfilLink(job.id),
+        }));
+    }
+  } catch (err) {
+    console.warn('[Dashboard] No se pudieron cargar ofertas favoritas:', err.message);
+  }
+
+  const fallbackCards = favoritos.map((link) => {
+    const fallbackId = parseOfertaIdFromLink(link);
+    return {
+      id: fallbackId || '',
+      title: 'Oferta favorita',
+      company: 'Ver oferta guardada',
+      location: '',
+      logo: '★',
+      logoColor: '#5C6BC0',
+      tags: [],
+      tagTypes: [],
+      salary: '',
+      time: '',
+      desc: '',
+      link: fallbackId ? getPerfilLink(fallbackId) : link,
+    };
+  });
+
+  const cards = offerCards.length ? offerCards : fallbackCards;
+  grid.innerHTML = cards.map((o) => {
+    const tags = o.tags.map((t, i) => `<span class="job-tag ${o.tagTypes[i] || ''}">${t}</span>`).join('');
+    const link = o.link || getPerfilLink(o.id);
+    // El favorito siempre está active en la sección de favoritos
+    return `
+      <div class="job-card">
+        <button type="button" class="card-fav-btn active" data-id="${o.id}" title="Quitar de favoritos" aria-label="Quitar de favoritos">
+          <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-star"></use></svg>
+        </button>
+        <button type="button" class="card-share-btn" data-link="${link}" title="Compartir oferta" aria-label="Compartir oferta">
+          <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-share"></use></svg>
+        </button>
+        <a class="job-card-link" href="${link}">
+          <div class="job-card-head">
+            <div class="company-logo" style="color:${o.logoColor}">${o.logo}</div>
+            <div class="job-meta">
+              <div class="job-title">${o.title}</div>
+              <div class="company-name">${o.company}${o.location ? ' · ' + o.location : ''}</div>
+            </div>
+          </div>
+          <div class="job-tags">${tags}</div>
+          <p class="job-desc">${o.desc}</p>
+          <div class="job-footer">
+            <div class="salary">${o.salary}</div>
+            <div class="time-ago">${o.time}</div>
+          </div>
+        </a>
+      </div>`;
+  }).join('');
+
+  // Inicializar listeners para botones
+  initFavoritesOnFavoritosGrid();
+  initSharePopoverOnFavoritosGrid();
+}
+
+function getPerfilLink(id) {
+  return new URL(`${UI_PAGES.oferta_detalle}?id=${id}`, document.baseURI).href;
+}
+
+function getOfferFavoriteLink(id) {
+  return new URL(`${UI_PAGES.oferta_detalle}?id=${id}`, document.baseURI).href;
+}
+
+function initFavoritesOnFavoritosGrid() {
+  const grid = document.getElementById('favGrid');
+  if (!grid) return;
+
+  grid.addEventListener('click', async (event) => {
+    const btn = event.target.closest('.card-fav-btn');
+    if (!btn) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    const session = getSession();
+    if (!session?.token) {
+      window.location.href = UI_PAGES.login;
+      return;
+    }
+
+    const jobId = btn.dataset.id;
+    if (!jobId) return;
+
+    const card = btn.closest('.job-card');
+    if (!card) return;
+
+    // Remove favorites by matching the oferta ID parsed from the saved links
+    const nextLinks = (CANDIDATO.favoritos || []).filter((link) => parseOfertaIdFromLink(link) !== String(jobId));
+
+    btn.disabled = true;
+    try {
+      // Animar la desaparición de la tarjeta
+      card.style.transition = 'all 0.3s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'translateX(-20px)';
+
+      // Esperar a que termine la animación
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Actualizar en servidor
+      await API.patchPerfilCandidato(session.candidatoId, { favoritos: nextLinks });
+      CANDIDATO.favoritos = nextLinks;
+      showToast('Oferta eliminada de favoritos', 'info');
+
+      // Remover la tarjeta del DOM
+      card.remove();
+
+      // Si no hay más favoritos, mostrar el estado vacío
+      const grid = document.getElementById('favGrid');
+      if (!grid || grid.children.length === 0) {
+        await renderFavoritos();
+      }
+    } catch (err) {
+      console.error('[Dashboard] Error actualizando favoritos:', err.message);
+      showToast('No se pudo actualizar favoritos', 'error');
+      // Revertir la animación en caso de error
+      card.style.opacity = '1';
+      card.style.transform = 'translateX(0)';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+}
+
+function getSharePopoverDashboard() {
+  let pop = document.getElementById('sharePopoverDashboard');
+  if (!pop) {
+    pop = document.createElement('div');
+    pop.id = 'sharePopoverDashboard';
+    pop.className = 'share-popover hidden';
+    pop.innerHTML = `
+      <div class="share-popover-header">Compartir oferta</div>
+      <div class="share-popover-row">
+        <input readonly class="share-input" id="sharePopoverInputDashboard" aria-label="Enlace de la oferta" />
+        <button type="button" class="share-copy-btn">Copiar</button>
+      </div>
+    `;
+    document.body.appendChild(pop);
+  }
+  return pop;
+}
+
+function closeSharePopoverDashboard() {
+  const pop = document.getElementById('sharePopoverDashboard');
+  if (pop) pop.classList.add('hidden');
+}
+
+function openSharePopoverDashboard(button, url) {
+  const pop = getSharePopoverDashboard();
+  const input = pop.querySelector('.share-input');
+  if (!input) return;
+
+  const absoluteUrl = new URL(url, document.baseURI).href;
+  input.value = absoluteUrl;
+
+  const rect = button.getBoundingClientRect();
+  const left = Math.min(Math.max(rect.left + rect.width / 2 - 170, 16), window.innerWidth - 336);
+  const top = rect.bottom + window.scrollY + 10;
+
+  pop.style.left = `${left}px`;
+  pop.style.top = `${top}px`;
+  pop.classList.remove('hidden');
+  pop.style.position = 'absolute';
+}
+
+function initSharePopoverOnFavoritosGrid() {
+  const grid = document.getElementById('favGrid');
+  const pop = getSharePopoverDashboard();
+  if (!grid || !pop) return;
+
+  grid.addEventListener('click', (event) => {
+    const btn = event.target.closest('.card-share-btn');
+    if (!btn) return;
+    event.preventDefault();
+    event.stopPropagation();
+    openSharePopoverDashboard(btn, btn.dataset.link || window.location.href);
+  });
+
+  pop.addEventListener('click', (event) => {
+    event.stopPropagation();
+  });
+
+  document.addEventListener('click', closeSharePopoverDashboard);
+
+  const copyBtn = pop.querySelector('.share-copy-btn');
+  copyBtn?.addEventListener('click', async () => {
+    const input = pop.querySelector('.share-input');
+    if (!input) return;
+    try {
+      await navigator.clipboard.writeText(input.value);
+      showToast('Link copiado al portapapeles', 'success');
+    } catch (err) {
+      console.error('Error copiando enlace:', err);
+      showToast('No se pudo copiar el link', 'error');
+    }
+  });
+}
+
+
 /* ─────────────────────────────────
    NAVEGACIÓN ENTRE SECCIONES
 ───────────────────────────────── */
-const SECTIONS = ['overview', 'cv', 'postulaciones', 'recomendadas', 'perfil'];
+const SECTIONS = ['overview', 'cv', 'postulaciones', 'favoritos', 'recomendadas', 'perfil'];
 
 function switchSection(id) {
   // Activar item del sidebar
@@ -458,6 +705,11 @@ function initUploadCv() {
 
   // Exponer la función para actualizar el botón desde otras partes del código
   window.updateUploadButton = updateUploadButton;
+}
+
+function initFavoritosButton() {
+  const button = document.getElementById('btnFavoritos');
+  if (!button) return;
 }
 
 /* ─────────────────────────────────
@@ -702,6 +954,8 @@ async function fetchProfile(candidatoId) {
       CANDIDATO.techs = data.habilidadesTech.filter(h => h.tipo === 'TECNOLOGIA').map(h => h.nombre);
     }
 
+    CANDIDATO.favoritos = Array.isArray(data.favoritos) ? data.favoritos : [];
+
     if (Array.isArray(data.experiencias)) {
       CANDIDATO.experiencia = data.experiencias.map(e => ({
         role: e.rol,
@@ -714,6 +968,7 @@ async function fetchProfile(candidatoId) {
     renderScore();
     renderSkills();
     renderIAAnalysis();
+    await renderFavoritos();
 
   } catch (err) {
     console.error('[Dashboard] Error cargando perfil:', err.message);
@@ -823,4 +1078,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   initReanalyze();
   initCopySummary();
   initSaveProfile();
+  initFavoritosButton();
 });

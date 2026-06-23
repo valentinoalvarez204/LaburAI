@@ -46,6 +46,7 @@ export class ProfileController {
       areaRubro?:         string;
       modalidadBuscada?:  string;
       pretensionSalarial?: string;
+      favoritos?:         string[];
     },
   ) {
     return this.profileService.updateCandidato(id, body);
@@ -130,7 +131,8 @@ export class ProfileController {
       return { message: 'CV re-analizado correctamente y datos estructurados actualizados' };
     } catch (error) {
       console.error('Error al intentar re-analizar el CV:', error);
-      throw new BadRequestException('Fallo al re-analizar el CV: ' + error.message);
+      const message = error instanceof Error ? error.message : String(error);
+      throw new BadRequestException('Fallo al re-analizar el CV: ' + message);
     }
   }
 

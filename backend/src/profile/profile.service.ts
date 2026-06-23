@@ -44,6 +44,7 @@ export class ProfileService {
     areaRubro?:         string;
     modalidadBuscada?:  string;
     pretensionSalarial?: string;
+    favoritos?:         string[];
   }) {
     return this.prisma.candidato.update({
       where: { id: candidatoId },
