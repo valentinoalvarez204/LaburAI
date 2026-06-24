@@ -57,11 +57,41 @@ async function checkCerebras() {
     const Cerebras = require('@cerebras/cerebras_cloud_sdk').default;
     const client = new Cerebras({ apiKey });
     const res = await client.chat.completions.create({
-      model: 'llama3.1-8b',
+      model: 'zai-glm-4.7',
       messages: [{ role: 'user', content: 'Di solo "hola"' }],
       max_tokens: 5,
     });
-    return `${OK} — modelo: llama3.1-8b — respuesta: "${res.choices[0].message.content.trim()}"`;
+    const content = res.choices[0]?.message?.content || '';
+    return `${OK} — modelo: zai-glm-4.7 — respuesta: "${content.trim()}"`;
+  } catch (e) {
+    return `${FAIL} — ${e.message}`;
+  }
+}
+
+async function checkOpenRouter() {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return SKIP;
+  try {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'openrouter/free',
+        messages: [{ role: 'user', content: 'Di solo "hola"' }],
+        max_tokens: 5,
+      }),
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    const text = data.choices?.[0]?.message?.content?.trim();
+    if (!text) {
+        console.log('\nDEBUG OpenRouter Empty Text Content:', JSON.stringify(data, null, 2));
+        throw new Error('No hubo respuesta del modelo');
+    }
+    return `${OK} — modelo: openrouter/free — respuesta: "${text}"`;
   } catch (e) {
     return `${FAIL} — ${e.message}`;
   }
@@ -109,6 +139,7 @@ async function main() {
     { name: '🤖 Groq (Llama 3.1)',                fn: checkGroq },
     { name: '✨ Gemini (Google 2.0 Flash)',        fn: checkGemini },
     { name: '⚡ Cerebras (Llama 3.1)',             fn: checkCerebras },
+    { name: '🌐 OpenRouter (Gemini 2.0 Flash)',      fn: checkOpenRouter },
     { name: '📦 Supabase Storage',                 fn: checkSupabase },
   ];
 
