@@ -734,13 +734,15 @@ function initUploadCv() {
   // Función para actualizar el estado del botón según si hay CV
   function updateUploadButton(hasCv) {
     if (hasCv) {
-      btnUpload.style.opacity = '0.5';
-      btnUpload.style.cursor = 'not-allowed';
-      btnUpload.title = 'Ya tienes un CV subido. No puedes subir más de uno.';
+      btnUpload.style.opacity = '1';
+      btnUpload.style.cursor = 'pointer';
+      btnUpload.title = 'Hacé clic para actualizar tu CV';
+      btnUpload.textContent = 'Actualizar mi CV';
     } else {
       btnUpload.style.opacity = '1';
       btnUpload.style.cursor = 'pointer';
       btnUpload.title = '';
+      btnUpload.textContent = 'Subir mi CV';
     }
   }
 
@@ -751,14 +753,7 @@ function initUploadCv() {
     const session = requireSession();
     if (!session?.candidatoId) return;
 
-    // Verificar si ya tiene un CV subido
-    if (CANDIDATO.cvUrl) {
-      // Mostrar mensaje de error usando showToast
-      showToast('No es posible subir más de 1 CV', 'error');
-      e.preventDefault();
-      return;
-    }
-
+    // Ya no bloqueamos la subida si tiene un CV, permitimos actualizarlo
     fileInput.click();
   });
 

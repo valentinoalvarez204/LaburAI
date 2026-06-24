@@ -4,26 +4,28 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { IAPIService } from '../interfaces/ia-service.interface';
 import { AnalisisCVDto } from '../dto/analisis-cv.dto';
 
-const PROMPT_ANALISIS_CV = (textoCV: string) => `
+// El CV se pasa siempre en el role: user, nunca dentro del system prompt.
+const PROMPT_ANALISIS_CV = () => `
 Sos un parser ATS especializado en extracción de CVs.
+Tu tarea es extraer ÚNICAMENTE información explícita del CV que recibirás.
 
-Tu tarea es extraer únicamente información explícita del CV.
+REGLAS ESTRICTAS:
+- NO inventes información que no esté escrita.
+- NO deduzcas tecnologías ni completes stacks.
+- NO agregues experiencia no mencionada.
+- Si el CV no es IT, NO incluyas tecnologías IT.
+- Si un dato no existe, usá [] para arrays y "" para strings.
+- Respondé SOLO JSON válido, sin markdown, sin texto adicional.
 
-REGLAS:
-- NO inventes información.
-- NO deduzcas tecnologías.
-- NO agregues experiencia no escrita.
-- NO completes stacks.
-- Si el CV no es IT, NO agregues tecnologías IT.
-- Si un dato no existe, devolver [] o "".
-- Responder SOLO JSON válido.
-- Sin markdown.
-- Sin explicación.
+CRITERIOS PARA scoreCV (escala 0-100 cada uno):
+- "completitud": ¿qué tan completo está el CV? (tiene contacto, resumen, experiencia, formación, habilidades)
+- "claridad": ¿qué tan fácil es leer y entender el contenido?
+- "estructura": ¿está bien organizado y ordenado cronológicamente?
 
-Formato:
+Formato de respuesta:
 
 {
-  "resumen": "",
+  "resumen": "Breve descripción fiel al CV, máximo 3 oraciones.",
   "scoreCV": {
     "completitud": 0,
     "claridad": 0,
@@ -54,17 +56,12 @@ Formato:
   ]
 }
 
-INSTRUCCIONES:
-- Extraer TODAS las experiencias laborales.
-- Mantener nombres exactos.
-- Unir viñetas en un solo texto.
-- No resumir demasiado.
-- Tecnologías SOLO si aparecen explícitamente.
-- Separar habilidades técnicas y blandas.
-- El resumen debe ser breve y fiel al CV.
-
-CV:
-${textoCV}
+INSTRUCCIONES ADICIONALES:
+- Extraer TODAS las experiencias laborales sin omitir ninguna.
+- Mantener nombres exactos de empresas, roles y tecnologías.
+- Unir viñetas/bullets de una misma experiencia en un solo texto en "descripcion".
+- Separar habilidades técnicas (herramientas, metodologías) de blandas (comunicación, liderazgo).
+- Incluir tecnologías en "tecnologiasDetectadas" SOLO si aparecen explícitamente en esa experiencia.
 `.trim();
 
 @Injectable()
@@ -93,12 +90,11 @@ export class GeminiService implements IAPIService {
 
   private cleanAndParseJSON(text: string): any {
     try {
-      // Remover markdown y limpiar texto
       const cleaned = text
         .replace(/```json/g, '')
         .replace(/```/g, '')
         .trim();
-      
+
       const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
@@ -119,14 +115,13 @@ export class GeminiService implements IAPIService {
     }
 
     try {
-      // Usar systemInstruction para el prompt y user para el CV
-      const model = this.genAI.getGenerativeModel({ 
+      const model = this.genAI.getGenerativeModel({
         model: 'gemini-2.0-flash',
-        systemInstruction: PROMPT_ANALISIS_CV(''),
+        systemInstruction: PROMPT_ANALISIS_CV(), // Sin parámetro — el CV va como contenido del usuario
         generationConfig: {
           temperature: 0,
           responseMimeType: 'application/json',
-        }
+        },
       });
 
       const result = await model.generateContent(textoCV);
@@ -136,7 +131,7 @@ export class GeminiService implements IAPIService {
       if (parsed) {
         return parsed as AnalisisCVDto;
       }
-      
+
       throw new Error('No se pudo obtener un JSON válido');
     } catch (error) {
       this.logger.error('Error al analizar CV con Gemini:', error);
@@ -147,17 +142,23 @@ export class GeminiService implements IAPIService {
   async calcularMatch(perfilCV: string, ofertaTrabajo: string): Promise<number> {
     this.logger.log('Calculando Match con Gemini... (Low Token Mode)');
 
+    // Guard: si no hay cliente configurado, retornar 0 en vez de crashear
+    if (!this.genAI) {
+      this.logger.warn('GEMINI_API_KEY no configurada.');
+      return 0;
+    }
+
     try {
-      const model = this.genAI.getGenerativeModel({ 
+      const model = this.genAI.getGenerativeModel({
         model: 'gemini-2.0-flash',
+        systemInstruction: 'Respondé SOLO con JSON válido. Sin markdown. Sin texto adicional. Formato: {"match": 0}',
         generationConfig: {
           temperature: 0,
           responseMimeType: 'application/json',
-        }
+        },
       });
 
-      const prompt = `Compara este candidato con la oferta y devuelve la compatibilidad del 0 al 100.
-Formato: JSON puro con la única clave "match" y el número entero. Sin markdown.
+      const prompt = `Compatibilidad candidato/oferta del 0 al 100. Devolvé solo {"match": N}.
 
 Candidato:
 ${perfilCV}
@@ -168,8 +169,8 @@ ${ofertaTrabajo}`;
       const result = await model.generateContent(prompt);
       const text = result.response.text();
       const parsed = this.cleanAndParseJSON(text);
-      
-      return parsed?.match || 0;
+
+      return parsed?.match ?? 0;
     } catch (error) {
       this.logger.error('Error calculando match en Gemini:', error);
       return 0;

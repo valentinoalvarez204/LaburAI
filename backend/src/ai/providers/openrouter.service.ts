@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Cerebras from '@cerebras/cerebras_cloud_sdk';
 import { IAPIService } from '../interfaces/ia-service.interface';
 import { AnalisisCVDto } from '../dto/analisis-cv.dto';
 
@@ -65,12 +64,13 @@ INSTRUCCIONES ADICIONALES:
 `.trim();
 
 @Injectable()
-export class CerebrasService implements IAPIService {
-  private readonly logger = new Logger(CerebrasService.name);
-  private client: Cerebras;
+export class OpenRouterService implements IAPIService {
+  private readonly logger = new Logger(OpenRouterService.name);
+  private readonly apiKey: string | undefined;
+  private readonly apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
 
   private readonly FALLBACK: AnalisisCVDto = {
-    resumen: 'Error en el procesamiento del CV con Cerebras.',
+    resumen: 'Error en el procesamiento del CV con OpenRouter.',
     scoreCV: { completitud: 0, claridad: 0, estructura: 0 },
     habilidadesTecnicas: [],
     habilidadesBlandas: [],
@@ -82,10 +82,7 @@ export class CerebrasService implements IAPIService {
   };
 
   constructor(private configService: ConfigService) {
-    const apiKey = this.configService.get<string>('CEREBRAS_API_KEY');
-    if (apiKey) {
-      this.client = new Cerebras({ apiKey });
-    }
+    this.apiKey = this.configService.get<string>('OPENROUTER_API_KEY');
   }
 
   private cleanAndParseJSON(text: string): any {
@@ -107,32 +104,46 @@ export class CerebrasService implements IAPIService {
   }
 
   async analizarCV(textoCV: string): Promise<AnalisisCVDto> {
-    this.logger.log('Analizando CV con Cerebras (Llama 3.1 8B)...');
+    this.logger.log('Analizando CV con OpenRouter (Gemini 2.0 Flash)...');
 
-    if (!this.client) {
-      this.logger.warn('CEREBRAS_API_KEY no configurada.');
-      return { ...this.FALLBACK, resumen: 'Configurá CEREBRAS_API_KEY' };
+    if (!this.apiKey) {
+      this.logger.warn('OPENROUTER_API_KEY no configurada.');
+      return { ...this.FALLBACK, resumen: 'Configurá OPENROUTER_API_KEY' };
     }
 
     try {
-      const response: any = await this.client.chat.completions.create({
-        model: 'zai-glm-4.7',
-        messages: [
-          {
-            role: 'system',
-            content: PROMPT_ANALISIS_CV(), // Sin parámetro — el CV va en el user message
-          },
-          {
-            role: 'user',
-            content: textoCV,
-          },
-        ],
-        temperature: 0,
-        response_format: { type: 'json_object' },
+      const response = await fetch(this.apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://laburai.com', // Opcional para OpenRouter
+          'X-Title': 'LaburAI', // Opcional para OpenRouter
+        },
+        body: JSON.stringify({
+          model: 'openrouter/free',
+          messages: [
+            {
+              role: 'system',
+              content: PROMPT_ANALISIS_CV(),
+            },
+            {
+              role: 'user',
+              content: textoCV,
+            },
+          ],
+          temperature: 0,
+          response_format: { type: 'json_object' },
+        }),
       });
 
-      const content = response.choices[0]?.message?.content;
-      if (!content) throw new Error('Cerebras no devolvió contenido');
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content;
+
+      if (!content) {
+        this.logger.error('OpenRouter no devolvió contenido:', data);
+        throw new Error('OpenRouter no devolvió contenido');
+      }
 
       const parsed = this.cleanAndParseJSON(content);
       if (parsed) {
@@ -141,46 +152,57 @@ export class CerebrasService implements IAPIService {
 
       throw new Error('No se pudo obtener un JSON válido');
     } catch (error) {
-      this.logger.error('Error en Cerebras:', error);
+      this.logger.error('Error en OpenRouter:', error);
       return this.FALLBACK;
     }
   }
 
   async calcularMatch(perfilCV: string, ofertaTrabajo: string): Promise<number> {
-    this.logger.log('Calculando Match con Cerebras (Low Token Mode)...');
-    if (!this.client) return 0;
+    this.logger.log('Calculando Match con OpenRouter...');
+    if (!this.apiKey) return 0;
 
     try {
-      const response: any = await this.client.chat.completions.create({
-        model: 'gpt-oss-120b',
-        messages: [
-          {
-            role: 'system',
-            content: 'Respondé SOLO con JSON válido. Sin markdown. Sin texto adicional. Formato: {"match": 0}',
-          },
-          {
-            role: 'user',
-            content: `Compatibilidad candidato/oferta del 0 al 100. Devolvé solo {"match": N}.
+      const response = await fetch(this.apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://laburai.com',
+          'X-Title': 'LaburAI',
+        },
+        body: JSON.stringify({
+          model: 'openrouter/free',
+          messages: [
+            {
+              role: 'system',
+              content: 'Respondé SOLO con JSON válido. Sin markdown. Sin texto adicional. Formato: {"match": 0}',
+            },
+            {
+              role: 'user',
+              content: `Compatibilidad candidato/oferta del 0 al 100. Devolvé solo {"match": N}.
 
 Candidato:
 ${perfilCV}
 
 Oferta:
 ${ofertaTrabajo}`,
-          },
-        ],
-        temperature: 0,
-        response_format: { type: 'json_object' },
-        max_tokens: 20,
+            },
+          ],
+          temperature: 0,
+          response_format: { type: 'json_object' },
+          max_tokens: 20,
+        }),
       });
 
-      const content = response.choices[0]?.message?.content;
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content;
+
       if (!content) return 0;
 
       const parsed = this.cleanAndParseJSON(content);
       return parsed?.match ?? 0;
     } catch (error) {
-      this.logger.error('Error calculando match en Cerebras:', error);
+      this.logger.error('Error calculando match en OpenRouter:', error);
       return 0;
     }
   }
