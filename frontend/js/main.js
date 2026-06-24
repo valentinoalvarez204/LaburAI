@@ -44,7 +44,6 @@ async function fetchHomeJobs() {
       JOBS.sort((a, b) => b.timestamp - a.timestamp);
     }
 
-    renderJobs('todos');
     renderCategories();
   } catch (err) {
     console.error('Error cargando ofertas en home:', err);
@@ -185,24 +184,6 @@ function initCtaSession() {
 }
 
 /* ─────────────────────────────────
-   TÍTULOS DE OFERTAS (Si es Empresa)
-───────────────────────────────── */
-function initOfertasUI() {
-  const session = typeof getSession === 'function' ? getSession() : null;
-  const isCandidato = session && session.rol === 'candidato';
-  
-  if (!isCandidato) {
-    const eyebrow = document.getElementById('ofertasEyebrow');
-    const title = document.getElementById('ofertasTitle');
-    const tabParaVos = document.getElementById('tabParaVos');
-    
-    if (eyebrow) eyebrow.textContent = 'Explorar el mercado';
-    if (title) title.textContent = 'Últimas ofertas publicadas';
-    if (tabParaVos) tabParaVos.textContent = 'Destacadas';
-  }
-}
-
-/* ─────────────────────────────────
    BUSCADOR — redirige a ofertas.html
    Si vacío → va igual a ofertas.html
 ───────────────────────────────── */
@@ -243,61 +224,6 @@ function initChips() { /* chips son links directos en el HTML */ }
 
 
 /* ─────────────────────────────────
-   RENDER JOB CARDS
-───────────────────────────────── */
-function renderJobs(filter = 'todos') {
-  const grid = document.getElementById('jobsGrid');
-  if (!grid) return;
-
-  // Filtrar ofertas y limitar a 6 (2 filas de 3)
-  const list = JOBS.filter((j) => j.filter.includes(filter)).slice(0, 6);
-
-  if (!list.length) {
-    grid.innerHTML = '<p style="color:var(--text3);font-size:14px;padding:16px 0">No hay ofertas en esta categoría por el momento.</p>';
-    return;
-  }
-
-  grid.innerHTML = list.map((job) => {
-    const tags = job.tags
-      .map((tag, i) => `<span class="job-tag ${job.tagTypes[i] || ''}">${tag}</span>`)
-      .join('');
-
-    const matchVal = job.match || 0;
-    const badge = matchVal > 0 ? `<div class="match-badge">✦ ${matchVal}% match</div>` : '';
-
-    return `
-      <a class="job-card" href="${UI_PAGES.oferta_detalle}?id=${job.id}">
-        ${badge}
-        <div class="job-card-head">
-          <div class="company-logo" style="color:${job.logoColor}">${job.logo}</div>
-          <div class="job-meta">
-            <div class="job-title">${job.title}</div>
-            <div class="company-name">${job.company} · ${job.location}</div>
-          </div>
-        </div>
-        <div class="job-tags">${tags}</div>
-        <div class="job-footer">
-          <div class="salary">${job.salary}</div>
-          <div class="time-ago">${job.time}</div>
-        </div>
-      </a>`;
-  }).join('');
-}
-
-/* ─────────────────────────────────
-   TABS
-───────────────────────────────── */
-function initTabs() {
-  document.querySelectorAll('.tab[data-filter]').forEach((tab) => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
-      tab.classList.add('active');
-      renderJobs(tab.dataset.filter);
-    });
-  });
-}
-
-/* ─────────────────────────────────
    INIT
 ───────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -305,7 +231,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initReveal();
   initNavSession();
   initCtaSession();
-  initOfertasUI(); // Nueva funcion para adaptar UI empresa
   initChips();
   initSearch();
 
@@ -314,5 +239,4 @@ document.addEventListener('DOMContentLoaded', async () => {
   await fetchStats();
   initCounters(); // Se inicia después de actualizar data-target
 
-  initTabs();
 });

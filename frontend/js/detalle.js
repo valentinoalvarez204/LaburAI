@@ -30,6 +30,38 @@ function getOferta(id) {
   return OFERTAS.find((o) => o.id === parseInt(id, 10)) || OFERTAS[0];
 }
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function renderCompanyLogo(data, className = 'company-logo', options = {}) {
+  if (data.logoUrl) {
+    return `
+      <div class="${className} company-logo--image">
+        <img src="${escapeHtml(data.logoUrl)}" alt="Logo de ${escapeHtml(data.company)}" loading="lazy">
+      </div>`;
+  }
+
+  const solidStyle = options.solid
+    ? `background:${escapeHtml(data.logoColor || '#5C6BC0')};color:#fff`
+    : `color:${escapeHtml(data.logoColor || '#5C6BC0')}`;
+  return `<div class="${className}" style="${solidStyle}">${escapeHtml(data.logo || '?')}</div>`;
+}
+
+function renderCompanyLogoInto(element, data) {
+  if (!element) return;
+  element.classList.toggle('company-logo--image', Boolean(data.logoUrl));
+  element.innerHTML = data.logoUrl
+    ? `<img src="${escapeHtml(data.logoUrl)}" alt="Logo de ${escapeHtml(data.company)}" loading="lazy">`
+    : escapeHtml(data.logo || '?');
+  element.style.color = data.logoUrl ? '' : (data.logoColor || '');
+}
+
 /* ─────────────────────────────────
    RENDER COMPLETO
 ───────────────────────────────── */
@@ -42,10 +74,7 @@ function renderPage(oferta) {
 
   // Logo
   const logoEl = document.getElementById('jobLogo');
-  if (logoEl) {
-    logoEl.textContent = oferta.logo;
-    logoEl.style.color = oferta.logoColor;
-  }
+  renderCompanyLogoInto(logoEl, oferta);
 
   // Tags en header
   const tagsEl = document.getElementById('jobTagsHeader');
@@ -163,7 +192,7 @@ function renderPage(oferta) {
   if (companyTab) {
     companyTab.innerHTML = `
       <div class="company-profile-header">
-        <div class="cp-logo" style="background:${oferta.logoColor}">${oferta.logo}</div>
+        ${renderCompanyLogo(oferta, 'cp-logo', { solid: true })}
         <div>
           <div class="cp-name">${oferta.company}</div>
           <div class="cp-sector">${oferta.company_industry}</div>
@@ -269,7 +298,7 @@ function renderPage(oferta) {
   if (miniEl) {
     miniEl.innerHTML = `
       <div class="company-mini-head">
-        <div class="company-mini-logo" style="background:${oferta.logoColor}">${oferta.logo}</div>
+        ${renderCompanyLogo(oferta, 'company-mini-logo', { solid: true })}
         <div>
           <div class="company-mini-name">${oferta.company}</div>
           <div class="company-mini-sector">${oferta.company_industry}</div>
@@ -286,7 +315,7 @@ function renderPage(oferta) {
   const modalPreview = document.getElementById('modalJobPreview');
   if (modalPreview) {
     modalPreview.innerHTML = `
-      <div class="mjp-logo" style="background:${oferta.logoColor};color:#fff">${oferta.logo}</div>
+      ${renderCompanyLogo(oferta, 'mjp-logo', { solid: true })}
       <div>
         <div class="mjp-title">${oferta.title}</div>
         <div class="mjp-company">${oferta.company} · ${oferta.location}</div>
@@ -405,7 +434,7 @@ function renderSimilar(oferta) {
       <a class="job-card" href="${UI_PAGES.oferta_detalle}?id=${o.id}">
         ${badge}
         <div class="job-card-head">
-          <div class="company-logo" style="color:${o.logoColor}">${o.logo}</div>
+          ${renderCompanyLogo(o)}
           <div class="job-meta">
             <div class="job-title">${o.title}</div>
             <div class="company-name">${o.company} · ${o.location}</div>
@@ -447,6 +476,25 @@ function initSave() {
   let saved = false;
   let favoriteLinks = [];
   const offerLink = new URL(`${UI_PAGES.oferta_detalle}?id=${getParam('id')}`, document.baseURI).href;
+  const session = getSession();
+  const isCandidato = String(session?.rol || '').toLowerCase() === 'candidato' && Boolean(session?.candidatoId);
+
+  if (!isCandidato) {
+    ['btnSave', 'btnSaveAlt'].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.hidden = true;
+      btn.style.display = 'none';
+    });
+    return;
+  }
+
+  ['btnSave', 'btnSaveAlt'].forEach((id) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.hidden = false;
+    if (id === 'btnSave') btn.style.display = '';
+  });
 
   function updateSaveButtons() {
     ['btnSave', 'btnSaveAlt'].forEach((id) => {
@@ -463,7 +511,6 @@ function initSave() {
   }
 
   async function refreshSavedState() {
-    const session = getSession();
     if (!session?.token || !session?.candidatoId) return;
 
     try {
@@ -480,7 +527,6 @@ function initSave() {
     event?.preventDefault();
     event?.stopPropagation();
 
-    const session = getSession();
     if (!session?.token || !session?.candidatoId) {
       window.location.href = UI_PAGES.login;
       return;
@@ -642,6 +688,7 @@ function renderSimilar(oferta) {
         company: j.empresa?.nombre || 'Empresa',
         location: j.ubicacion,
         logo: j.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+        logoUrl: j.empresa?.logoUrl || j.logoUrl || j.empresaLogoUrl || '',
         logoColor: '#5C6BC0',
         tags: [j.modalidad, j.jornada],
         tagTypes: [j.modalidad === 'Remoto' ? 'remote' : '', ''],
@@ -667,7 +714,7 @@ function renderSimilarList(grid, list) {
       <a class="job-card" href="${UI_PAGES.oferta_detalle}?id=${o.id}">
         ${badge}
         <div class="job-card-head">
-          <div class="company-logo" style="color:${o.logoColor}">${o.logo}</div>
+          ${renderCompanyLogo(o)}
           <div class="job-meta">
             <div class="job-title">${o.title}</div>
             <div class="company-name">${o.company} · ${o.location}</div>
@@ -806,6 +853,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       company:      job.empresa?.nombre || 'Empresa',
       location:     job.ubicacion,
       logo:         job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+      logoUrl:      job.empresa?.logoUrl || job.logoUrl || job.empresaLogoUrl || '',
       logoColor:    '#5C6BC0',
       tags:         [job.modalidad, job.jornada],
       tagTypes:     [job.modalidad === 'Remoto' ? 'remote' : '', ''],

@@ -278,15 +278,6 @@
         <div class="offers-grid" id="favGrid"></div>
       </section>
 
-      <!-- ── SECCIÓN: RECOMENDADAS ── -->
-      <section id="recomendadas" class="dash-section hidden">
-        <div class="section-title-row">
-          <h2 class="dash-section-title">Ofertas recomendadas para vos</h2>
-          <span class="ai-pill-sm">✦ Ordenadas por compatibilidad IA</span>
-        </div>
-        <div class="rec-grid" id="recGrid"></div>
-      </section>
-
       <!-- ── SECCIÓN: MI PERFIL ── -->
       <section id="perfil" class="dash-section hidden">
         <div class="section-title-row">
@@ -296,6 +287,14 @@
         <div class="profile-form-grid">
           <div class="pf-card">
             <h3 class="pf-card-title">Datos personales</h3>
+            <div class="candidato-foto-upload">
+              <div class="cfu-avatar" id="candProfileAvatar">?</div>
+              <div>
+                <div class="cfu-name" id="candProfileName">Cargando…</div>
+                <input type="file" id="candFotoInput" accept="image/png,image/jpeg,image/webp" hidden />
+                <button type="button" class="btn-ghost btn-sm" id="btnCambiarFoto" style="margin-top:6px">Cambiar foto</button>
+              </div>
+            </div>
             <div class="form-row">
               <div class="form-field">
                 <label class="form-label">Nombre</label>
@@ -364,6 +363,10 @@
                 <option value="$1800000 +">+ $1.800.000</option>
               </select>
             </div>
+            <div class="form-field">
+              <label class="form-label">Link - LinkedIn</label>
+              <input type="url" id="profileLinkedin" class="form-input" placeholder="https://www.linkedin.com/in/tu-perfil" value=""/>
+            </div>
           </div>
           <!-- Configuración de cuenta -->
           <div class="pf-card cuenta-card">
@@ -400,6 +403,7 @@
 
   <script src="../js/utils.js"></script>
   <script src="../js/api.js"></script>
+  <script src="../js/image-cropper.js"></script>
   <script src="../js/dashboard-candidato.js"></script>
 </body>
 </html>

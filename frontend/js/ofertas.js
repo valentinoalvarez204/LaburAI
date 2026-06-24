@@ -33,6 +33,85 @@ const state = {
 
 let FAVORITE_LINKS = [];
 
+function normalizeText(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function renderCompanyLogo(job, className = 'company-logo') {
+  if (job.logoUrl) {
+    return `
+      <div class="${className} company-logo--image">
+        <img src="${escapeHtml(job.logoUrl)}" alt="Logo de ${escapeHtml(job.company)}" loading="lazy">
+      </div>`;
+  }
+  return `<div class="${className}" style="color:${escapeHtml(job.logoColor)}">${escapeHtml(job.logo)}</div>`;
+}
+
+async function getEmpresaLogoFallback() {
+  const session = getSession();
+  if (String(session?.rol || '').toLowerCase() !== 'empresa') return null;
+
+  const fallback = {
+    empresaId: session.empresaId || '',
+    nombre: session.nombre || '',
+    logoUrl: session.logoUrl || '',
+  };
+
+  if (!session?.token) return fallback.logoUrl ? fallback : null;
+
+  try {
+    const perfil = await API.getPerfilEmpresa();
+    fallback.nombre = perfil?.nombre || fallback.nombre;
+    fallback.logoUrl = perfil?.logoUrl || fallback.logoUrl;
+    if (fallback.logoUrl) {
+      session.logoUrl = fallback.logoUrl;
+      sessionStorage.setItem('labuai_session', JSON.stringify(session));
+    }
+  } catch (err) {
+    console.warn('[Ofertas] No se pudo cargar logo de empresa autenticada:', err.message);
+  }
+
+  return fallback.logoUrl ? fallback : null;
+}
+
+function resolveJobLogoUrl(job, empresaFallback) {
+  const apiLogoUrl = job.empresa?.logoUrl || job.logoUrl || job.empresaLogoUrl || '';
+  if (apiLogoUrl) return apiLogoUrl;
+
+  const sameEmpresaId = empresaFallback?.empresaId && job.empresaId === empresaFallback.empresaId;
+  const sameEmpresaName = empresaFallback?.nombre && normalizeText(job.empresa?.nombre) === normalizeText(empresaFallback.nombre);
+
+  return sameEmpresaId || sameEmpresaName ? empresaFallback.logoUrl : '';
+}
+
+async function loadMissingLogoUrlsFromDetails(jobs) {
+  const entries = await Promise.all(
+    jobs.map(async (job) => {
+      const currentLogoUrl = job.empresa?.logoUrl || job.logoUrl || job.empresaLogoUrl || '';
+      if (currentLogoUrl) return [job.id, currentLogoUrl];
+
+      try {
+        const detail = await API.getOferta(job.id);
+        return [job.id, detail?.empresa?.logoUrl || detail?.logoUrl || detail?.empresaLogoUrl || ''];
+      } catch (err) {
+        console.warn(`[Ofertas] No se pudo cargar logo del detalle ${job.id}:`, err.message);
+        return [job.id, ''];
+      }
+    })
+  );
+
+  return new Map(entries.filter(([, logoUrl]) => Boolean(logoUrl)));
+}
+
 /* ─────────────────────────────────
    HAMBURGER
 ───────────────────────────────── */
@@ -337,7 +416,7 @@ function renderCards() {
 
   // Obtener sesión para verificar rol
   const session = getSession();
-  const isEmpresa = session?.rol === 'empresa';
+  const isCandidato = String(session?.rol || '').toLowerCase() === 'candidato' && Boolean(session?.candidatoId);
 
   grid.innerHTML = pageItems.map((job) => {
     const tags = job.tags.map((t, i) => buildTagHTML(t, job.tagTypes[i])).join('');
@@ -347,15 +426,17 @@ function renderCards() {
 
     return `
       <div class="job-card">
-        <button type="button" class="card-fav-btn${isSaved ? ' active' : ''}" data-id="${job.id}" title="${isSaved ? 'Quitar de favoritos' : 'Agregar a favoritos'}" aria-label="${isSaved ? 'Quitar de favoritos' : 'Agregar a favoritos'}">
-          <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-star"></use></svg>
-        </button>
+        ${isCandidato ? `
+          <button type="button" class="card-fav-btn${isSaved ? ' active' : ''}" data-id="${job.id}" title="${isSaved ? 'Quitar de favoritos' : 'Agregar a favoritos'}" aria-label="${isSaved ? 'Quitar de favoritos' : 'Agregar a favoritos'}">
+            <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-star"></use></svg>
+          </button>
+        ` : ''}
         <button type="button" class="card-share-btn" data-link="${UI_PAGES.oferta_detalle}?id=${job.id}" title="Compartir oferta" aria-label="Compartir oferta">
           <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-share"></use></svg>
         </button>
         <a class="job-card-link" href="${UI_PAGES.oferta_detalle}?id=${job.id}">
           <div class="job-card-head">
-            <div class="company-logo" style="color:${job.logoColor}">${job.logo}</div>
+            ${renderCompanyLogo(job)}
             <div class="job-meta">
             <div class="job-title">${job.title}</div>
             <div class="company-name">${job.company} · ${job.location}</div>
@@ -457,7 +538,8 @@ function initFavoritesOnCards() {
     event.stopPropagation();
 
     const session = getSession();
-    if (!session?.token) {
+    const isCandidato = String(session?.rol || '').toLowerCase() === 'candidato' && Boolean(session?.candidatoId);
+    if (!session?.token || !isCandidato) {
       window.location.href = UI_PAGES.login;
       return;
     }
@@ -677,17 +759,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cargar ofertas reales desde la API
   try {
-    const data = await API.getOfertas();
+    const [data, empresaFallback] = await Promise.all([
+      API.getOfertas(),
+      getEmpresaLogoFallback(),
+    ]);
+    const detailLogoUrls = await loadMissingLogoUrlsFromDetails(data);
 
     // Llenar con datos reales
     OFERTAS.length = 0;
     data.forEach((job) => {
+      const logoUrl = resolveJobLogoUrl(job, empresaFallback) || detailLogoUrls.get(job.id) || '';
       OFERTAS.push({
         id: job.id,
         title: job.titulo,
         company: job.empresa?.nombre || 'Empresa',
         location: job.ubicacion,
         logo: job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+        logoUrl,
         logoColor: '#5C6BC0',
         tags: [job.modalidad, job.jornada, ...(job.habilidades?.slice(0, 1) || [])],
         tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', '', ''],

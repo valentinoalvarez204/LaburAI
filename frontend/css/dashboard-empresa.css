@@ -18,6 +18,36 @@ body {
   font-size: 13px;
 }
 
+.dash-sidebar .sidebar-profile,
+.dash-sidebar .sidebar-user,
+.dash-sidebar .sp-profile,
+.dash-sidebar :has(> .sp-avatar--empresa) {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.dash-sidebar .sp-avatar--empresa {
+  width: 130px;
+  height: 90px;
+  margin: 0 auto 10px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.dash-sidebar .sp-name,
+.dash-sidebar .sp-role,
+.dash-sidebar .sp-sub,
+.dash-sidebar .sp-avatar--empresa + * {
+  text-align: center;
+}
+
+.dash-sidebar .sp-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+}
+
 
 /* ─────────────────────────────────
    HAMBURGER (mobile)
@@ -823,24 +853,37 @@ body {
 }
 
 .elu-avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
+  width: 100px;
+  height: 82px;
+  border-radius: 20px;
   background: linear-gradient(135deg, #11998E, #38EF7D);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-head);
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 800;
   color: #fff;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.elu-avatar--image {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+}
+
+.elu-avatar img {
+  width: %;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .elu-name {
   font-family: var(--font-head);
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 800;
   color: var(--text);
 }
 

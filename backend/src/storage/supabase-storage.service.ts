@@ -9,6 +9,7 @@ export class SupabaseStorageService {
   private readonly logger = new Logger(SupabaseStorageService.name);
   private supabase: SupabaseClient;
   private readonly BUCKET = 'cvs';
+  private readonly PROFILE_PHOTOS_BUCKET = 'fotos_perfil';
 
   constructor(private configService: ConfigService) {
     const url = this.configService.get<string>('SUPABASE_URL');
@@ -85,6 +86,43 @@ export class SupabaseStorageService {
     } catch (error) {
       this.logger.error('Error al eliminar archivos de Supabase Storage:', error.message);
       return false;
+    }
+  }
+
+  async subirFotoPerfil(fileBuffer: Buffer, fileNameInfo: string, ownerId: string, contentType: string): Promise<string> {
+    if (!this.supabase) {
+      this.logger.warn('Supabase no configurado, necesitas activarlo para subir fotos de perfil.');
+      return '';
+    }
+
+    try {
+      const sanitizedFileNameInfo = fileNameInfo
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9.\-_]/g, '_')
+        .toLowerCase();
+
+      const fileName = `${ownerId}/${Date.now()}-${sanitizedFileNameInfo}`;
+
+      const { data, error } = await this.supabase.storage
+        .from(this.PROFILE_PHOTOS_BUCKET)
+        .upload(fileName, fileBuffer, {
+          contentType,
+          upsert: true,
+        });
+
+      if (error) throw error;
+
+      const { data: urlData } = this.supabase.storage
+        .from(this.PROFILE_PHOTOS_BUCKET)
+        .getPublicUrl(data.path);
+
+      this.logger.log(`Foto de perfil subida a Supabase Storage: ${urlData.publicUrl}`);
+
+      return urlData.publicUrl;
+    } catch (error) {
+      this.logger.error('Error al subir foto de perfil a Supabase Storage:', error.message);
+      return '';
     }
   }
 }

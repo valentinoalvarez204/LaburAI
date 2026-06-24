@@ -2,6 +2,7 @@ import { Injectable, BadRequestException, ForbiddenException, NotFoundException,
 import { PrismaService } from '../prisma.service';
 import { AI_PROVIDER_TOKEN } from '../ai/ai.module';
 import type { IAPIService } from '../ai/interfaces/ia-service.interface';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class ApplicationsService {
@@ -10,6 +11,7 @@ export class ApplicationsService {
   constructor(
     private prisma: PrismaService,
     @Inject(AI_PROVIDER_TOKEN) private aiService: IAPIService,
+    private notificationsService: NotificationsService,
   ) { }
 
   // Postularse a una oferta
@@ -51,7 +53,7 @@ export class ApplicationsService {
       },
       include: {
         oferta: {
-          select: { titulo: true, empresa: { select: { nombre: true } } },
+          select: { titulo: true, empresa: { select: { nombre: true, logoUrl: true } } },
         },
       },
     });
@@ -64,7 +66,7 @@ export class ApplicationsService {
       include: {
         oferta: {
           include: {
-            empresa: { select: { nombre: true, ubicacion: true } },
+            empresa: { select: { nombre: true, ubicacion: true, logoUrl: true } },
           },
         },
       },
@@ -169,10 +171,33 @@ export class ApplicationsService {
 
   // Actualizar una postulación (estado o notes)
   async update(id: string, data: { estado?: 'PENDIENTE' | 'REVISADA' | 'ENTREVISTA' | 'RECHAZADA', notes?: string }) {
-    return this.prisma.postulacion.update({
+    const updated = await this.prisma.postulacion.update({
       where: { id },
       data,
+      include: {
+        candidato: true,
+        oferta: { select: { titulo: true } },
+      },
     });
+
+    if (data.estado) {
+      const statusLabels = {
+        PENDIENTE: 'en revisión',
+        REVISADA: 'revisada',
+        ENTREVISTA: 'seleccionada para entrevista',
+        RECHAZADA: 'rechazada',
+      };
+
+      await this.notificationsService.create({
+        usuarioId: updated.candidato.usuarioId,
+        titulo: 'Actualización de postulación',
+        mensaje: `Tu postulación para "${updated.oferta.titulo}" ha sido ${statusLabels[data.estado]}.`,
+        tipo: data.estado === 'RECHAZADA' ? 'alert' : 'success',
+        link: `/pages/dashboard-candidato.html?section=postulaciones&id=${updated.id}`,
+      });
+    }
+
+    return updated;
   }
 
   // Ver una postulación específica
@@ -187,7 +212,7 @@ export class ApplicationsService {
         },
         oferta: {
           include: {
-            empresa: { select: { nombre: true, id: true } }
+            empresa: { select: { nombre: true, id: true, logoUrl: true } }
           }
         }
       }

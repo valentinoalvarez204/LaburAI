@@ -6,7 +6,6 @@
    - Score ring animado
    - Habilidades detectadas
    - Postulaciones con filtro
-   - Ofertas recomendadas
    - Avatar dropdown
    - Sidebar mobile
 ════════════════════════════════════════════ */
@@ -16,6 +15,7 @@
 ─────────────────────────────────── */
 let CANDIDATO = {
   nombre: '',
+  fotoUrl: '',
   cvUrl: '',
   score: null,
   scoreData: {
@@ -35,7 +35,130 @@ let CANDIDATO = {
 };
 
 let POSTULACIONES = [];
-let RECOMENDADAS = [];
+const CANDIDATO_FOTO_MAX_BYTES = 10 * 1024 * 1024;
+
+function setAvatarBackground(el, url, fallbackName = CANDIDATO.nombre) {
+  if (!el) return;
+
+  if (url) {
+    el.textContent = '';
+    el.style.backgroundImage = `url("${url}")`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+    el.style.backgroundRepeat = 'no-repeat';
+    return;
+  }
+
+  el.style.backgroundImage = '';
+  el.style.backgroundSize = '';
+  el.style.backgroundPosition = '';
+  el.style.backgroundRepeat = '';
+  el.textContent = (fallbackName || 'U').charAt(0).toUpperCase();
+}
+
+function setCandidatoFoto(url, fallbackName = CANDIDATO.nombre) {
+  const profileAvatar = document.getElementById('candProfileAvatar');
+
+  if (profileAvatar && url) {
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = `Foto de ${fallbackName || 'candidato'}`;
+    profileAvatar.replaceChildren(img);
+    profileAvatar.classList.add('cfu-avatar--image');
+  } else if (profileAvatar) {
+    profileAvatar.classList.remove('cfu-avatar--image');
+    profileAvatar.replaceChildren(document.createTextNode((fallbackName || 'U').charAt(0).toUpperCase()));
+  }
+
+  document.querySelectorAll('#spAvatar, .avatar-circle').forEach((el) => {
+    setAvatarBackground(el, url, fallbackName);
+  });
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function getOfertaLogoUrl(job) {
+  return job?.empresa?.logoUrl || job?.logoUrl || job?.empresaLogoUrl || '';
+}
+
+function formatOfertaSalary(job) {
+  if (job?.salarioMin && job?.salarioMax) {
+    return `$${job.salarioMin.toLocaleString('es-AR')} – $${job.salarioMax.toLocaleString('es-AR')}`;
+  }
+  if (job?.salarioMin) return `$${job.salarioMin.toLocaleString('es-AR')}`;
+  return 'Salario a convenir';
+}
+
+function mapOfertaToFavoriteCard(job, fallbackLink) {
+  const company = job?.empresa?.nombre || 'Empresa';
+  return {
+    id: job.id,
+    title: job.titulo,
+    company,
+    location: job.ubicacion || '',
+    logo: company.charAt(0).toUpperCase() || '?',
+    logoUrl: getOfertaLogoUrl(job),
+    logoColor: '#5C6BC0',
+    tags: [job.modalidad, job.jornada, ...(job.habilidades?.slice(0, 1) || [])].filter(Boolean),
+    tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', '', ''],
+    salary: formatOfertaSalary(job),
+    time: job.creadoEn ? new Date(job.creadoEn).toLocaleDateString('es-AR') : '',
+    desc: job.descripcion || 'Oferta guardada en favoritos',
+    link: fallbackLink || getPerfilLink(job.id),
+  };
+}
+
+async function loadFavoriteOffers(ids) {
+  const list = await API.getOfertas();
+  const jobsById = new Map(Array.isArray(list) ? list.map((job) => [String(job.id), job]) : []);
+
+  const detailEntries = await Promise.all(
+    ids.map(async (id) => {
+      const listJob = jobsById.get(String(id));
+      if (listJob && getOfertaLogoUrl(listJob)) return [String(id), listJob];
+
+      try {
+        const detailJob = await API.getOferta(id);
+        return [String(id), detailJob || listJob];
+      } catch (err) {
+        console.warn(`[Dashboard] No se pudo cargar detalle de favorito ${id}:`, err.message);
+        return [String(id), listJob || null];
+      }
+    })
+  );
+
+  return new Map(detailEntries.filter(([, job]) => Boolean(job)));
+}
+
+async function hydratePostulacionLogos(postulaciones) {
+  const missing = postulaciones.filter((p) => p.id && !p.logoUrl);
+  if (!missing.length) return postulaciones;
+
+  const logoEntries = await Promise.all(
+    missing.map(async (p) => {
+      try {
+        const job = await API.getOferta(p.id);
+        return [String(p.id), getOfertaLogoUrl(job)];
+      } catch (err) {
+        console.warn(`[Dashboard] No se pudo cargar logo de postulación ${p.id}:`, err.message);
+        return [String(p.id), ''];
+      }
+    })
+  );
+
+  const logosById = new Map(logoEntries.filter(([, logoUrl]) => Boolean(logoUrl)));
+  return postulaciones.map((p) => ({
+    ...p,
+    logoUrl: p.logoUrl || logosById.get(String(p.id)) || '',
+  }));
+}
 
 /* ─────────────────────────────────
    RENDER SCORE DEL CV
@@ -217,7 +340,9 @@ function renderPostulaciones(filter = 'todas') {
 
   el.innerHTML = list.map((p) => `
     <a class="postul-item" href="${UI_PAGES.oferta_detalle}?id=${p.id}">
-      <div class="pi-logo" style="color:${p.logoColor}">${p.logo}</div>
+      ${p.logoUrl
+        ? `<div class="pi-logo company-logo--image"><img src="${p.logoUrl}" alt="Logo de ${p.company || p.empresa || 'empresa'}" loading="lazy"></div>`
+        : `<div class="pi-logo" style="color:${p.logoColor}">${p.logo}</div>`}
       <div class="pi-info">
         <div class="pi-title">${p.title}</div>
         <div class="pi-company">${p.company}</div>
@@ -235,32 +360,6 @@ function initPostulacionesFiltros() {
       renderPostulaciones(btn.dataset.pf);
     });
   });
-}
-
-/* ─────────────────────────────────
-   RENDER RECOMENDADAS
-───────────────────────────────── */
-function renderRecomendadas() {
-  const grid = document.getElementById('recGrid');
-  if (!grid) return;
-  grid.innerHTML = RECOMENDADAS.map((o) => {
-    const tags = o.tags.map((t, i) => `<span class="job-tag ${o.tagTypes[i] || ''}">${t}</span>`).join('');
-    return `
-      <a class="job-card" href="${UI_PAGES.oferta_detalle}?id=${o.id}">
-        <div class="job-card-head">
-          <div class="company-logo" style="color:${o.logoColor}">${o.logo}</div>
-          <div class="job-meta">
-            <div class="job-title">${o.title}</div>
-            <div class="company-name">${o.company} · ${o.location}</div>
-          </div>
-        </div>
-        <div class="job-tags">${tags}</div>
-        <div class="job-footer">
-          <div class="salary">${o.salary}</div>
-          <div class="time-ago">${o.time}</div>
-        </div>
-      </a>`;
-  }).join('');
 }
 
 function parseOfertaIdFromLink(link) {
@@ -286,34 +385,19 @@ async function renderFavoritos() {
   }
 
   const ids = favoritos.map(parseOfertaIdFromLink).filter(Boolean);
-  let offerCards = [];
+  let favoriteJobs = new Map();
 
   try {
-    const data = await API.getOfertas();
-    if (Array.isArray(data)) {
-      offerCards = data
-        .filter((job) => ids.includes(job.id))
-        .map((job) => ({
-          id: job.id,
-          title: job.titulo,
-          company: job.empresa?.nombre || 'Empresa',
-          location: job.ubicacion,
-          logo: job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
-          logoColor: '#5C6BC0',
-          tags: [job.modalidad, job.jornada],
-          tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', ''],
-          salary: job.salarioMin ? `$${job.salarioMin.toLocaleString('es-AR')}` : 'A convenir',
-          time: new Date(job.creadoEn).toLocaleDateString('es-AR'),
-          desc: job.descripcion || 'Oferta guardada en favoritos',
-          link: getPerfilLink(job.id),
-        }));
-    }
+    favoriteJobs = await loadFavoriteOffers(ids);
   } catch (err) {
     console.warn('[Dashboard] No se pudieron cargar ofertas favoritas:', err.message);
   }
 
-  const fallbackCards = favoritos.map((link) => {
+  const cards = favoritos.map((link) => {
     const fallbackId = parseOfertaIdFromLink(link);
+    const job = fallbackId ? favoriteJobs.get(String(fallbackId)) : null;
+    if (job) return mapOfertaToFavoriteCard(job, fallbackId ? getPerfilLink(fallbackId) : link);
+
     return {
       id: fallbackId || '',
       title: 'Oferta favorita',
@@ -330,32 +414,33 @@ async function renderFavoritos() {
     };
   });
 
-  const cards = offerCards.length ? offerCards : fallbackCards;
   grid.innerHTML = cards.map((o) => {
-    const tags = o.tags.map((t, i) => `<span class="job-tag ${o.tagTypes[i] || ''}">${t}</span>`).join('');
+    const tags = o.tags.map((t, i) => `<span class="job-tag ${escapeHtml(o.tagTypes[i] || '')}">${escapeHtml(t)}</span>`).join('');
     const link = o.link || getPerfilLink(o.id);
     // El favorito siempre está active en la sección de favoritos
     return `
       <div class="job-card">
-        <button type="button" class="card-fav-btn active" data-id="${o.id}" title="Quitar de favoritos" aria-label="Quitar de favoritos">
+        <button type="button" class="card-fav-btn active" data-id="${escapeHtml(o.id)}" title="Quitar de favoritos" aria-label="Quitar de favoritos">
           <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-star"></use></svg>
         </button>
-        <button type="button" class="card-share-btn" data-link="${link}" title="Compartir oferta" aria-label="Compartir oferta">
+        <button type="button" class="card-share-btn" data-link="${escapeHtml(link)}" title="Compartir oferta" aria-label="Compartir oferta">
           <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-share"></use></svg>
         </button>
-        <a class="job-card-link" href="${link}">
+        <a class="job-card-link" href="${escapeHtml(link)}">
           <div class="job-card-head">
-            <div class="company-logo" style="color:${o.logoColor}">${o.logo}</div>
+            ${o.logoUrl
+              ? `<div class="company-logo company-logo--image"><img src="${escapeHtml(o.logoUrl)}" alt="Logo de ${escapeHtml(o.company || o.empresa || 'empresa')}" loading="lazy"></div>`
+              : `<div class="company-logo" style="color:${escapeHtml(o.logoColor)}">${escapeHtml(o.logo)}</div>`}
             <div class="job-meta">
-              <div class="job-title">${o.title}</div>
-              <div class="company-name">${o.company}${o.location ? ' · ' + o.location : ''}</div>
+              <div class="job-title">${escapeHtml(o.title)}</div>
+              <div class="company-name">${escapeHtml(o.company)}${o.location ? ' · ' + escapeHtml(o.location) : ''}</div>
             </div>
           </div>
           <div class="job-tags">${tags}</div>
-          <p class="job-desc">${o.desc}</p>
+          <p class="job-desc">${escapeHtml(o.desc)}</p>
           <div class="job-footer">
-            <div class="salary">${o.salary}</div>
-            <div class="time-ago">${o.time}</div>
+            <div class="salary">${escapeHtml(o.salary)}</div>
+            <div class="time-ago">${escapeHtml(o.time)}</div>
           </div>
         </a>
       </div>`;
@@ -377,6 +462,8 @@ function getOfferFavoriteLink(id) {
 function initFavoritesOnFavoritosGrid() {
   const grid = document.getElementById('favGrid');
   if (!grid) return;
+  if (grid.dataset.favoriteActionsBound === 'true') return;
+  grid.dataset.favoriteActionsBound = 'true';
 
   grid.addEventListener('click', async (event) => {
     const btn = event.target.closest('.card-fav-btn');
@@ -479,6 +566,8 @@ function initSharePopoverOnFavoritosGrid() {
   const grid = document.getElementById('favGrid');
   const pop = getSharePopoverDashboard();
   if (!grid || !pop) return;
+  if (grid.dataset.shareActionsBound === 'true') return;
+  grid.dataset.shareActionsBound = 'true';
 
   grid.addEventListener('click', (event) => {
     const btn = event.target.closest('.card-share-btn');
@@ -512,7 +601,7 @@ function initSharePopoverOnFavoritosGrid() {
 /* ─────────────────────────────────
    NAVEGACIÓN ENTRE SECCIONES
 ───────────────────────────────── */
-const SECTIONS = ['overview', 'cv', 'postulaciones', 'favoritos', 'recomendadas', 'perfil'];
+const SECTIONS = ['overview', 'cv', 'postulaciones', 'favoritos', 'perfil'];
 
 function switchSection(id) {
   // Activar item del sidebar
@@ -707,6 +796,55 @@ function initUploadCv() {
   window.updateUploadButton = updateUploadButton;
 }
 
+function initCandidatoFotoUpload() {
+  const input = document.getElementById('candFotoInput');
+  const button = document.getElementById('btnCambiarFoto');
+  if (!input || !button) return;
+
+  button.addEventListener('click', () => input.click());
+
+  input.addEventListener('change', async () => {
+    const session = requireSession();
+    if (!session?.candidatoId) return;
+
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      showToast('Solo se aceptan imágenes JPG, PNG o WebP', 'error');
+      input.value = '';
+      return;
+    }
+
+    if (file.size > CANDIDATO_FOTO_MAX_BYTES) {
+      showToast('La imagen no puede superar los 10 MB', 'error');
+      input.value = '';
+      return;
+    }
+
+    ImageCropper.open({
+      file,
+      title: 'Ajustar foto',
+      saveLabel: 'Guardar foto',
+      outputName: 'foto-candidato.png',
+      outputSize: 512,
+      onSave: async (croppedFile) => {
+        const result = await API.uploadCandidatoFoto(session.candidatoId, croppedFile);
+        CANDIDATO.fotoUrl = result.fotoUrl || '';
+        session.fotoUrl = CANDIDATO.fotoUrl;
+        sessionStorage.setItem('labuai_session', JSON.stringify(session));
+        setCandidatoFoto(CANDIDATO.fotoUrl, CANDIDATO.nombre);
+        showToast('Foto actualizada correctamente', 'success');
+      },
+      onError: (error) => {
+        console.error('[Dashboard] Error subiendo foto:', error.message);
+        showToast('No se pudo subir la foto', 'error');
+      },
+    });
+    input.value = '';
+  });
+}
+
 function initFavoritosButton() {
   const button = document.getElementById('btnFavoritos');
   if (!button) return;
@@ -730,11 +868,13 @@ function initSaveProfile() {
 
     try {
       const telefonoVal = document.getElementById('profileTelefono')?.value?.trim();
+      const linkedinVal = document.getElementById('profileLinkedin')?.value?.trim();
       const payload = {
         nombre: document.getElementById('profileNombre')?.value?.trim() || undefined,
         apellido: document.getElementById('profileApellido')?.value?.trim() || undefined,
         ubicacion: document.getElementById('profileUbicacion')?.value?.trim() || undefined,
         telefono: telefonoVal ? telefonoVal : null,
+        linkedin: linkedinVal ? linkedinVal : null,
         areaRubro: document.getElementById('profileAreaRubro')?.value || undefined,
         modalidadBuscada: document.getElementById('profileModalidadBuscada')?.value || undefined,
         pretensionSalarial: document.getElementById('profilePretensionSalarial')?.value?.trim() || undefined,
@@ -751,11 +891,22 @@ function initSaveProfile() {
       const profileApellido = document.getElementById('profileApellido');
       const profileUbicacion = document.getElementById('profileUbicacion');
       const profileTelefono = document.getElementById('profileTelefono');
+      const profileLinkedin = document.getElementById('profileLinkedin');
       const profileEmail = document.getElementById('profileEmail');
       if (profileNombre) profileNombre.value = payload.nombre || '';
       if (profileApellido) profileApellido.value = payload.apellido || '';
       if (profileUbicacion) profileUbicacion.value = payload.ubicacion || '';
       if (profileTelefono) profileTelefono.value = payload.telefono || '';
+      if (profileLinkedin) profileLinkedin.value = payload.linkedin || '';
+
+      CANDIDATO.nombre = `${payload.nombre || ''} ${payload.apellido || ''}`.trim();
+      const firstName = CANDIDATO.nombre.split(' ')[0] || 'Usuario';
+      const candProfileName = document.getElementById('candProfileName');
+      const spName = document.getElementById('spName');
+      if (candProfileName) candProfileName.textContent = CANDIDATO.nombre || firstName;
+      if (spName) spName.textContent = CANDIDATO.nombre || firstName;
+      document.querySelectorAll('.avatar-name').forEach(el => el.textContent = CANDIDATO.nombre);
+      setCandidatoFoto(CANDIDATO.fotoUrl, CANDIDATO.nombre || firstName);
 
       updateProfileCompleteness({
         nombre: payload.nombre,
@@ -817,21 +968,21 @@ async function fetchProfile(candidatoId) {
     const data = await API.getPerfilCandidato(candidatoId);
 
     CANDIDATO.nombre = `${data.nombre || ''} ${data.apellido || ''}`.trim();
+    CANDIDATO.fotoUrl = data.fotoUrl || '';
     CANDIDATO.cvUrl  = data.cvUrl || '';
     CANDIDATO.score  = CANDIDATO.cvUrl && data.scoreCV !== null && data.scoreCV !== undefined ? data.scoreCV : null;
     CANDIDATO.resumen = data.resumenIA || 'Subí tu CV para que la IA genere un resumen de tu perfil profesional.';
 
     const firstName = CANDIDATO.nombre.split(' ')[0] || 'Usuario';
-    const inicial   = firstName.charAt(0).toUpperCase();
 
     // Sidebar
-    const spAvatar = document.getElementById('spAvatar');
     const spName   = document.getElementById('spName');
-    if (spAvatar) spAvatar.textContent = inicial;
     if (spName)   spName.textContent   = CANDIDATO.nombre || firstName;
+    const candProfileName = document.getElementById('candProfileName');
+    if (candProfileName) candProfileName.textContent = CANDIDATO.nombre || firstName;
+    setCandidatoFoto(CANDIDATO.fotoUrl, CANDIDATO.nombre || firstName);
 
     // Todos los avatares y nombres dinámicos del dash
-    document.querySelectorAll('.avatar-circle').forEach(el => el.textContent = inicial);
     document.querySelectorAll('.avatar-name').forEach(el   => el.textContent = CANDIDATO.nombre);
 
     // Saludo
@@ -902,6 +1053,7 @@ async function fetchProfile(candidatoId) {
     const profileAreaRubro      = document.getElementById('profileAreaRubro');
     const profileModalidadBuscada = document.getElementById('profileModalidadBuscada');
     const profilePretensionSalarial = document.getElementById('profilePretensionSalarial');
+    const profileLinkedin       = document.getElementById('profileLinkedin');
     if (profileNombre)           profileNombre.value           = data.nombre    || '';
     if (profileApellido)         profileApellido.value         = data.apellido  || '';
     if (profileEmail)            profileEmail.value            = data.usuario?.email || '';
@@ -910,6 +1062,7 @@ async function fetchProfile(candidatoId) {
     if (profileAreaRubro)        profileAreaRubro.value        = data.areaRubro || '';
     if (profileModalidadBuscada) profileModalidadBuscada.value = data.modalidadBuscada || '';
     if (profilePretensionSalarial) profilePretensionSalarial.value = data.pretensionSalarial || '';
+    if (profileLinkedin)         profileLinkedin.value         = data.linkedin  || '';
 
     updateProfileCompleteness({
       nombre:    data.nombre,
@@ -975,32 +1128,6 @@ async function fetchProfile(candidatoId) {
   }
 }
 
-async function fetchRecommendations() {
-  try {
-    const data = await API.getOfertas();
-    if (!Array.isArray(data)) return;
-
-    RECOMENDADAS = data.slice(0, 6).map(job => ({
-      id: job.id,
-      title: job.titulo,
-      company: job.empresa?.nombre || 'Empresa',
-      location: job.ubicacion,
-      logo: job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
-      logoColor: '#5C6BC0',
-      tags: [job.modalidad, job.jornada],
-      tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', ''],
-      salary: job.salarioMin ? `$${job.salarioMin.toLocaleString('es-AR')}` : 'A convenir',
-      time: 'Reciente',
-      match: null, // Sin mock: se mostrara solo si el backend lo provee
-    }));
-
-    renderRecomendadas();
-  } catch (err) {
-    console.error('[Dashboard] Error cargando recomendaciones:', err.message);
-  }
-}
-
-
 /* ─────────────────────────────────
    INIT
 ───────────────────────────────── */
@@ -1028,6 +1155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Inicializar controles de subida después de cargar el perfil
     initUploadCv();
+    initCandidatoFotoUpload();
 
     // Postulaciones
     try {
@@ -1038,11 +1166,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           title: p.oferta?.titulo || 'Oferta',
           company: p.oferta?.empresa?.nombre || 'Empresa',
           logo: p.oferta?.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+          logoUrl: p.oferta?.empresa?.logoUrl || p.oferta?.logoUrl || p.oferta?.empresaLogoUrl || '',
           logoColor: '#5C6BC0',
           fecha: new Date(p.creadoEn).toLocaleDateString('es-AR'),
           status: p.estado.toLowerCase(),
           match: p.matchIA || null,
         }));
+        POSTULACIONES = await hydratePostulacionLogos(POSTULACIONES);
 
         // Actualizar el contador del botón "Todas"
         const pfBtnTodas = document.getElementById('pfBtnTodas');
@@ -1067,10 +1197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       .catch((err) => console.error('[Dashboard] Error cargando stats candidato:', err.message));
   }
 
-  // 4. Recomendaciones
-  fetchRecommendations();
-
-  // 5. Interacciones
+  // 4. Interacciones
   initNavbar();
   initNavSession();
   initSidebarNav();
@@ -1079,4 +1206,118 @@ document.addEventListener('DOMContentLoaded', async () => {
   initCopySummary();
   initSaveProfile();
   initFavoritosButton();
+});
+function getOfferIdFromUrl(url) {
+  if (!url) return '';
+  try {
+    return new URL(url, window.location.href).searchParams.get('id') || '';
+  } catch {
+    return '';
+  }
+}
+
+function getTextSignature(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+async function hydrateFavoriteLogos() {
+  const session = getSession();
+  if (!session?.token || !session?.candidatoId) return;
+
+  const favoriteSection =
+    document.getElementById('favGrid') ||
+    document.getElementById('favoritesList') ||
+    document.querySelector('[data-section="favoritos"]') ||
+    Array.from(document.querySelectorAll('section, .dash-section, .tab-panel, main'))
+      .find((el) => getTextSignature(el.textContent).includes('favoritos')) ||
+    document.body;
+
+  const pendingLogos = Array.from(favoriteSection.querySelectorAll('.pi-logo, .company-logo'))
+    .filter((el) => !el.classList.contains('company-logo--image'));
+
+  if (!pendingLogos.length) return;
+
+  function applyLogo(logoEl, logo) {
+    if (!logo?.logoUrl) return;
+    logoEl.classList.add('company-logo--image');
+    logoEl.style.color = '';
+    logoEl.style.background = 'transparent';
+    logoEl.style.border = 'none';
+    logoEl.innerHTML = `<img src="${logo.logoUrl}" alt="${logo.alt || 'Logo de empresa'}" loading="lazy">`;
+  }
+
+  let favoritos = [];
+  try {
+    const profile = await API.getPerfilCandidato(session.candidatoId);
+    favoritos = Array.isArray(profile.favoritos) ? profile.favoritos.map(String) : [];
+  } catch (_) {
+    favoritos = [];
+  }
+
+  const favoriteLogos = await Promise.all(
+    favoritos.map(async (link) => {
+      const id = getOfferIdFromUrl(link);
+      if (!id) return null;
+      try {
+        const job = await API.getOferta(id);
+        const company = job.empresa?.nombre || '';
+        const logoUrl = job.empresa?.logoUrl || job.logoUrl || job.empresaLogoUrl || '';
+        if (!logoUrl) return null;
+        return {
+          id,
+          title: getTextSignature(job.titulo),
+          company: getTextSignature(company),
+          logoUrl,
+          alt: `Logo de ${company || 'empresa'}`,
+        };
+      } catch (_) {
+        return null;
+      }
+    })
+  );
+
+  const logos = favoriteLogos.filter(Boolean);
+
+  pendingLogos.forEach((logoEl, index) => {
+    const card = logoEl.closest('a, .job-card, .postulation-item, .profile-item, .content-card') || logoEl.parentElement;
+    const cardText = getTextSignature(card?.textContent || '');
+    const byText = logos.find((job) => cardText.includes(job.title) && cardText.includes(job.company));
+    const match = byText || logos[index];
+    if (!match) return;
+
+    applyLogo(logoEl, match);
+  });
+
+  const stillPending = Array.from(favoriteSection.querySelectorAll('.pi-logo, .company-logo'))
+    .filter((el) => !el.classList.contains('company-logo--image'));
+  if (!stillPending.length) return;
+
+  try {
+    const allJobs = await API.getOfertas();
+    const logoIndex = allJobs
+      .map((job) => ({
+        title: getTextSignature(job.titulo),
+        company: getTextSignature(job.empresa?.nombre),
+        logoUrl: job.empresa?.logoUrl || job.logoUrl || job.empresaLogoUrl || '',
+        alt: `Logo de ${job.empresa?.nombre || 'empresa'}`,
+      }))
+      .filter((job) => job.logoUrl);
+
+    stillPending.forEach((logoEl) => {
+      const card = logoEl.closest('a, .job-card, .postulation-item, .profile-item, .content-card') || logoEl.parentElement;
+      const cardText = getTextSignature(card?.textContent || '');
+      const match = logoIndex.find((job) => cardText.includes(job.title) && cardText.includes(job.company));
+      applyLogo(logoEl, match);
+    });
+  } catch (_) {
+    // Si el listado no trae logos, se conserva la inicial como fallback visual.
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(hydrateFavoriteLogos, 800);
+  const root = document.getElementById('favGrid') || document.getElementById('favoritesList');
+  if (!root) return;
+  const observer = new MutationObserver(() => hydrateFavoriteLogos());
+  observer.observe(root, { childList: true, subtree: true });
 });

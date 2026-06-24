@@ -110,6 +110,36 @@ body { background: var(--bg); }
   align-items: start;
 }
 
+.dash-sidebar .sidebar-profile,
+.dash-sidebar .sidebar-user,
+.dash-sidebar .sp-profile,
+.dash-sidebar :has(> .sp-avatar) {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.dash-sidebar .sp-avatar {
+  width: 78px;
+  height: 78px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  font-size: 22px;
+}
+
+.dash-sidebar .sp-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  text-align: center;
+}
+
+.dash-sidebar .sp-role,
+.dash-sidebar .sp-sub,
+.dash-sidebar .sp-avatar + * {
+  text-align: center;
+}
+
 /* Completud del perfil */
 .sidebar-cv-status {
   margin-top: auto;
@@ -668,28 +698,64 @@ body { background: var(--bg); }
 }
 
 /* ─────────────────────────────────
-   SECCIÓN: RECOMENDADAS
-───────────────────────────────── */
-.rec-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 14px;
-}
-
-/* ─────────────────────────────────
    SECCIÓN: MI PERFIL
 ───────────────────────────────── */
 .profile-form-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  display: grid; grid-template-columns: 1fr; gap: 20px;
+  width: 100%;
 }
 .cuenta-card {
-  grid-column: span 2;
-  min-height: 200px;
+  grid-column: auto;
+  min-height: 180px;
+}
+.pf-card {
+  width: 100%;
 }
 .pf-card-title {
   font-family: var(--font-head); font-size: 15px; font-weight: 700;
   color: var(--text); margin-bottom: 18px;
   padding-bottom: 12px; border-bottom: 1px solid var(--border);
+}
+.candidato-foto-upload {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  margin-bottom: 20px;
+}
+.cfu-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #11998E, #5C6BC0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-head);
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.cfu-avatar--image {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+}
+.cfu-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.cfu-name {
+  font-family: var(--font-head);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
 }
 .form-field   { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 .form-row     { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -782,4 +848,32 @@ body { background: var(--bg); }
 .status-verified {
   color: white; /* blanco */
   font-weight: 600;
+}
+.pi-logo.company-logo--image {
+  background: transparent;
+  border: none;
+  overflow: hidden;
+}
+
+.pi-logo.company-logo--image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  padding: 0;
+  display: block;
+}
+
+#favoritesList .company-logo.company-logo--image,
+#favoritesList .pi-logo.company-logo--image {
+  background: transparent;
+  border: none;
+}
+
+#favoritesList .company-logo.company-logo--image img,
+#favoritesList .pi-logo.company-logo--image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  padding: 0;
+  display: block;
 }

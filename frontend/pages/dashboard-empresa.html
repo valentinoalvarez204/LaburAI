@@ -406,7 +406,8 @@
               <div class="elu-avatar" id="empAvatar">--</div>
               <div>
                 <div class="elu-name" id="empTopName">-</div>
-                <button class="btn-ghost btn-sm" style="margin-top:6px">Cambiar logo</button>
+                <input type="file" id="empLogoInput" accept="image/png,image/jpeg,image/webp" hidden />
+                <button type="button" class="btn-ghost btn-sm" id="btnCambiarLogo" style="margin-top:6px">Cambiar logo</button>
               </div>
             </div>
             <div class="form-field">
@@ -494,6 +495,7 @@
   <div class="dash-overlay" id="dashOverlay"></div>
   <script src="../js/utils.js"></script>
   <script src="../js/api.js"></script>
+  <script src="../js/image-cropper.js"></script>
   <script src="../js/dashboard-empresa.js"></script>
 </body>
 </html>

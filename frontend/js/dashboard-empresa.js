@@ -5,10 +5,49 @@
 /* ─────────────────────────────────
    DATOS — Reactive state (populated from API)
 ───────────────────────────────── */
-let EMPRESA = { nombre: '', iniciales: '' };
+let EMPRESA = { nombre: '', iniciales: '', logoUrl: '' };
 let OFERTAS_DATA = [];
 let CANDIDATOS_DATA = [];
 const MATCH_ANALYSIS_LIMIT = 5;
+const EMPRESA_LOGO_MAX_BYTES = 10 * 1024 * 1024;
+
+function setLogoBackground(el, url, fallbackName = EMPRESA.nombre) {
+  if (!el) return;
+
+  if (url) {
+    el.textContent = '';
+    el.style.backgroundImage = `url("${url}")`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+    el.style.backgroundRepeat = 'no-repeat';
+    return;
+  }
+
+  el.style.backgroundImage = '';
+  el.style.backgroundSize = '';
+  el.style.backgroundPosition = '';
+  el.style.backgroundRepeat = '';
+  el.textContent = (fallbackName || 'E').charAt(0).toUpperCase();
+}
+
+function setEmpresaLogo(url, fallbackName = EMPRESA.nombre) {
+  const avatar = document.getElementById('empAvatar');
+
+  if (avatar && url) {
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = `Logo de ${fallbackName || 'empresa'}`;
+    avatar.replaceChildren(img);
+    avatar.classList.add('elu-avatar--image');
+  } else if (avatar) {
+    avatar.classList.remove('elu-avatar--image');
+    avatar.replaceChildren(document.createTextNode((fallbackName || 'E').charAt(0).toUpperCase()));
+  }
+
+  document.querySelectorAll('#dashSidebar .sp-avatar, .sp-avatar--empresa, .avatar-circle').forEach((el) => {
+    setLogoBackground(el, url, fallbackName);
+  });
+}
 
 /* ─────────────────────────────────
    NAVEGACIÓN
@@ -597,6 +636,9 @@ function initGuardarEmpresa() {
         document.querySelectorAll('.sp-name, .avatar-name, .elu-name').forEach((el) => {
           if (el) el.textContent = data.nombre;
         });
+        EMPRESA.nombre = data.nombre || EMPRESA.nombre;
+        EMPRESA.iniciales = EMPRESA.nombre.charAt(0).toUpperCase();
+        setEmpresaLogo(EMPRESA.logoUrl, EMPRESA.nombre);
       }
 
     } catch (error) {
@@ -606,6 +648,55 @@ function initGuardarEmpresa() {
       btn.disabled = false;
       btn.textContent = prevText;
     }
+  });
+}
+
+function initEmpresaLogoUpload() {
+  const input = document.getElementById('empLogoInput');
+  const button = document.getElementById('btnCambiarLogo');
+  if (!input || !button) return;
+
+  button.addEventListener('click', () => input.click());
+
+  input.addEventListener('change', async () => {
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      showToast('Solo se aceptan imágenes JPG, PNG o WebP', 'error');
+      input.value = '';
+      return;
+    }
+
+    if (file.size > EMPRESA_LOGO_MAX_BYTES) {
+      showToast('La imagen no puede superar los 10 MB', 'error');
+      input.value = '';
+      return;
+    }
+
+    ImageCropper.open({
+      file,
+      title: 'Ajustar logo',
+      saveLabel: 'Guardar logo',
+      outputName: 'logo-empresa.png',
+      outputSize: 512,
+      onSave: async (croppedFile) => {
+        const result = await API.uploadEmpresaLogo(croppedFile);
+        EMPRESA.logoUrl = result.logoUrl || '';
+        const session = getSession();
+        if (session) {
+          session.logoUrl = EMPRESA.logoUrl;
+          sessionStorage.setItem('labuai_session', JSON.stringify(session));
+        }
+        setEmpresaLogo(EMPRESA.logoUrl, EMPRESA.nombre);
+        showToast('Logo actualizado correctamente', 'success');
+      },
+      onError: (error) => {
+        console.error('[Dashboard] Error subiendo logo:', error.message);
+        showToast('No se pudo subir el logo', 'error');
+      },
+    });
+    input.value = '';
   });
 }
 
@@ -934,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     EMPRESA.nombre = session.nombre;
     EMPRESA.iniciales = session.nombre.charAt(0).toUpperCase();
     document.querySelectorAll('.sp-name, .avatar-name').forEach((el) => el.textContent = session.nombre);
-    document.querySelectorAll('.sp-avatar, .avatar-circle').forEach((el) => el.textContent = EMPRESA.iniciales);
+    setEmpresaLogo(EMPRESA.logoUrl, session.nombre);
     const greetEl = document.querySelector('.greeting-title');
     if (greetEl) greetEl.textContent = `Bienvenido, ${session.nombre} 🏢`;
   }
@@ -969,9 +1060,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const topName = document.getElementById('empTopName');
-        const topAvatar = document.getElementById('empAvatar');
         if (topName) topName.textContent = perf.nombre || 'Empresa';
-        if (topAvatar) topAvatar.textContent = (perf.nombre || 'E').charAt(0).toUpperCase();
+        EMPRESA.logoUrl = perf.logoUrl || '';
+        if (EMPRESA.logoUrl) {
+          session.logoUrl = EMPRESA.logoUrl;
+          sessionStorage.setItem('labuai_session', JSON.stringify(session));
+        }
+        setEmpresaLogo(EMPRESA.logoUrl, perf.nombre);
       }
 
       const misOfertas = await API.getOfertas({ empresaId: session.empresaId });
@@ -1078,5 +1173,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initPublicarForm();
   initEmpresaForms();
   initGuardarEmpresa();
+  initEmpresaLogoUpload();
   initCuentaOptions();
 });

@@ -45,10 +45,19 @@ export class ProfileService {
     modalidadBuscada?:  string;
     pretensionSalarial?: string;
     favoritos?:         string[];
+    fotoUrl?:           string;
   }) {
     return this.prisma.candidato.update({
       where: { id: candidatoId },
       data,
+    });
+  }
+
+  async updateCandidatoFoto(candidatoId: string, fotoUrl: string) {
+    return this.prisma.candidato.update({
+      where: { id: candidatoId },
+      data: { fotoUrl },
+      select: { id: true, fotoUrl: true },
     });
   }
 
@@ -212,6 +221,14 @@ export class ProfileService {
     return this.prisma.empresa.update({
       where: { usuarioId },
       data,
+    });
+  }
+
+  async updateEmpresaLogoByUserId(usuarioId: string, logoUrl: string) {
+    return this.prisma.empresa.update({
+      where: { usuarioId },
+      data: { logoUrl },
+      select: { id: true, logoUrl: true },
     });
   }
 
