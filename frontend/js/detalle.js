@@ -262,18 +262,44 @@ function renderPage(oferta) {
     if (btnLoginToApply) btnLoginToApply.style.display = 'none';
     if (btnLoginToApplyMobile) btnLoginToApplyMobile.style.display = 'none';
 
-    if (btnApply) {
-      const btnText = oferta.modalidad === 'Remoto' ? 'Postularme' : 'Postulación Rápida';
-      btnApply.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg> ${btnText}`;
-      btnApply.style.display = 'flex';
+    if (oferta.yaPostulado) {
+      // YA POSTULADO: Deshabilitar botones y cambiar texto
+      if (btnApply) {
+        btnApply.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Ya estás postulado`;
+        btnApply.style.display = 'flex';
+        btnApply.classList.add('btn-applied');
+        btnApply.disabled = true;
+        btnApply.style.opacity = '0.7';
+        btnApply.style.cursor = 'default';
+        btnApply.onclick = (e) => { e.preventDefault(); e.stopPropagation(); };
+      }
+      if (btnApplyMobile) {
+        btnApplyMobile.innerText = 'Ya postulado';
+        btnApplyMobile.style.display = 'flex';
+        btnApplyMobile.disabled = true;
+        btnApplyMobile.style.opacity = '0.7';
+      }
+    } else {
+      // NO POSTULADO AÚN
+      if (btnApply) {
+        const btnText = oferta.modalidad === 'Remoto' ? 'Postularme' : 'Postulación Rápida';
+        btnApply.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg> ${btnText}`;
+        btnApply.style.display = 'flex';
+        btnApply.classList.remove('btn-applied');
+        btnApply.disabled = false;
+        btnApply.style.opacity = '1';
+        btnApply.style.cursor = 'pointer';
+      }
+      if (btnApplyMobile) {
+        const btnTextBtn = oferta.modalidad === 'Remoto' ? 'Postularme' : 'Postul. Rápida';
+        btnApplyMobile.innerText = btnTextBtn;
+        btnApplyMobile.style.display = 'flex';
+        btnApplyMobile.disabled = false;
+        btnApplyMobile.style.opacity = '1';
+      }
     }
-    if (btnSaveAlt) btnSaveAlt.style.display = 'flex';
     
-    if (btnApplyMobile) {
-      const btnTextBtn = oferta.modalidad === 'Remoto' ? 'Postularme' : 'Postul. Rápida';
-      btnApplyMobile.innerText = btnTextBtn;
-      btnApplyMobile.style.display = 'flex';
-    }
+    if (btnSaveAlt) btnSaveAlt.style.display = 'flex';
   }
 
   // Sidebar — info rows
@@ -669,6 +695,24 @@ function initModal() {
       sucOverlay?.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
 
+      // Actualizar estado local para que al cerrar el modal el botón se vea aplicado
+      const btnApply = document.getElementById('btnApply');
+      const btnApplyMobile = document.getElementById('btnApplyMobile');
+      
+      if (btnApply) {
+        btnApply.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Ya estás postulado`;
+        btnApply.classList.add('btn-applied');
+        btnApply.disabled = true;
+        btnApply.style.opacity = '0.7';
+        btnApply.style.cursor = 'default';
+        btnApply.onclick = (e) => { e.preventDefault(); e.stopPropagation(); };
+      }
+      if (btnApplyMobile) {
+        btnApplyMobile.innerText = 'Ya postulado';
+        btnApplyMobile.disabled = true;
+        btnApplyMobile.style.opacity = '0.7';
+      }
+
     } catch (err) {
       showToast('No se pudo conectar con el servidor', 'error');
       btnConfirm.disabled = false;
@@ -847,7 +891,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!id) { window.location.href = UI_PAGES.ofertas; return; }
 
   try {
-    const job = await API.getOferta(id);
+    const session = getSession();
+    const candidateId = session?.candidatoId;
+    const job = await API.getOferta(id, candidateId);
 
     if (!job || !job.id) { window.location.href = UI_PAGES.ofertas; return; }
 
@@ -869,6 +915,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       match:        job.matchIA || 0,
       analizado:    job.analizado || false,
       analisisRestantes: job.analisisRestantes ?? 3,
+      yaPostulado:  job.yaPostulado || false,
       modalidad:    job.modalidad,
       jornada:      job.jornada,
       exp:          job.experiencia || 'No especificada',
