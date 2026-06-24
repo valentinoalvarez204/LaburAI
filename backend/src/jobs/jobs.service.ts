@@ -95,15 +95,24 @@ export class JobsService {
           where: { candidatoId_ofertaId: { candidatoId, ofertaId: id } },
         });
 
+        const postulacionExistente = await this.prisma.postulacion.findUnique({
+          where: {
+            candidatoId_ofertaId: { candidatoId, ofertaId: id }
+          }
+        });
+
         response.matchIA = existingAnalysis?.match ?? 0;
         response.analizado = !!existingAnalysis;
         response.analisisRestantes = Math.max(0, 3 - totalAnalyses);
+        response.yaPostulado = !!postulacionExistente;
       } else {
         response.matchIA = 0;
         response.analizado = false;
         response.analisisRestantes = 3;
+        response.yaPostulado = false;
       }
     }
+
 
     return response;
   }

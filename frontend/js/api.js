@@ -139,9 +139,10 @@ async function getOfertas(params = {}) {
   }
 }
 
-async function getOferta(id) {
+async function getOferta(id, candidatoId = null) {
   try {
-    return await apiFetch(`/jobs/${id}`);
+    const qs = candidatoId ? `?candidatoId=${candidatoId}` : '';
+    return await apiFetch(`/jobs/${id}${qs}`);
   } catch (err) {
     console.error(`[API] Error obteniendo oferta ${id}:`, err.message);
     throw err;
