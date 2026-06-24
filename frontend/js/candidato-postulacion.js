@@ -172,9 +172,12 @@ function renderDetailPage(app) {
     skillsList.innerHTML = '<span class="text-secondary" style="font-size:13px">Habilidades no detectadas</span>';
   }
 
-  // --- Contacto ---
-  document.getElementById('candEmail').textContent = cand.usuario?.email || 'N/A';
+  // --- Datos del candidato ---
   document.getElementById('candPhone').textContent = cand.telefono || 'No proporcionado';
+  document.getElementById('candEmail').textContent = cand.usuario?.email || cand.email || 'No proporcionado';
+  document.getElementById('candAreaRubro').textContent = cand.areaRubro || 'No especificada';
+  document.getElementById('candModalidadBuscada').textContent = cand.modalidadBuscada || 'No especificada';
+  document.getElementById('candPretensionSalarial').textContent = cand.pretensionSalarial || 'No especificada';
 
   // --- Motivación ---
   const motiv = document.getElementById('motivLetter');
@@ -357,3 +360,152 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavSession();
   initPage();
 });
+function setCandidatoPostulacionAvatar(url, fallbackName = '') {
+  const avatar = document.getElementById('spAvatar') || document.querySelector('#dashSidebar .sp-avatar');
+  const nameEl = document.getElementById('spName') || document.querySelector('#dashSidebar .sp-name');
+  const displayName = fallbackName || 'Usuario';
+
+  if (nameEl) nameEl.textContent = displayName;
+  if (!avatar) return;
+
+  if (url) {
+    avatar.textContent = '';
+    avatar.style.backgroundImage = `url("${url}")`;
+    avatar.style.backgroundSize = 'cover';
+    avatar.style.backgroundPosition = 'center';
+    avatar.style.backgroundRepeat = 'no-repeat';
+    return;
+  }
+
+  avatar.style.backgroundImage = '';
+  avatar.style.backgroundSize = '';
+  avatar.style.backgroundPosition = '';
+  avatar.style.backgroundRepeat = '';
+  avatar.textContent = displayName.charAt(0).toUpperCase();
+}
+
+async function hydrateCandidatoPostulacionAvatar() {
+  const session = typeof getSession === 'function'
+    ? getSession()
+    : JSON.parse(sessionStorage.getItem('labuai_session') || '{}');
+  if (!session?.candidatoId) return;
+
+  setCandidatoPostulacionAvatar(session.fotoUrl || '', session.nombre || '');
+
+  try {
+    const profile = await API.getPerfilCandidato(session.candidatoId);
+    const fullName = `${profile.nombre || ''} ${profile.apellido || ''}`.trim() || session.nombre || '';
+    setCandidatoPostulacionAvatar(profile.fotoUrl || '', fullName);
+
+    session.fotoUrl = profile.fotoUrl || '';
+    session.nombre = fullName || session.nombre;
+    sessionStorage.setItem('labuai_session', JSON.stringify(session));
+  } catch (error) {
+    console.warn('[CandidatoPostulacion] No se pudo cargar la foto del candidato:', error.message);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', hydrateCandidatoPostulacionAvatar);
+
+function setSidebarEmpresaLogo(url, fallbackName = '') {
+  const avatar = document.querySelector('#dashSidebar .sp-avatar');
+  const displayName = fallbackName || 'Empresa';
+  if (!avatar) return;
+
+  if (url) {
+    avatar.textContent = '';
+    avatar.style.backgroundImage = `url("${url}")`;
+    avatar.style.backgroundSize = 'cover';
+    avatar.style.backgroundPosition = 'center';
+    avatar.style.backgroundRepeat = 'no-repeat';
+    return;
+  }
+
+  avatar.style.backgroundImage = '';
+  avatar.style.backgroundSize = '';
+  avatar.style.backgroundPosition = '';
+  avatar.style.backgroundRepeat = '';
+  avatar.textContent = displayName.charAt(0).toUpperCase();
+}
+
+function setPostulacionCandidatePhoto(url, fallbackName = '') {
+  const displayName = fallbackName || 'Candidato';
+  const initials = displayName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join('') || 'C';
+
+  const explicitCandidates = Array.from(document.querySelectorAll('.cand-avatar, .candidate-avatar, .cp-avatar, .profile-avatar, .avatar-lg'));
+  const initialCandidates = Array.from(document.querySelectorAll('main *')).filter((el) => {
+    const text = (el.textContent || '').trim().toUpperCase();
+    const hasOnlyInitials = text === initials || /^[A-ZÁÉÍÓÚÑ]{1,3}$/.test(text);
+    return hasOnlyInitials && el.children.length === 0;
+  });
+
+  const candidates = [...explicitCandidates, ...initialCandidates];
+  const avatar = candidates.find((el) => {
+    const text = (el.textContent || '').trim().toUpperCase();
+    return text === initials || text.length <= 3;
+  }) || candidates[0];
+
+  if (!avatar) return;
+
+  if (url) {
+    avatar.textContent = '';
+    avatar.style.backgroundImage = `url("${url}")`;
+    avatar.style.backgroundSize = 'cover';
+    avatar.style.backgroundPosition = 'center';
+    avatar.style.backgroundRepeat = 'no-repeat';
+    avatar.style.overflow = 'hidden';
+    return;
+  }
+
+  avatar.style.backgroundImage = '';
+  avatar.style.backgroundSize = '';
+  avatar.style.backgroundPosition = '';
+  avatar.style.backgroundRepeat = '';
+  avatar.textContent = initials;
+}
+
+async function hydratePostulacionLogosAndPhotos() {
+  const session = typeof getSession === 'function'
+    ? getSession()
+    : JSON.parse(sessionStorage.getItem('labuai_session') || '{}');
+
+  setSidebarEmpresaLogo(session?.logoUrl || '', session?.nombre || '');
+
+  if (session?.rol === 'EMPRESA' || session?.empresaId) {
+    try {
+      const empresa = await API.getPerfilEmpresa();
+      setSidebarEmpresaLogo(empresa.logoUrl || '', empresa.nombre || session.nombre || '');
+      session.logoUrl = empresa.logoUrl || '';
+      session.nombre = empresa.nombre || session.nombre;
+      sessionStorage.setItem('labuai_session', JSON.stringify(session));
+    } catch (error) {
+      console.warn('[CandidatoPostulacion] No se pudo cargar el logo de empresa:', error.message);
+    }
+  }
+
+  const postulacionId = new URLSearchParams(window.location.search).get('id');
+  if (!postulacionId) return;
+
+  try {
+    const postulacion = await API.getPostulacion(postulacionId);
+    let candidato = postulacion?.candidato || {};
+    if (!candidato.fotoUrl && candidato.id) {
+      try {
+        candidato = await API.getPerfilCandidato(candidato.id);
+      } catch (error) {
+        console.warn('[CandidatoPostulacion] No se pudo cargar el perfil del candidato:', error.message);
+      }
+    }
+    const candidateName = `${candidato.nombre || ''} ${candidato.apellido || ''}`.trim();
+    setPostulacionCandidatePhoto(candidato.fotoUrl || '', candidateName);
+  } catch (error) {
+    console.warn('[CandidatoPostulacion] No se pudo cargar la foto de la postulación:', error.message);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', hydratePostulacionLogosAndPhotos);

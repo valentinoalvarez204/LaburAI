@@ -31,6 +31,87 @@ const state = {
   results: [...OFERTAS],
 };
 
+let FAVORITE_LINKS = [];
+
+function normalizeText(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function renderCompanyLogo(job, className = 'company-logo') {
+  if (job.logoUrl) {
+    return `
+      <div class="${className} company-logo--image">
+        <img src="${escapeHtml(job.logoUrl)}" alt="Logo de ${escapeHtml(job.company)}" loading="lazy">
+      </div>`;
+  }
+  return `<div class="${className}" style="color:${escapeHtml(job.logoColor)}">${escapeHtml(job.logo)}</div>`;
+}
+
+async function getEmpresaLogoFallback() {
+  const session = getSession();
+  if (String(session?.rol || '').toLowerCase() !== 'empresa') return null;
+
+  const fallback = {
+    empresaId: session.empresaId || '',
+    nombre: session.nombre || '',
+    logoUrl: session.logoUrl || '',
+  };
+
+  if (!session?.token) return fallback.logoUrl ? fallback : null;
+
+  try {
+    const perfil = await API.getPerfilEmpresa();
+    fallback.nombre = perfil?.nombre || fallback.nombre;
+    fallback.logoUrl = perfil?.logoUrl || fallback.logoUrl;
+    if (fallback.logoUrl) {
+      session.logoUrl = fallback.logoUrl;
+      sessionStorage.setItem('labuai_session', JSON.stringify(session));
+    }
+  } catch (err) {
+    console.warn('[Ofertas] No se pudo cargar logo de empresa autenticada:', err.message);
+  }
+
+  return fallback.logoUrl ? fallback : null;
+}
+
+function resolveJobLogoUrl(job, empresaFallback) {
+  const apiLogoUrl = job.empresa?.logoUrl || job.logoUrl || job.empresaLogoUrl || '';
+  if (apiLogoUrl) return apiLogoUrl;
+
+  const sameEmpresaId = empresaFallback?.empresaId && job.empresaId === empresaFallback.empresaId;
+  const sameEmpresaName = empresaFallback?.nombre && normalizeText(job.empresa?.nombre) === normalizeText(empresaFallback.nombre);
+
+  return sameEmpresaId || sameEmpresaName ? empresaFallback.logoUrl : '';
+}
+
+async function loadMissingLogoUrlsFromDetails(jobs) {
+  const entries = await Promise.all(
+    jobs.map(async (job) => {
+      const currentLogoUrl = job.empresa?.logoUrl || job.logoUrl || job.empresaLogoUrl || '';
+      if (currentLogoUrl) return [job.id, currentLogoUrl];
+
+      try {
+        const detail = await API.getOferta(job.id);
+        return [job.id, detail?.empresa?.logoUrl || detail?.logoUrl || detail?.empresaLogoUrl || ''];
+      } catch (err) {
+        console.warn(`[Ofertas] No se pudo cargar logo del detalle ${job.id}:`, err.message);
+        return [job.id, ''];
+      }
+    })
+  );
+
+  return new Map(entries.filter(([, logoUrl]) => Boolean(logoUrl)));
+}
+
 /* ─────────────────────────────────
    HAMBURGER
 ───────────────────────────────── */
@@ -284,6 +365,33 @@ function buildTagHTML(label, type) {
   return `<span class="job-tag${cls}">${label}</span>`;
 }
 
+function getOfferFavoriteLink(id) {
+  return new URL(`${UI_PAGES.oferta_detalle}?id=${id}`, document.baseURI).href;
+}
+
+async function loadFavoriteLinks() {
+  const session = getSession();
+  if (!session?.token || !session?.candidatoId) {
+    FAVORITE_LINKS = [];
+    return;
+  }
+
+  try {
+    const profile = await API.getPerfilCandidato(session.candidatoId);
+    FAVORITE_LINKS = Array.isArray(profile.favoritos) ? profile.favoritos.map(String) : [];
+  } catch (err) {
+    console.warn('[Ofertas] No se pudieron cargar favoritos:', err.message);
+    FAVORITE_LINKS = [];
+  }
+}
+
+async function updateFavoriteLinksOnServer(nextLinks) {
+  const session = getSession();
+  if (!session?.token || !session?.candidatoId) throw new Error('Sesión no encontrada');
+  await API.patchPerfilCandidato(session.candidatoId, { favoritos: nextLinks });
+  FAVORITE_LINKS = nextLinks;
+}
+
 function renderCards() {
   const grid = document.getElementById('offersGrid');
   if (!grid) return;
@@ -308,16 +416,28 @@ function renderCards() {
 
   // Obtener sesión para verificar rol
   const session = getSession();
-  const isEmpresa = session?.rol === 'empresa';
+  const isCandidato = String(session?.rol || '').toLowerCase() === 'candidato' && Boolean(session?.candidatoId);
 
   grid.innerHTML = pageItems.map((job) => {
     const tags = job.tags.map((t, i) => buildTagHTML(t, job.tagTypes[i])).join('');
 
+    const offerLink = getOfferFavoriteLink(job.id);
+    const isSaved = FAVORITE_LINKS.includes(offerLink);
+
     return `
-      <a class="job-card" href="${UI_PAGES.oferta_detalle}?id=${job.id}">
-        <div class="job-card-head">
-          <div class="company-logo" style="color:${job.logoColor}">${job.logo}</div>
-          <div class="job-meta">
+      <div class="job-card">
+        ${isCandidato ? `
+          <button type="button" class="card-fav-btn${isSaved ? ' active' : ''}" data-id="${job.id}" title="${isSaved ? 'Quitar de favoritos' : 'Agregar a favoritos'}" aria-label="${isSaved ? 'Quitar de favoritos' : 'Agregar a favoritos'}">
+            <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-star"></use></svg>
+          </button>
+        ` : ''}
+        <button type="button" class="card-share-btn" data-link="${UI_PAGES.oferta_detalle}?id=${job.id}" title="Compartir oferta" aria-label="Compartir oferta">
+          <svg class="icon icon-sm"><use href="../assets/icons.svg#icon-share"></use></svg>
+        </button>
+        <a class="job-card-link" href="${UI_PAGES.oferta_detalle}?id=${job.id}">
+          <div class="job-card-head">
+            ${renderCompanyLogo(job)}
+            <div class="job-meta">
             <div class="job-title">${job.title}</div>
             <div class="company-name">${job.company} · ${job.location}</div>
           </div>
@@ -328,8 +448,125 @@ function renderCards() {
           <div class="salary">${job.salary}</div>
           <div class="time-ago">${job.time}</div>
         </div>
-      </a>`;
+      </a>
+      </div>`;
   }).join('');
+}
+
+function getSharePopover() {
+  let pop = document.getElementById('sharePopover');
+  if (!pop) {
+    pop = document.createElement('div');
+    pop.id = 'sharePopover';
+    pop.className = 'share-popover hidden';
+    pop.innerHTML = `
+      <div class="share-popover-header">Compartir oferta</div>
+      <div class="share-popover-row">
+        <input readonly class="share-input" id="sharePopoverInput" aria-label="Enlace de la oferta" />
+        <button type="button" class="share-copy-btn">Copiar</button>
+      </div>
+    `;
+    document.body.appendChild(pop);
+  }
+  return pop;
+}
+
+function closeSharePopover() {
+  const pop = document.getElementById('sharePopover');
+  if (pop) pop.classList.add('hidden');
+}
+
+function openSharePopover(button, url) {
+  const pop = getSharePopover();
+  const input = pop.querySelector('.share-input');
+  if (!input) return;
+
+  const absoluteUrl = new URL(url, document.baseURI).href;
+  input.value = absoluteUrl;
+
+  const rect = button.getBoundingClientRect();
+  const left = Math.min(Math.max(rect.left + rect.width / 2 - 170, 16), window.innerWidth - 336);
+  const top = rect.bottom + window.scrollY + 10;
+
+  pop.style.left = `${left}px`;
+  pop.style.top = `${top}px`;
+  pop.classList.remove('hidden');
+  pop.style.position = 'absolute';
+}
+
+function initSharePopover() {
+  const grid = document.getElementById('offersGrid');
+  const pop = getSharePopover();
+  if (!grid || !pop) return;
+
+  grid.addEventListener('click', (event) => {
+    const btn = event.target.closest('.card-share-btn');
+    if (!btn) return;
+    event.preventDefault();
+    event.stopPropagation();
+    openSharePopover(btn, btn.dataset.link || window.location.href);
+  });
+
+  pop.addEventListener('click', (event) => {
+    event.stopPropagation();
+  });
+
+  document.addEventListener('click', closeSharePopover);
+
+  const copyBtn = pop.querySelector('.share-copy-btn');
+  copyBtn?.addEventListener('click', async () => {
+    const input = pop.querySelector('.share-input');
+    if (!input) return;
+    try {
+      await navigator.clipboard.writeText(input.value);
+      showToast('Link copiado al portapapeles', 'success');
+    } catch (err) {
+      console.error('Error copiando enlace:', err);
+      showToast('No se pudo copiar el link', 'error');
+    }
+  });
+}
+
+function initFavoritesOnCards() {
+  const grid = document.getElementById('offersGrid');
+  if (!grid) return;
+
+  grid.addEventListener('click', async (event) => {
+    const btn = event.target.closest('.card-fav-btn');
+    if (!btn) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    const session = getSession();
+    const isCandidato = String(session?.rol || '').toLowerCase() === 'candidato' && Boolean(session?.candidatoId);
+    if (!session?.token || !isCandidato) {
+      window.location.href = UI_PAGES.login;
+      return;
+    }
+
+    const jobId = btn.dataset.id;
+    if (!jobId) return;
+
+    const offerLink = getOfferFavoriteLink(jobId);
+    const isSaved = FAVORITE_LINKS.includes(offerLink);
+    const nextLinks = isSaved
+      ? FAVORITE_LINKS.filter((link) => link !== offerLink)
+      : [...FAVORITE_LINKS, offerLink];
+
+    btn.disabled = true;
+    try {
+      await updateFavoriteLinksOnServer(nextLinks);
+      btn.classList.toggle('active', !isSaved);
+      btn.title = !isSaved ? 'Quitar de favoritos' : 'Agregar a favoritos';
+      btn.setAttribute('aria-label', !isSaved ? 'Quitar de favoritos' : 'Agregar a favoritos');
+      showToast(!isSaved ? 'Oferta agregada a favoritos' : 'Oferta eliminada de favoritos', !isSaved ? 'success' : 'info');
+    } catch (err) {
+      console.error('[Ofertas] Error actualizando favoritos:', err.message);
+      showToast('No se pudo actualizar favoritos', 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  });
 }
 
 /* ─────────────────────────────────
@@ -517,20 +754,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   initReveal();
 
   showSkeleton();
+  initSharePopover();
+  initFavoritesOnCards();
 
   // Cargar ofertas reales desde la API
   try {
-    const data = await API.getOfertas();
+    const [data, empresaFallback] = await Promise.all([
+      API.getOfertas(),
+      getEmpresaLogoFallback(),
+    ]);
+    const detailLogoUrls = await loadMissingLogoUrlsFromDetails(data);
 
     // Llenar con datos reales
     OFERTAS.length = 0;
     data.forEach((job) => {
+      const logoUrl = resolveJobLogoUrl(job, empresaFallback) || detailLogoUrls.get(job.id) || '';
       OFERTAS.push({
         id: job.id,
         title: job.titulo,
         company: job.empresa?.nombre || 'Empresa',
         location: job.ubicacion,
         logo: job.empresa?.nombre?.charAt(0).toUpperCase() || '?',
+        logoUrl,
         logoColor: '#5C6BC0',
         tags: [job.modalidad, job.jornada, ...(job.habilidades?.slice(0, 1) || [])],
         tagTypes: [job.modalidad === 'Remoto' ? 'remote' : '', '', ''],
@@ -576,5 +821,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (_) { /* silencioso */ }
 
   renderAllFilters(industriasCustom);
+  await loadFavoriteLinks();
   applyAndRender();
 });

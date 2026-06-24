@@ -38,14 +38,54 @@ export class ProfileController {
   updateCandidato(
     @Param('id') id: string,
     @Body() body: {
-      nombre?:    string;
-      apellido?:  string;
-      ubicacion?: string;
-      telefono?:  string;
-      linkedin?:  string;
+      nombre?:            string;
+      apellido?:          string;
+      ubicacion?:         string;
+      telefono?:          string;
+      linkedin?:          string;
+      areaRubro?:         string;
+      modalidadBuscada?:  string;
+      pretensionSalarial?: string;
+      favoritos?:         string[];
+      fotoUrl?:           string;
     },
   ) {
     return this.profileService.updateCandidato(id, body);
+  }
+
+  // POST /api/profile/candidato/:id/foto — sube la foto de perfil
+  @Post('candidato/:id/foto')
+  @UseGuards(JwtGuard)
+  @UseInterceptors(
+    FileInterceptor('foto', {
+      storage: memoryStorage(),
+      fileFilter: (_req, file, cb) => {
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) {
+          return cb(new BadRequestException('Solo se aceptan imágenes JPG, PNG o WebP'), false);
+        }
+        cb(null, true);
+      },
+      limits: { fileSize: 10 * 1024 * 1024 },
+    }),
+  )
+  async uploadCandidatoFoto(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) throw new BadRequestException('No se recibió ninguna imagen');
+
+    const fotoUrl = await this.storageService.subirFotoPerfil(
+      file.buffer,
+      file.originalname,
+      id,
+      file.mimetype,
+    );
+
+    if (!fotoUrl) throw new BadRequestException('No se pudo subir la foto');
+
+    await this.profileService.updateCandidatoFoto(id, fotoUrl);
+
+    return { fotoUrl, message: 'Foto subida correctamente' };
   }
 
   // POST /api/profile/candidato/:id/cv — sube el CV en PDF
@@ -127,7 +167,8 @@ export class ProfileController {
       return { message: 'CV re-analizado correctamente y datos estructurados actualizados' };
     } catch (error) {
       console.error('Error al intentar re-analizar el CV:', error);
-      throw new BadRequestException('Fallo al re-analizar el CV: ' + error.message);
+      const message = error instanceof Error ? error.message : String(error);
+      throw new BadRequestException('Fallo al re-analizar el CV: ' + message);
     }
   }
 
@@ -154,6 +195,41 @@ export class ProfileController {
     },
   ) {
     return this.profileService.updateEmpresaByUserId(req.user.sub, body);
+  }
+
+  // POST /api/profile/empresa/logo
+  @Post('empresa/logo')
+  @UseGuards(JwtGuard)
+  @UseInterceptors(
+    FileInterceptor('logo', {
+      storage: memoryStorage(),
+      fileFilter: (_req, file, cb) => {
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) {
+          return cb(new BadRequestException('Solo se aceptan imágenes JPG, PNG o WebP'), false);
+        }
+        cb(null, true);
+      },
+      limits: { fileSize: 10 * 1024 * 1024 },
+    }),
+  )
+  async uploadEmpresaLogo(
+    @Req() req: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) throw new BadRequestException('No se recibió ninguna imagen');
+
+    const logoUrl = await this.storageService.subirFotoPerfil(
+      file.buffer,
+      file.originalname,
+      req.user.sub,
+      file.mimetype,
+    );
+
+    if (!logoUrl) throw new BadRequestException('No se pudo subir el logo');
+
+    await this.profileService.updateEmpresaLogoByUserId(req.user.sub, logoUrl);
+
+    return { logoUrl, message: 'Logo subido correctamente' };
   }
 
   // GET /api/profile/empresa/:id

@@ -17,6 +17,7 @@ model Usuario {
 
   candidato Candidato?
   empresa   Empresa?
+  notificaciones Notificacion[]
 }
 
 enum Rol {
@@ -32,12 +33,17 @@ model Candidato {
   ubicacion            String?
   telefono             String?
   linkedin             String?
+  areaRubro            String?
+  modalidadBuscada     String?
+  pretensionSalarial   String?
+  fotoUrl              String?
   cvUrl                String?
   scoreCV              Int?
   resumenIA            String?
   habilidades          String[] // array plano usado por el match IA low-token
   habilidadesFaltantes String[] // sugerencias de la IA
   formacion            String[] // títulos y estudios detectados por la IA
+  favoritos            String[] @default([]) // enlaces de ofertas guardadas por el candidato
   creadoEn             DateTime @default(now())
 
   usuarioId String  @unique
@@ -84,6 +90,7 @@ model Empresa {
   descripcion   String?
   ubicacion     String?
   sitioWeb      String?
+  logoUrl       String?
   anoFundacion  Int?
   tamanoEmpresa String?
   creadoEn      DateTime @default(now())
@@ -173,4 +180,18 @@ enum Estado {
   REVISADA
   ENTREVISTA
   RECHAZADA
+}
+
+// ── NOTIFICACIONES ──
+model Notificacion {
+  id       String   @id @default(uuid())
+  titulo   String
+  mensaje  String
+  tipo     String   @default("info") // info, success, warning, alert
+  leida    Boolean  @default(false)
+  link     String?
+  creadoEn DateTime @default(now())
+
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId String
 }

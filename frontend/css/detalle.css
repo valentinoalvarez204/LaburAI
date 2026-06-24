@@ -49,18 +49,28 @@
   margin-bottom: 24px;
 }
 .jhc-logo {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
+  width: 130px;
+  height: 90px;
+  margin: 0 auto 10px;
+  border-radius: 20px;
   background: var(--bg2);
   border: 1.5px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-head);
-  font-size: 26px;
+  font-size: 13px;
   font-weight: 800;
   flex-shrink: 0;
+  overflow: hidden;
+}
+.jhc-logo.company-logo--image img {
+  object-fit: cover;
+  padding: 0;
+}
+.jhc-logo.company-logo--image {
+  background: transparent;
+  border: none;
 }
 .jhc-meta    { flex: 1; min-width: 0; }
 .jhc-tags    { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
@@ -295,7 +305,7 @@
   border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-head); font-size: 22px; font-weight: 800;
-  color: #fff; flex-shrink: 0;
+  color: #fff; flex-shrink: 0; overflow: hidden;
 }
 .cp-name    { font-family: var(--font-head); font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
 .cp-sector  { font-size: 13px; color: var(--text3); }
@@ -428,7 +438,7 @@
 
 /* Mini card empresa en sidebar */
 .company-mini-head  { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
-.company-mini-logo  { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 16px; font-weight: 800; color: #fff; flex-shrink: 0; }
+.company-mini-logo  { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 16px; font-weight: 800; color: #fff; flex-shrink: 0; overflow: hidden; }
 .company-mini-name  { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text); }
 .company-mini-sector { font-size: 12px; color: var(--text3); margin-top: 2px; }
 .company-mini-desc  { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 12px; }
@@ -547,7 +557,7 @@
   border-radius: var(--r);
   border: 1px solid var(--border);
 }
-.mjp-logo  { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 16px; font-weight: 800; flex-shrink: 0; }
+.mjp-logo  { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 16px; font-weight: 800; flex-shrink: 0; overflow: hidden; }
 .mjp-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text); }
 .mjp-company { font-size: 12px; color: var(--text3); margin-top: 2px; }
 
@@ -682,7 +692,7 @@
   .cp-stat         { min-width: 50%; }
 }
 @media (max-width: 480px) {
-  .jhc-logo  { width: 48px; height: 48px; font-size: 20px; }
+  .jhc-logo  { width: 130px; height: 90px; margin: 0 auto 10px; border-radius: 20px; font-size: 13px; }
   .jhc-title { font-size: 18px; }
   .match-ring-wrap { display: none; }
 }

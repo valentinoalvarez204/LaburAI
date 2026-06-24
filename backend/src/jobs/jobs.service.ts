@@ -51,7 +51,7 @@ export class JobsService {
       where,
       include: {
         empresa: {
-          select: { nombre: true, industria: true, ubicacion: true },
+          select: { nombre: true, industria: true, ubicacion: true, logoUrl: true },
         },
         postulaciones: {
           select: { id: true, estado: true },
@@ -64,7 +64,7 @@ export class JobsService {
     return ofertas.map(o => {
       const vencida = o.fechaLimite && o.fechaLimite < ahora;
       const estado = o.esBorrador ? 'BORRADOR' : (vencida ? 'CERRADA' : 'ACTIVA');
-      return { ...o, estado };
+      return { ...o, estado, logoUrl: o.empresa?.logoUrl || null };
     });
   }
 

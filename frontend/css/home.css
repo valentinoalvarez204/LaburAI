@@ -39,6 +39,29 @@
 /* Contenido izquierdo */
 .hero-left { position: relative; z-index: 1; }
 
+.hero-title-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.hero-title-photo {
+  position: absolute;
+  width: min(450px, 44vw);
+  right: -940px;
+  top: 180%;
+  transform: translateY(-50%);
+  opacity: .2;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero-title-photo-secondary {
+  width: min(380px, 44vw);
+  right: 450px;
+  top: 49%;
+  opacity: .2;
+}
+
 .ai-badge {
   display: inline-flex;
   align-items: center;
@@ -71,6 +94,8 @@
 }
 
 .hero-title {
+  position: relative;
+  z-index: 1;
   font-family: var(--font-head);
   font-size: clamp(34px, 4.5vw, 58px);
   font-weight: 800;
@@ -243,6 +268,24 @@
   gap: 12px;
   margin-top: 32px;
 }
+.categories-head {
+  text-align: center;
+}
+.categories-head .eyebrow {
+  justify-content: center;
+}
+.categories-head .sec-header {
+  justify-content: center;
+}
+.categories-head .sec-sub {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+.categories-head .see-all {
+  position: absolute;
+  right: var(--pad-x);
+}
 .cat-card {
   background: var(--white);
   border: 1.5px solid var(--border);
@@ -259,69 +302,6 @@
 .cat-icon  { width: 44px; height: 44px; border-radius: 12px; background: var(--grad-soft); border: 1.5px solid #D8DCF2; display: flex; align-items: center; justify-content: center; font-size: 22px; }
 .cat-name  { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.4; }
 .cat-count { font-size: 12px; color: var(--muted); }
-
-/* ─────────────────────────────────
-   TABS (filtros de ofertas)
-───────────────────────────────── */
-.tabs { display: flex; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; }
-.tab {
-  background: var(--white);
-  border: 1.5px solid var(--border);
-  color: var(--text2);
-  padding: 7px 18px;
-  border-radius: 100px;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all .2s;
-  cursor: pointer;
-}
-.tab.active { background: var(--grad); border-color: transparent; color: #fff; box-shadow: 0 2px 10px rgba(92, 107, 192, 0.3); }
-
-/* ─────────────────────────────────
-   TARJETAS DE OFERTAS
-───────────────────────────────── */
-.jobs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
-}
-.job-card {
-  background: var(--white);
-  border: 1.5px solid var(--border);
-  border-radius: var(--r2);
-  padding: 22px;
-  position: relative;
-  transition: all .22s;
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-}
-.job-card:hover { border-color: var(--indigo); box-shadow: var(--shadow-lg); transform: translateY(-3px); }
-
-.match-badge {
-  position: absolute;
-  top: 16px; right: 16px;
-  background: var(--grad-soft);
-  border: 1.5px solid #D0D5F0;
-  color: var(--indigo);
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 8px;
-}
-.job-card-head  { display: flex; gap: 13px; align-items: flex-start; margin-bottom: 14px; }
-.company-logo   { width: 44px; height: 44px; border-radius: 12px; background: var(--bg2); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 17px; font-weight: 800; flex-shrink: 0; }
-.job-meta       { flex: 1; min-width: 0; }
-.job-title      { font-family: var(--font-head); font-size: 15px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; color: var(--text); }
-.company-name   { font-size: 13px; color: var(--text2); }
-
-.job-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-.job-tag  { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 6px; background: var(--bg2); border: 1.5px solid var(--border); color: var(--text2); }
-.job-tag.remote { background: #EEF1FF; border-color: #C5CCF0; color: var(--indigo); }
-.job-tag.hot    { background: #FFF3E0; border-color: #FFCC80; color: #E65100; }
-
-.job-footer  { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--border); }
-.salary      { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text); }
-.time-ago    { font-size: 11px; color: var(--text3); }
 
 /* ─────────────────────────────────
    CÓMO FUNCIONA
@@ -413,11 +393,14 @@
   .stat        { min-width: 50%; }
 }
 @media (max-width: 720px) {
-  .jobs-grid   { grid-template-columns: 1fr; }
+  .categories-head .sec-header { flex-direction: column; align-items: center; gap: 10px; }
+  .categories-head .see-all { position: static; }
   .search-box  { flex-direction: column; border-radius: var(--r); }
   .search-sep  { display: none; }
   .search-btn  { height: 48px; justify-content: center; width: 100%; }
   .hero        { padding-top: 60px; }
+  .hero-title-photo { width: min(260px, 72vw); right: -35px; opacity: .14; }
+  .hero-title-photo-secondary { width: min(190px, 54vw); right: 10px; top: 18%; opacity: .12; }
 }
 @media (max-width: 480px) {
   .cat-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }

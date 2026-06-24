@@ -479,7 +479,9 @@ footer {
   border-radius: 8px;
 }
 .job-card-head  { display: flex; gap: 13px; align-items: flex-start; margin-bottom: 14px; }
-.company-logo   { width: 44px; height: 44px; border-radius: 12px; background: var(--bg2); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 17px; font-weight: 800; flex-shrink: 0; }
+.company-logo   { width: 90px; height: 65px; border-radius: 12px; background: var(--bg2); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 17px; font-weight: 800; flex-shrink: 0; overflow: hidden; }
+.company-logo.company-logo--image { background: transparent; border: none; }
+.company-logo--image img { width: 100%; height: 100%; object-fit: cover; display: block; padding: 0; }
 .job-meta       { flex: 1; min-width: 0; }
 .job-title      { font-family: var(--font-head); font-size: 15px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; color: var(--text); }
 .company-name   { font-size: 13px; color: var(--text2); }
@@ -491,6 +493,60 @@ footer {
 .job-footer     { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--border); margin-top: auto; }
 .salary         { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text); }
 .time-ago       { font-size: 11px; color: var(--text3); }
+
+.share-popover {
+  position: absolute;
+  z-index: 9999;
+  width: min(340px, calc(100vw - 32px));
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-lg);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+.share-popover.hidden { display: none; }
+.share-popover-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.share-popover-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+.share-input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg2);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--font-body);
+}
+.share-input:focus {
+  outline: none;
+  border-color: var(--indigo);
+}
+.share-copy-btn {
+  border: none;
+  background: var(--indigo);
+  color: #fff;
+  padding: 11px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.share-copy-btn:hover {
+  filter: brightness(1.05);
+}
 
 /* ─────────────────────────────────
    BREADCRUMB
@@ -729,4 +785,317 @@ footer {
 @media (max-width: 480px) {
   .footer-grid    { grid-template-columns: 1fr; }
   .footer-bottom  { flex-direction: column; text-align: center; }
+}
+/* ─────────────────────────────────
+   DROPDOWN DE NOTIFICACIONES (NAVBAR)
+───────────────────────────────── */
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: -10px;
+  width: 340px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-lg);
+  display: none;
+  flex-direction: column;
+  z-index: 400;
+  overflow: hidden;
+  animation: notif-in .25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.notif-dropdown.active { display: flex; }
+
+@keyframes notif-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.notif-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg2);
+}
+.notif-header h4 { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text); }
+.notif-mark-all {
+  font-size: 11px; font-weight: 600; color: var(--indigo);
+  background: none; border: none; padding: 4px 8px;
+  cursor: pointer; border-radius: 6px;
+}
+.notif-mark-all:hover { background: var(--white); }
+
+.notif-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+.notif-empty { padding: 40px 20px; text-align: center; color: var(--text3); font-size: 13px; }
+
+.notif-item {
+  padding: 14px 18px;
+  display: flex;
+  gap: 12px;
+  cursor: pointer;
+  transition: background .2s;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+  position: relative;
+}
+.notif-item:hover { background: var(--bg); }
+.notif-item.unread { background: rgba(92, 107, 192, 0.03); }
+.notif-item.unread .notif-i-status {
+  width: 8px; height: 8px; background: var(--indigo);
+  border-radius: 50%; margin-top: 5px; flex-shrink: 0;
+}
+.notif-i-content { flex: 1; min-width: 0; }
+.notif-i-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.notif-i-msg { font-size: 12px; color: var(--text2); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.notif-i-date { font-size: 11px; color: var(--text3); margin-top: 6px; }
+
+.notif-footer {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  background: var(--white);
+}
+.notif-footer a { font-size: 12px; font-weight: 600; color: var(--indigo); }
+.notif-footer a:hover { text-decoration: underline; }
+
+/* Badge de número en la campana */
+#notifDot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  background: var(--error);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 2px solid var(--white);
+  padding: 0 4px;
+}
+
+/* ─────────────────────────────────
+   TOAST DE NOTIFICACIÓN REAL-TIME
+───────────────────────────────── */
+#notifPortal {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+.rt-notif {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 14px 18px;
+  width: 320px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+  border: 1.5px solid var(--border);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  pointer-events: all;
+  cursor: pointer;
+  animation: rt-in .4s cubic-bezier(0.17, 0.67, 0.5, 1.28);
+  transition: all .3s ease;
+}
+@keyframes rt-in {
+  from { opacity: 0; transform: translateX(40px) scale(0.9); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+.rt-notif.hiding {
+  opacity: 0;
+  transform: translateX(40px);
+}
+.rt-notif .icon-box {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--grad-soft); color: var(--indigo);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.rt-notif .content { flex: 1; }
+.rt-notif .title { font-family: var(--font-head); font-size: 13px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+.rt-notif .msg { font-size: 12px; color: var(--text2); line-height: 1.4; }
+
+/* Colores por tipo */
+.rt-notif--success .icon-box { background: #E8F5E9; color: var(--success); }
+.rt-notif--alert .icon-box   { background: #FFEBEE; color: var(--error); }
+/* Reusable image cropper */
+.image-crop-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(17, 24, 39, .54);
+}
+
+.image-crop-modal.hidden {
+  display: none;
+}
+
+.image-crop-dialog {
+  width: min(420px, 100%);
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r2);
+  box-shadow: var(--shadow-lg);
+  padding: 20px;
+}
+
+.image-crop-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.modal-close-btn {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.image-crop-preview {
+  width: min(280px, 72vw);
+  aspect-ratio: 1;
+  margin: 0 auto 18px;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1.5px solid var(--border);
+  background: var(--bg2);
+  position: relative;
+}
+
+.image-crop-preview img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: none;
+  transform-origin: center;
+  user-select: none;
+  pointer-events: none;
+}
+
+.image-crop-controls {
+  display: grid;
+  gap: 8px;
+}
+
+.image-crop-zoom-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  gap: 8px;
+}
+
+.image-crop-step {
+  width: 36px;
+  height: 32px;
+  padding: 0;
+}
+
+.image-crop-controls input[type="range"] {
+  width: 100%;
+}
+
+.image-crop-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+/* Oculta la foto/logo redondo del usuario en la navbar.
+   La imagen de perfil se mantiene disponible en dashboard/perfil. */
+#navbar .avatar-circle,
+.navbar .avatar-circle,
+#navbar .nav-user .avatar-circle,
+#navbar .user-menu .avatar-circle {
+  display: none !important;
+}
+
+body #navbar .avatar-circle,
+body #navbar .nav-avatar,
+body #navbar .user-avatar,
+body #navbar .avatar-img,
+body #navbar .avatar-photo,
+body #navbar .profile-avatar,
+body .navbar .avatar-circle,
+body .navbar .nav-avatar,
+body .navbar .user-avatar,
+body .navbar .avatar-img,
+body .navbar .avatar-photo,
+body .navbar .profile-avatar {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+/* Ajuste del óvalo de usuario en navbar: sin foto, nombre centrado y flecha más marcada. */
+body #navbar .nav-user,
+body #navbar .navbar-user,
+body #navbar .user-menu,
+body #navbar .user-dropdown,
+body #navbar .avatar-dropdown,
+body #navbar .nav-user-btn,
+body #navbar .user-menu-btn,
+body #navbar .dropdown-toggle,
+body .navbar .nav-user,
+body .navbar .navbar-user,
+body .navbar .user-menu,
+body .navbar .user-dropdown,
+body .navbar .avatar-dropdown,
+body .navbar .nav-user-btn,
+body .navbar .user-menu-btn,
+body .navbar .dropdown-toggle {
+  min-width: 168px;
+  padding-left: 24px !important;
+  padding-right: 18px !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+body #navbar .avatar-name,
+body #navbar .user-name,
+body #navbar .nav-user-name,
+body .navbar .avatar-name,
+body .navbar .user-name,
+body .navbar .nav-user-name {
+  flex: 1 1 auto;
+  text-align: center !important;
+}
+
+body #navbar .avatar-arrow,
+body #navbar .dropdown-arrow,
+body #navbar .chevron,
+body #navbar [class*="arrow"],
+body .navbar .avatar-arrow,
+body .navbar .dropdown-arrow,
+body .navbar .chevron,
+body .navbar [class*="arrow"] {
+  font-weight: 900 !important;
+  stroke-width: 3 !important;
 }

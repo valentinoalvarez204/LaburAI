@@ -8,6 +8,7 @@ import { ProfileModule } from './profile/profile.module';
 import { StatsModule } from './stats/stats.module';
 import { EntrevistasModule } from './entrevistas/entrevistas.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 import { PrismaModule } from './prisma.module';
 import { AiModule } from './ai/ai.module';
@@ -23,6 +24,7 @@ import { AiModule } from './ai/ai.module';
     StatsModule,
     EntrevistasModule,
     DashboardModule,
+    NotificationsModule,
     AiModule,
   ],
 })

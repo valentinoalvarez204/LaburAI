@@ -270,13 +270,12 @@
         <div class="postulaciones-list" id="postulacionesList"></div>
       </section>
 
-      <!-- ── SECCIÓN: RECOMENDADAS ── -->
-      <section id="recomendadas" class="dash-section hidden">
+      <!-- ── SECCIÓN: FAVORITOS ── -->
+      <section id="favoritos" class="dash-section hidden">
         <div class="section-title-row">
-          <h2 class="dash-section-title">Ofertas recomendadas para vos</h2>
-          <span class="ai-pill-sm">✦ Ordenadas por compatibilidad IA</span>
+          <h2 class="dash-section-title">Favoritos</h2>
         </div>
-        <div class="rec-grid" id="recGrid"></div>
+        <div class="offers-grid" id="favGrid"></div>
       </section>
 
       <!-- ── SECCIÓN: MI PERFIL ── -->
@@ -288,6 +287,14 @@
         <div class="profile-form-grid">
           <div class="pf-card">
             <h3 class="pf-card-title">Datos personales</h3>
+            <div class="candidato-foto-upload">
+              <div class="cfu-avatar" id="candProfileAvatar">?</div>
+              <div>
+                <div class="cfu-name" id="candProfileName">Cargando…</div>
+                <input type="file" id="candFotoInput" accept="image/png,image/jpeg,image/webp" hidden />
+                <button type="button" class="btn-ghost btn-sm" id="btnCambiarFoto" style="margin-top:6px">Cambiar foto</button>
+              </div>
+            </div>
             <div class="form-row">
               <div class="form-field">
                 <label class="form-label">Nombre</label>
@@ -329,37 +336,36 @@
             <h3 class="pf-card-title">Perfil profesional</h3>
             <div class="form-field">
               <label class="form-label">Área / Rubro</label>
-              <select class="form-select">
-                <option selected>Ventas y Comercial</option>
-                <option>Administración y RRHH</option>
-                <option>Tecnología e IT</option>
-                <option>Salud y Medicina</option>
-                <option>Educación y Docencia</option>
+              <select id="profileAreaRubro" class="form-select">
+                <option value="" selected disabled>Seleccioná un rubro</option>
+                <option value="Ventas y Comercial">Ventas y Comercial</option>
+                <option value="Administración y RRHH">Administración y RRHH</option>
+                <option value="Tecnología e IT">Tecnología e IT</option>
+                <option value="Salud y Medicina">Salud y Medicina</option>
+                <option value="Educación y Docencia">Educación y Docencia</option>
               </select>
             </div>
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label">Años de experiencia</label>
-                <select class="form-select">
-                  <option>1 – 2 años</option>
-                  <option>3 – 5 años</option>
-                  <option selected>5 – 10 años</option>
-                  <option>Más de 10 años</option>
-                </select>
-              </div>
-              <div class="form-field">
-                <label class="form-label">Modalidad buscada</label>
-                <select class="form-select">
-                  <option>Presencial</option>
-                  <option selected>Remoto</option>
-                  <option>Híbrido</option>
-                  <option>Indiferente</option>
-                </select>
-              </div>
+            <div class="form-field">
+              <label class="form-label">Modalidad buscada</label>
+              <select id="profileModalidadBuscada" class="form-select">
+                <option value="Presencial">Presencial</option>
+                <option value="Remoto">Remoto</option>
+                <option value="Híbrido">Híbrido</option>
+                <option value="Indiferente">Indiferente</option>
+              </select>
             </div>
             <div class="form-field">
               <label class="form-label">Pretensión salarial</label>
-              <input type="text" class="form-input" value="$500.000 – $700.000"/>
+              <select id="profilePretensionSalarial" class="form-select">
+                <option value="" selected disabled>Seleccioná una pretensión</option>
+                <option value="$800000-$1200000">$800.000 - $1.200.000</option>
+                <option value="$1200000-$1800000">$1.200.000 - $1.800.000</option>
+                <option value="$1800000 +">+ $1.800.000</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Link - LinkedIn</label>
+              <input type="url" id="profileLinkedin" class="form-input" placeholder="https://www.linkedin.com/in/tu-perfil" value=""/>
             </div>
           </div>
           <!-- Configuración de cuenta -->
@@ -397,6 +403,7 @@
 
   <script src="../js/utils.js"></script>
   <script src="../js/api.js"></script>
+  <script src="../js/image-cropper.js"></script>
   <script src="../js/dashboard-candidato.js"></script>
 </body>
 </html>

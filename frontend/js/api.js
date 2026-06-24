@@ -9,6 +9,18 @@ const API_BASE = window.location.hostname === 'localhost' || window.location.hos
   ? 'http://localhost:3000/api'
   : 'https://laburai.onrender.com/api';
 
+function normalizeAssetUrl(url = '') {
+  const value = String(url || '').trim();
+  if (!value) return '';
+  if (/^(https?:|data:|blob:)/i.test(value)) return value;
+  if (value.startsWith('//')) return `${window.location.protocol}${value}`;
+
+  const backendBase = API_BASE.replace(/\/api$/, '');
+  if (value.startsWith('/')) return `${backendBase}${value}`;
+  if (value.startsWith('uploads/')) return `${backendBase}/${value}`;
+  return value;
+}
+
 /**
  * Wrapper base para llamadas a la API.
  * Lanza un Error si la respuesta no es 2xx.
@@ -250,6 +262,20 @@ async function patchPerfilCandidato(id, data) {
   }
 }
 
+async function uploadCandidatoFoto(id, file) {
+  try {
+    const formData = new FormData();
+    formData.append('foto', file);
+    return await apiFetch(`/profile/candidato/${id}/foto`, {
+      method: 'POST',
+      body: formData,
+    });
+  } catch (err) {
+    console.error(`[API] Error subiendo foto de candidato ${id}:`, err.message);
+    throw err;
+  }
+}
+
 async function postReAnalyzeCV(id) {
   try {
     return await apiFetch(`/profile/candidato/${id}/re-analyze`, { method: 'POST' });
@@ -307,6 +333,20 @@ async function patchPerfilEmpresa(data) {
   }
 }
 
+async function uploadEmpresaLogo(file) {
+  try {
+    const formData = new FormData();
+    formData.append('logo', file);
+    return await apiFetch(`/profile/empresa/logo`, {
+      method: 'POST',
+      body: formData,
+    });
+  } catch (err) {
+    console.error(`[API] Error subiendo logo de empresa:`, err.message);
+    throw err;
+  }
+}
+
 async function getIndustrias() {
   try {
     return await apiFetch(`/profile/industrias`);
@@ -316,9 +356,68 @@ async function getIndustrias() {
   }
 }
 /* ─────────────────────────────────
+   NOTIFICACIONES
+───────────────────────────────── */
+
+async function getNotifications() {
+  try {
+    return await apiFetch('/notifications');
+  } catch (err) {
+    console.error('[API] Error obteniendo notificaciones:', err.message);
+    throw err;
+  }
+}
+
+async function getNotificationsUnreadCount() {
+  try {
+    return await apiFetch('/notifications/unread-count');
+  } catch (err) {
+    console.error('[API] Error count notif:', err.message);
+    throw err;
+  }
+}
+
+async function patchNotificationRead(id) {
+  try {
+    return await apiFetch(`/notifications/${id}/read`, { method: 'PATCH' });
+  } catch (err) {
+    console.error('[API] Error marking notif as read:', err.message);
+    throw err;
+  }
+}
+
+async function patchNotificationsReadAll() {
+  try {
+    return await apiFetch('/notifications/read-all', { method: 'PATCH' });
+  } catch (err) {
+    console.error('[API] Error marking all as read:', err.message);
+    throw err;
+  }
+}
+
+async function deleteNotificationsAll() {
+  try {
+    return await apiFetch('/notifications/all', { method: 'DELETE' });
+  } catch (err) {
+    console.error('[API] Error deleting all notifications:', err.message);
+    throw err;
+  }
+}
+
+async function deleteNotification(id) {
+  try {
+    return await apiFetch(`/notifications/${id}`, { method: 'DELETE' });
+  } catch (err) {
+    console.error('[API] Error deleting notification:', err.message);
+    throw err;
+  }
+}
+
+/* ─────────────────────────────────
    EXPORT GLOBAL
 ───────────────────────────────── */
 window.API = {
+  normalizeAssetUrl,
   // Auth
   login,
   register,
@@ -341,11 +440,20 @@ window.API = {
   // Perfil
   getPerfilCandidato,
   patchPerfilCandidato,
+  uploadCandidatoFoto,
   postReAnalyzeCV,
   uploadCv,
   getPerfilEmpresa,
   // Match IA
   postJobMatchAnalysis,
   patchPerfilEmpresa,
+  uploadEmpresaLogo,
   getIndustrias,
+  // Notificaciones
+  getNotifications,
+  getNotificationsUnreadCount,
+  patchNotificationRead,
+  patchNotificationsReadAll,
+  deleteNotificationsAll,
+  deleteNotification,
 };
