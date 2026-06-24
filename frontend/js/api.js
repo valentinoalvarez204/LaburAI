@@ -9,6 +9,18 @@ const API_BASE = window.location.hostname === 'localhost' || window.location.hos
   ? 'http://localhost:3000/api'
   : 'https://laburai.onrender.com/api';
 
+function normalizeAssetUrl(url = '') {
+  const value = String(url || '').trim();
+  if (!value) return '';
+  if (/^(https?:|data:|blob:)/i.test(value)) return value;
+  if (value.startsWith('//')) return `${window.location.protocol}${value}`;
+
+  const backendBase = API_BASE.replace(/\/api$/, '');
+  if (value.startsWith('/')) return `${backendBase}${value}`;
+  if (value.startsWith('uploads/')) return `${backendBase}/${value}`;
+  return value;
+}
+
 /**
  * Wrapper base para llamadas a la API.
  * Lanza un Error si la respuesta no es 2xx.
@@ -405,6 +417,7 @@ async function deleteNotification(id) {
    EXPORT GLOBAL
 ───────────────────────────────── */
 window.API = {
+  normalizeAssetUrl,
   // Auth
   login,
   register,

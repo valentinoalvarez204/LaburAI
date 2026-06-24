@@ -154,16 +154,7 @@ export class ApplicationsService {
     return this.prisma.postulacion.findMany({
       where: { ofertaId },
       include: {
-        candidato: {
-          select: {
-            nombre: true,
-            apellido: true,
-            ubicacion: true,
-            habilidades: true,
-            scoreCV: true,
-            cvUrl: true,
-          },
-        },
+        candidato: true,
       },
       orderBy: { creadoEn: 'desc' },
     });

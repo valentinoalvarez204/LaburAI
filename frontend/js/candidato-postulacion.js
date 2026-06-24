@@ -172,11 +172,11 @@ function renderDetailPage(app) {
     skillsList.innerHTML = '<span class="text-secondary" style="font-size:13px">Habilidades no detectadas</span>';
   }
 
-  // --- Contacto ---
-  document.getElementById('candEmail').textContent = cand.usuario?.email || 'N/A';
+  // --- Datos del candidato ---
   document.getElementById('candPhone').textContent = cand.telefono || 'No proporcionado';
-  document.getElementById('candModalidadBuscada').textContent = cand.modalidadBuscada || 'No especificada';
+  document.getElementById('candEmail').textContent = cand.usuario?.email || cand.email || 'No proporcionado';
   document.getElementById('candAreaRubro').textContent = cand.areaRubro || 'No especificada';
+  document.getElementById('candModalidadBuscada').textContent = cand.modalidadBuscada || 'No especificada';
   document.getElementById('candPretensionSalarial').textContent = cand.pretensionSalarial || 'No especificada';
 
   // --- Motivación ---
