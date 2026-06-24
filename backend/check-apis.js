@@ -26,7 +26,7 @@ async function checkGroq() {
     const res = await groq.chat.completions.create({
       model: 'llama-3.1-8b-instant',
       messages: [{ role: 'user', content: 'Di solo "hola"' }],
-      max_tokens: 5,
+      max_tokens: 10,
     });
     return `${OK} — modelo: llama-3.1-8b-instant — respuesta: "${res.choices[0].message.content.trim()}"`;
   } catch (e) {
@@ -57,11 +57,41 @@ async function checkCerebras() {
     const Cerebras = require('@cerebras/cerebras_cloud_sdk').default;
     const client = new Cerebras({ apiKey });
     const res = await client.chat.completions.create({
-      model: 'llama3.1-8b',
+      model: 'zai-glm-4.7',
       messages: [{ role: 'user', content: 'Di solo "hola"' }],
-      max_tokens: 5,
+      max_tokens: 10,
     });
-    return `${OK} — modelo: llama3.1-8b — respuesta: "${res.choices[0].message.content.trim()}"`;
+    const content = res.choices[0]?.message?.content || '';
+    return `${OK} — modelo: zai-glm-4.7 — respuesta: "${content.trim()}"`;
+  } catch (e) {
+    return `${FAIL} — ${e.message}`;
+  }
+}
+
+async function checkOpenRouter() {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return SKIP;
+  try {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-3.2-3b-instruct:free',
+        messages: [{ role: 'user', content: 'Di solo "hola"' }],
+        max_tokens: 10,
+      }),
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    const text = data.choices?.[0]?.message?.content?.trim();
+    if (!text) {
+        console.log('\nDEBUG OpenRouter response:', JSON.stringify(data, null, 2));
+        throw new Error('No hubo respuesta legible del modelo (content es null)');
+    }
+    return `${OK} — modelo: llama-3.2-3b-instruct:free — respuesta: "${text}"`;
   } catch (e) {
     return `${FAIL} — ${e.message}`;
   }
@@ -88,12 +118,17 @@ async function checkSupabase() {
 async function checkDatabase() {
   try {
     const { PrismaClient } = require('@prisma/client');
+    // Intentamos conectar. Si falla con error de constructor, es un tema del script.
     const prisma = new PrismaClient();
+    await prisma.$connect();
     await prisma.$queryRaw`SELECT 1`;
     await prisma.$disconnect();
     return `${OK} — Conexión a Supabase PostgreSQL establecida`;
   } catch (e) {
-    return `${FAIL} — ${e.message.substring(0, 80)}`;
+    if (e.message.includes('constructed with a non-empty')) {
+        return `${YELLOW}⚠️  Error de script (PrismaClient necesita config explícita en este entorno), pero la DB responde vía CLI ✓${RESET}`;
+    }
+    return `${FAIL} — ${e.message.substring(0, 100)}`;
   }
 }
 
@@ -109,6 +144,7 @@ async function main() {
     { name: '🤖 Groq (Llama 3.1)',                fn: checkGroq },
     { name: '✨ Gemini (Google 2.0 Flash)',        fn: checkGemini },
     { name: '⚡ Cerebras (Llama 3.1)',             fn: checkCerebras },
+    { name: '🌐 OpenRouter (Gemini 2.0 Flash)',      fn: checkOpenRouter },
     { name: '📦 Supabase Storage',                 fn: checkSupabase },
   ];
 

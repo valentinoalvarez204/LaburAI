@@ -102,9 +102,20 @@ function renderDetailPage(app) {
       btnTab.style.display = 'inline-block';
     }
     const cvFilename = document.getElementById('cvFilename');
+    const cvThumbnailContainer = document.getElementById('cvThumbnailContainer');
+    const cvPlaceholder = document.getElementById('cvPlaceholder');
+
     if (cvFilename) {
       cvFilename.textContent = finalCvUrl.split('/').pop().split('?')[0] || 'Documento CV';
     }
+
+    if (cvThumbnailContainer) {
+      cvThumbnailContainer.innerHTML = '<div class="cv-thumb-loading"><div class="mini-spinner"></div></div>';
+      cvThumbnailContainer.style.display = 'flex';
+      if (cvPlaceholder) cvPlaceholder.style.display = 'none';
+      renderPdfThumbnail(finalCvUrl, 'cvThumbnailContainer');
+    }
+
     const cvScorePill = document.getElementById('cvScorePill');
     if (cvScorePill && cand.scoreCV !== undefined && cand.scoreCV !== null) {
       cvScorePill.textContent = `Score: ${cand.scoreCV}`;
@@ -113,6 +124,9 @@ function renderDetailPage(app) {
       cvScorePill.style.display = 'none';
     }
   } else {
+    const cvThumbnailContainer = document.getElementById('cvThumbnailContainer');
+    if (cvThumbnailContainer) cvThumbnailContainer.style.display = 'none';
+    
     if (cvBody) {
       cvBody.innerHTML = `
         <div class="cv-fullscreen-placeholder">
@@ -505,6 +519,53 @@ async function hydratePostulacionLogosAndPhotos() {
     setPostulacionCandidatePhoto(candidato.fotoUrl || '', candidateName);
   } catch (error) {
     console.warn('[CandidatoPostulacion] No se pudo cargar la foto de la postulación:', error.message);
+  }
+}
+
+
+/**
+ * renderPdfThumbnail — Usa pdf.js para renderizar la primera hoja en un canvas
+ */
+async function renderPdfThumbnail(url, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container || !url) return;
+
+  try {
+    // Configurar worker de pdf.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const loadingTask = pdfjsLib.getDocument(url);
+    const pdf = await loadingTask.promise;
+    const page = await pdf.getPage(1);
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    // Queremos que el canvas se ajuste al ancho del contenedor (aprox 240px)
+    const viewport = page.getViewport({ scale: 1.5 }); // Escala base mayor para calidad
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    const renderContext = {
+      canvasContext: context,
+      viewport: viewport
+    };
+
+    await page.render(renderContext).promise;
+
+    // Reemplazar spinner por el canvas
+    container.innerHTML = '';
+    container.appendChild(canvas);
+    canvas.className = 'cv-thumbnail-canvas';
+
+  } catch (err) {
+    console.error('[CV-Thumb] Error renderizando PDF:', err);
+    container.innerHTML = `
+      <div class="cv-thumb-error">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Error de vista previa</span>
+      </div>
+    `;
   }
 }
 

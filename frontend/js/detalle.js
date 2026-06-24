@@ -114,10 +114,14 @@ function renderPage(oferta) {
     } else if (oferta.analizado) {
       renderMatchRing(oferta.match);
       setText('matchPct', `${oferta.match}%`);
-      if (analyzeBtn) analyzeBtn.disabled = true;
+      // Habilitamos el botón incluso si ya fue analizado para permitir re-análisis
+      if (analyzeBtn) {
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = 'Volver a analizar match';
+      }
       if (matchNote) {
         matchNote.style.display = '';
-        matchNote.textContent = 'Este puesto ya fue analizado. No se puede repetir.';
+        matchNote.textContent = 'Podés volver a analizar si actualizaste tu perfil.';
       }
     } else {
       if (matchWrapper) matchWrapper.style.display = 'none';
@@ -125,7 +129,7 @@ function renderPage(oferta) {
       if (analyzeBtn) analyzeBtn.disabled = false;
       if (matchNote) {
         matchNote.style.display = '';
-        matchNote.textContent = `Te quedan ${oferta.analisisRestantes} análisis de match.`;
+        matchNote.textContent = `Tenés análisis disponibles para esta oferta.`;
       }
     }
   } else {
@@ -397,15 +401,16 @@ function initMatchAnalysis(oferta) {
       renderMatchRing(oferta.match);
       setText('matchPct', `${oferta.match}%`);
       const matchNote = document.getElementById('matchNote');
-      if (matchNote) matchNote.textContent = 'Este puesto ya fue analizado. No se puede repetir.';
-      showToast('Match analizado con IA. Resultado disponible.', 'success');
+      if (matchNote) matchNote.textContent = 'Análisis actualizado con IA.';
+      showToast('Match analizado con IA. Resultado actualizado.', 'success');
     } catch (err) {
       console.error('Error analizando match:', err);
-      analyzeBtn.disabled = false;
       showToast(err.message || 'No se pudo analizar el match', 'error');
     } finally {
-      analyzeBtn.disabled = oferta.analizado;
-      analyzeBtn.textContent = 'Analizar match con IA';
+      if (analyzeBtn) {
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = 'Volver a analizar match';
+      }
     }
   });
 }

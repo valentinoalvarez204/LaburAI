@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { GeminiService } from './providers/gemini.service';
 import { GroqService } from './providers/groq.service';
 import { CerebrasService } from './providers/cerebras.service';
+import { OpenRouterService } from './providers/openrouter.service';
 
 export const AI_PROVIDER_TOKEN = 'AI_PROVIDER_TOKEN';
 
@@ -12,12 +13,14 @@ export const AI_PROVIDER_TOKEN = 'AI_PROVIDER_TOKEN';
     GeminiService,
     GroqService,
     CerebrasService,
+    OpenRouterService,
     {
       provide: AI_PROVIDER_TOKEN,
       useFactory: (
         geminiService: GeminiService,
         groqService: GroqService,
         cerebrasService: CerebrasService,
+        openRouterService: OpenRouterService,
       ) => {
         const providerName = (process.env.PROVEEDOR_IA || 'groq').toLowerCase();
 
@@ -26,12 +29,14 @@ export const AI_PROVIDER_TOKEN = 'AI_PROVIDER_TOKEN';
             return geminiService;
           case 'cerebras':
             return cerebrasService;
+          case 'openrouter':
+            return openRouterService;
           case 'groq':
           default:
             return groqService;
         }
       },
-      inject: [GeminiService, GroqService, CerebrasService],
+      inject: [GeminiService, GroqService, CerebrasService, OpenRouterService],
     },
   ],
   exports: [AI_PROVIDER_TOKEN],
