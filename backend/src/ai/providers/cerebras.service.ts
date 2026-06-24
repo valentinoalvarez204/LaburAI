@@ -116,7 +116,7 @@ export class CerebrasService implements IAPIService {
 
     try {
       const response: any = await this.client.chat.completions.create({
-        model: 'llama3.1-8b',
+        model: 'zai-glm-4.7',
         messages: [
           {
             role: 'system',
@@ -152,7 +152,7 @@ export class CerebrasService implements IAPIService {
 
     try {
       const response: any = await this.client.chat.completions.create({
-        model: 'llama3.1-8b',
+        model: 'gpt-oss-120b',
         messages: [
           {
             role: 'system',
